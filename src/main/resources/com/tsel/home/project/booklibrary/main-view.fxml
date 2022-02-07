@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="mainStage" maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #F7F3F2;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.MainViewController">
+   <children>
+      <AnchorPane prefHeight="125.0" prefWidth="1000.0" style="-fx-background-color: #05A380;" AnchorPane.bottomAnchor="473.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label layoutX="38.0" layoutY="20.0" text="𝐌𝐲" textFill="#074e46">
+               <font>
+                  <Font size="60.0" />
+               </font>
+            </Label>
+            <Label layoutX="123.0" layoutY="20.0" text="𝐋𝐢𝐛𝐫𝐚𝐫𝐲" textFill="#f7f3f2">
+               <font>
+                  <Font size="60.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <SplitPane dividerPositions="0.3405535499398315" layoutY="127.0" prefHeight="431.0" prefWidth="833.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="127.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="429.0" prefWidth="289.0" style="-fx-background-color: #F7F3F2;">
+               <children>
+                  <TableView layoutX="12.0" layoutY="40.0" prefHeight="379.0" prefWidth="260.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="Номер" />
+                      <TableColumn prefWidth="75.0" text="Название" />
+                    </columns>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </TableView>
+                  <Button fx:id="addBookButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#addBook" prefHeight="3.0" prefWidth="123.0" style="-fx-background-color: #058264;" text="Добавить книгу" textFill="WHITE" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="428.0" prefWidth="401.0" style="-fx-background-color: #F7F3F2;">
+               <children>
+                  <Label layoutX="260.0" layoutY="8.0" prefHeight="37.0" prefWidth="386.0" text="Информация о книге" AnchorPane.bottomAnchor="426.0" AnchorPane.leftAnchor="260.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="8.0">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                  </Label>
+                  <BorderPane layoutX="10.0" layoutY="45.0" style="-fx-border-color: black;" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="45.0">
+                     <center>
+                        <ImageView fitHeight="351.0" fitWidth="242.0" pickOnBounds="true" preserveRatio="true" style="-fx-blend-mode: black;" />
+                     </center>
+                  </BorderPane>
+                  <Button layoutX="14.0" layoutY="427.0" mnemonicParsing="false" prefHeight="3.0" prefWidth="123.0" style="-fx-background-color: #058264;" text="Изменить" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <Button layoutX="148.0" layoutY="427.0" mnemonicParsing="false" prefHeight="3.0" prefWidth="123.0" style="-fx-background-color: #058264;" text="Удалить" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <GridPane layoutX="259.0" layoutY="48.0" prefHeight="310.0" prefWidth="213.0" style="-fx-border-color: black;" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="259.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="45.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="0.0" prefWidth="183.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="305.0" minWidth="10.0" prefWidth="201.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Название">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="5.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Автор" GridPane.rowIndex="1">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="5.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Издатель" GridPane.rowIndex="2">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="5.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Количество страниц" GridPane.rowIndex="3">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="5.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Номер полки" GridPane.rowIndex="4">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="5.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Прочитано" GridPane.rowIndex="5">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="5.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Цикл" GridPane.rowIndex="6">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="5.0" />
+                           </GridPane.margin>
+                        </Label>
+                        <Label text="Завершённый цикл?" GridPane.rowIndex="7">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="5.0" />
+                           </GridPane.margin>
+                        </Label>
+                     </children>
+                  </GridPane>
+                  <Label layoutX="10.0" layoutY="8.0" prefHeight="37.0" prefWidth="244.0" text="Обложка">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>
