@@ -1,5 +1,7 @@
-package com.tsel.home.project.booklibrary.book;
+package com.tsel.home.project.booklibrary.repository.impl;
 
+import com.tsel.home.project.booklibrary.builder.BookBuilder;
+import com.tsel.home.project.booklibrary.data.Book;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,14 +54,13 @@ class BookRepositoryTest {
     }
 
     private Book createBook(long number) {
-        return BookBuilder.buildBook()
+        return BookBuilder.builder()
                 .name("name" + number)
                 .publisher("publisher" + number)
                 .author("author" + number)
                 .pages(100)
                 .bookshelf(1)
                 .read(true)
-                .fullSeries(true)
                 .build();
     }
 }

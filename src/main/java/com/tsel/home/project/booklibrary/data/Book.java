@@ -1,29 +1,30 @@
-package com.tsel.home.project.booklibrary.book;
+package com.tsel.home.project.booklibrary.data;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Objects;
 
-public class Book implements Serializable {
+public class Book implements BaseEntity {
 
     @Serial
     private static final long serialVersionUID = -88421120419730807L;
 
-    private Long id;
     private String name;
     private String author;
     private String publisher;
     private Integer pages;
     private Integer bookshelf;
     private Boolean read;
-    private Boolean fullSeries;
+    private String cycleName;
+    private Integer numberInSeries;
+    private String coverImgAbsolutePath;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    @Override
+    public String getKey() {
+        String compositeKey = name + "_" + author;
+        if (numberInSeries != null) {
+            compositeKey += "_" + numberInSeries;
+        }
+        return compositeKey;
     }
 
     public String getName() {
@@ -74,12 +75,28 @@ public class Book implements Serializable {
         this.read = read;
     }
 
-    public Boolean getFullSeries() {
-        return fullSeries;
+    public String getCycleName() {
+        return cycleName;
     }
 
-    public void setFullSeries(Boolean fullSeries) {
-        this.fullSeries = fullSeries;
+    public void setCycleName(String cycleName) {
+        this.cycleName = cycleName;
+    }
+
+    public Integer getNumberInSeries() {
+        return numberInSeries;
+    }
+
+    public void setNumberInSeries(Integer numberInSeries) {
+        this.numberInSeries = numberInSeries;
+    }
+
+    public String getCoverImgAbsolutePath() {
+        return coverImgAbsolutePath;
+    }
+
+    public void setCoverImgAbsolutePath(String coverImgAbsolutePath) {
+        this.coverImgAbsolutePath = coverImgAbsolutePath;
     }
 
     @Override
@@ -87,32 +104,34 @@ public class Book implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return id.equals(book.id)
-                && Objects.equals(name, book.name)
-                && Objects.equals(author, book.author)
-                && Objects.equals(publisher, book.publisher)
-                && Objects.equals(pages, book.pages)
+        return name.equals(book.name)
+                && author.equals(book.author)
+                && publisher.equals(book.publisher)
+                && pages.equals(book.pages)
                 && Objects.equals(bookshelf, book.bookshelf)
                 && Objects.equals(read, book.read)
-                && Objects.equals(fullSeries, book.fullSeries);
+                && Objects.equals(cycleName, book.cycleName)
+                && Objects.equals(numberInSeries, book.numberInSeries)
+                && Objects.equals(coverImgAbsolutePath, book.coverImgAbsolutePath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, author, publisher, pages, bookshelf, read, fullSeries);
+        return Objects.hash(name, author, publisher, pages, bookshelf, read, cycleName, numberInSeries, coverImgAbsolutePath);
     }
 
     @Override
     public String toString() {
         return "Book{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", author='" + author + '\'' +
                 ", publisher='" + publisher + '\'' +
                 ", pages=" + pages +
                 ", bookshelf=" + bookshelf +
                 ", read=" + read +
-                ", fullSeries=" + fullSeries +
+                ", cycleName='" + cycleName + '\'' +
+                ", numberInSeries=" + numberInSeries +
+                ", coverImgAbsolutePath=" + coverImgAbsolutePath +
                 '}';
     }
 }

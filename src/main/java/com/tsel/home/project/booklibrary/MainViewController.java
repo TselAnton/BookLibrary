@@ -1,12 +1,11 @@
 package com.tsel.home.project.booklibrary;
 
-import com.tsel.home.project.booklibrary.book.BookRepository;
+import com.tsel.home.project.booklibrary.repository.impl.BookRepository;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
@@ -19,17 +18,15 @@ import static java.util.Objects.requireNonNull;
 public class MainViewController extends Application {
 
     private final BookRepository bookRepository = BookRepository.getInstance();
-    private Image image = null;
+
+    private Image iconImage = null;
 
     @FXML
     private AnchorPane mainStage;
 
-    @FXML
-    private Button addBookButton;
-
     public MainViewController() {
         try {
-            image = new Image(requireNonNull(MainViewController.class.getResourceAsStream("icon.png")));
+            iconImage = new Image(requireNonNull(MainViewController.class.getResourceAsStream("icon.png")));
         } catch (Exception e) {
             e.printStackTrace();
             //todo: logger it
@@ -42,7 +39,7 @@ public class MainViewController extends Application {
         Scene scene = new Scene(mainWindowRoot.load());
         primaryStage.setResizable(false);
         primaryStage.setTitle("Book library");
-        primaryStage.getIcons().add(image);
+        primaryStage.getIcons().add(iconImage);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -50,6 +47,15 @@ public class MainViewController extends Application {
     @FXML
     public void addBook(ActionEvent actionEvent) throws IOException {
         showModalView("add-view.fxml", "Add new book");
+
+        //todo: update info
+    }
+
+    @FXML
+    public void editBook(ActionEvent actionEvent) throws IOException {
+        showModalView("edit-view.fxm", "Edit book");
+
+        //todo: update info
     }
 
     private void showModalView(String modalViewName, String title) throws IOException {
@@ -58,8 +64,9 @@ public class MainViewController extends Application {
 
         Stage newWindow = new Stage();
         newWindow.setTitle(title);
-        newWindow.getIcons().add(image);
+        newWindow.getIcons().add(iconImage);
         newWindow.setScene(secondScene);
+        newWindow.setResizable(false);
         newWindow.initModality(Modality.WINDOW_MODAL);
 
         Stage primaryStage = (Stage) mainStage.getScene().getWindow();
