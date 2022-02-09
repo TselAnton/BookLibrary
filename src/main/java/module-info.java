@@ -11,5 +11,8 @@ module com.tsel.home.project.booklibrary {
     requires eu.hansolo.tilesfx;
 
     exports com.tsel.home.project.booklibrary;
+    exports com.tsel.home.project.booklibrary.dto;
+
     opens com.tsel.home.project.booklibrary to javafx.fxml;
+    opens com.tsel.home.project.booklibrary.dto to javafx.fxml;
 }

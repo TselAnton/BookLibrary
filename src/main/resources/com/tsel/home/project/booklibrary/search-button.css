@@ -1,0 +1,25 @@
+.search-button {
+    -icon-paint: #058264;
+    -fx-background-color: -icon-paint;
+    -size: 30;
+    -fx-min-height: -size;
+    -fx-min-width: -size;
+    -fx-max-height: -size;
+    -fx-max-width: -size;
+
+    -fx-shape: "M102 379 c-88 -44 -124 -146 -80 -229 43 -80 126 -114 209 -86 l42 15 39 -40 c41 -41 56 -47 76 -27 20 20 14 35 -27 76 l-40 39 15 42 c28 82 -6 166 -85 208 -55 29 -94 29 -149 2z m142 -48 c38 -26 55 -57 56 -104 0 -77 -50 -127 -127 -127 -71 1 -123 53 -123 123 0 101 111 162 194 108z";
+}
+
+.search-button:hover {
+    -icon-paint: #074E46;
+}
+
+.default-button {
+    -icon-paint: #058264;
+    -fx-background-color: -icon-paint;
+}
+
+.default-button:hover {
+    -icon-paint: #074E46;
+    -fx-background-color: -icon-paint;
+}
