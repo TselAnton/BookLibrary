@@ -208,5 +208,5 @@
         </Label>
     </AnchorPane>
     <Button fx:id="addButton" layoutX="166.0" layoutY="624.0" mnemonicParsing="false" onAction="#addBook" styleClass="default-button" stylesheets="@search-button.css" text="Добавить" textFill="WHITE" />
-    <Button fx:id="cancelButton" layoutX="245.0" layoutY="624.0" mnemonicParsing="false" onAction="#cancel" styleClass="default-button" stylesheets="@search-button.css" text="Отмена" textFill="WHITE" />
+    <Button fx:id="cancelButton" layoutX="245.0" layoutY="624.0" mnemonicParsing="false" onAction="#cancelAdding" styleClass="default-button" stylesheets="@search-button.css" text="Отмена" textFill="WHITE" />
 </AnchorPane>

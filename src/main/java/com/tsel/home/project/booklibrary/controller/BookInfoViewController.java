@@ -2,17 +2,13 @@ package com.tsel.home.project.booklibrary.controller;
 
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
-import com.tsel.home.project.booklibrary.repository.impl.BookRepository;
-import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -22,13 +18,14 @@ import java.util.Optional;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
-public class BookInfoViewController {
+public class BookInfoViewController extends AbstractViewController {
 
-    private static final BookRepository bookRepository = BookRepository.getInstance();
+    private static final String OK = "OK";
 
-    private static final CycleRepository cycleRepository = CycleRepository.getInstance();
+    @FXML
+    private AnchorPane mainPane;
 
     @FXML
     private Label nameLabel;
@@ -65,12 +62,31 @@ public class BookInfoViewController {
 
     private Book book;
 
-    public void initData(String bookKey) {
-        book = bookRepository.getByName(bookKey);
+    public BookInfoViewController() {
+        super(null, null);
+    }
+
+    @Override
+    public void initController(AbstractViewController parentController, String bookKey) {
+        book = BOOK_REPOSITORY.getByName(bookKey);
         if (book == null) {
-            throw new IllegalStateException(format("Not found book by key = %s", bookKey));
+            throw new IllegalStateException(format("Not found book by key = %s for book info controller", bookKey));
         }
 
+        updateView();
+    }
+
+    @Override
+    public void updateControllerState(String bookKey) {
+        book = BOOK_REPOSITORY.getByName(bookKey);
+        if (book == null) {
+            throw new IllegalStateException(format("Not found book by key = %s for book info controller", bookKey));
+        }
+
+        updateView();
+    }
+
+    private void updateView() {
         nameLabel.setText(book.getName());
         authorLabel.setText(book.getAuthor());
         publisherLabel.setText(book.getPublisher());
@@ -80,7 +96,7 @@ public class BookInfoViewController {
         readCheck.setSelected(book.getRead());
 
         if (isNotBlank(book.getCycleName())) {
-            Cycle cycle = cycleRepository.getByName(book.getCycleName());
+            Cycle cycle = CYCLE_REPOSITORY.getByName(book.getCycleName());
 
             cycleLabel.setText(format("%s (%d / %d)", cycle.getName(), book.getNumberInSeries(), cycle.getBooksInCycle()));
             cycleEnded.setSelected(cycle.getEnded());
@@ -107,21 +123,24 @@ public class BookInfoViewController {
     }
 
     @FXML
-    public void editBook(ActionEvent actionEvent) {
-
+    public void editBook() {
+        loadModalView("Edit book", "edit-view.fxml", mainPane, book.getKey(),
+                this, 0, -25);
+        updateView();
     }
 
     @FXML
-    public void deleteBook(ActionEvent actionEvent) {
-        Alert warnAlert = new Alert(Alert.AlertType.CONFIRMATION);
+    public void deleteBook() {
+        Alert warnAlert = new Alert(CONFIRMATION);
         warnAlert.setTitle("Внимание!");
         warnAlert.setHeaderText("Вы уверены?");
         warnAlert.setContentText("Книга будет безвозратно удалена из библиотеки");
-        Optional<ButtonType> answer = warnAlert.showAndWait();
+        Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Вы уверены?",
+                "Книга будет безвозратно удалена из библиотеки");
 
-        if (answer.isPresent() && "OK".equals(answer.get().getText())) {
+        if (answer.isPresent() && OK.equals(answer.get().getText())) {
             Stage stage = (Stage) deleteButton.getScene().getWindow();
-            bookRepository.delete(book);
+            BOOK_REPOSITORY.delete(book);
             // todo: Заодно удалять автора и цикл, если таковых не имеется
             stage.close();
         }
