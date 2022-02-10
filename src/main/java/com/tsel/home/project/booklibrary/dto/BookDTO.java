@@ -1,5 +1,7 @@
 package com.tsel.home.project.booklibrary.dto;
 
+import javafx.scene.control.CheckBox;
+
 import java.util.Objects;
 
 public class BookDTO {
@@ -9,7 +11,7 @@ public class BookDTO {
     private String shelf;
     private String cycleName;
     private String cycleNumber;
-    private String read;
+    private CheckBox read;
 
     public String getName() {
         return name;
@@ -51,11 +53,11 @@ public class BookDTO {
         this.cycleNumber = cycleNumber;
     }
 
-    public String getRead() {
+    public CheckBox getRead() {
         return read;
     }
 
-    public void setRead(String read) {
+    public void setRead(CheckBox read) {
         this.read = read;
     }
 

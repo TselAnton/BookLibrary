@@ -27,14 +27,14 @@
       </AnchorPane>
     <AnchorPane layoutX="14.0" layoutY="140.0" minHeight="0.0" minWidth="0.0" prefHeight="460.0" prefWidth="1200.0" style="-fx-background-color: #F7F3F2;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="140.0">
          <children>
-            <TableView fx:id="bookTable" layoutX="12.0" layoutY="52.0" prefHeight="398.0" prefWidth="791.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="52.0">
+            <TableView fx:id="bookTable" layoutX="12.0" layoutY="52.0" onMouseClicked="#clickOnTable" prefHeight="398.0" prefWidth="980.0" style="-fx-alignment: CENTER-RIGHT;" stylesheets="@check-box.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="52.0">
               <columns>
                 <TableColumn fx:id="nameColumn" editable="false" prefWidth="319.0" text="Название" />
                 <TableColumn fx:id="authorColumn" maxWidth="1000.0" prefWidth="250.0" text="Автор" />
-                  <TableColumn fx:id="shelfColumn" maxWidth="200.0" text="Полка" />
+                  <TableColumn fx:id="shelfColumn" maxWidth="200.0" prefWidth="90.0" style="-fx-alignment: BASELINE_CENTER;" text="Полка" />
                   <TableColumn fx:id="cycleColumn" maxWidth="2000.0" prefWidth="150.0" text="Цикл" />
-                  <TableColumn fx:id="cycleNumberColumn" maxWidth="200.0" prefWidth="100.0" text="Номер" />
-                  <TableColumn fx:id="readColumn" editable="false" maxWidth="80.0" resizable="false" text="Прочитано" />
+                  <TableColumn fx:id="cycleNumberColumn" maxWidth="200.0" prefWidth="90.0" sortType="DESCENDING" style="-fx-alignment: BASELINE_CENTER;" text="Номер" />
+                  <TableColumn fx:id="readColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Прочитано" />
               </columns>
                <opaqueInsets>
                   <Insets />

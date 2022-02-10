@@ -1,4 +1,4 @@
-package com.tsel.home.project.booklibrary;
+package com.tsel.home.project.booklibrary.controller;
 
 import com.tsel.home.project.booklibrary.builder.BookBuilder;
 import com.tsel.home.project.booklibrary.builder.CycleBuilder;
@@ -11,7 +11,6 @@ import com.tsel.home.project.booklibrary.repository.impl.BookRepository;
 import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
 import com.tsel.home.project.booklibrary.repository.impl.PublisherRepository;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -79,7 +78,7 @@ public class AddBookViewController {
     private Button addButton;
 
     @FXML
-    public void cancel(ActionEvent actionEvent) {
+    public void cancel() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
@@ -119,7 +118,7 @@ public class AddBookViewController {
     }
 
     @FXML
-    public void chooseBookCover(ActionEvent actionEvent) {
+    public void chooseBookCover() {
         Stage stage = (Stage) selectFileButton.getScene().getWindow();
 
         File file = fileChooser.showOpenDialog(stage);
@@ -129,7 +128,7 @@ public class AddBookViewController {
     }
 
     @FXML
-    public void addBook(ActionEvent actionEvent) {
+    public void addBook() {
         String bookName = getInputText(nameInput);
         String author = getInputText(authorInput);
         String publisher = getInputText(publisherInput);
@@ -170,6 +169,8 @@ public class AddBookViewController {
             riseWarnMsg("Неверно заполнен номер полки", "Номер полки должен быть записан в виде целого числа");
             return;
         }
+
+        // Cycle validations
         if (isNotBlank(numberInCycle) && stringToInt(numberInCycle) == null) {
             riseWarnMsg("Неверно заполнен номер книги в цикле", "Номер книги в цикле должен быть записан в виде целого числа");
             return;
@@ -190,6 +191,15 @@ public class AddBookViewController {
             riseWarnMsg("Название цикла не заполнено", "Указано количество книг в цикле, но название цикла при этом не может быть пустым");
             return;
         }
+        if (isNotBlank(cycle) && isBlank(numberInCycle)) {
+            riseWarnMsg("Неверно заполнен номер книги в цикле", "Указано название цикла, но номер книги в цикле при этом не может быть пустым");
+            return;
+        }
+        if (isNotBlank(cycle) && isBlank(totalInCycle)) {
+            riseWarnMsg("Неверно заполнено количество книги в цикле", "Указано название цикла, но количество книг в цикле при этом не может быть пустым");
+            return;
+        }
+
 
         if (isNotBlank(cycle)) {
             Cycle newCycle = CycleBuilder.builder()
@@ -216,6 +226,11 @@ public class AddBookViewController {
                 .coverImgAbsolutePath(imagePath)
                 .build();
 
+        if (bookRepository.getByName(newBook.getKey()) != null) {
+            riseWarnMsg("Такая книга уже существует", "Книга с аналогичным названием, автором и номером цикла уже существует");
+            return;
+        }
+
         bookRepository.save(newBook);
 
         Stage stage = (Stage) addButton.getScene().getWindow();
@@ -241,14 +256,14 @@ public class AddBookViewController {
     }
 
     private boolean isChecked(CheckBox checkBox) {
-        return TRUE.equals(checkBox.isSelected());
+        return checkBox.isSelected();
     }
 
     private void riseWarnMsg(String warnMsg, String explanationMsg) {
-        Alert errorAlert = new Alert(Alert.AlertType.WARNING);
-        errorAlert.setTitle("Ошибка");
-        errorAlert.setHeaderText(warnMsg);
-        errorAlert.setContentText(explanationMsg);
-        errorAlert.showAndWait();
+        Alert warnAlert = new Alert(Alert.AlertType.WARNING);
+        warnAlert.setTitle("Ошибка");
+        warnAlert.setHeaderText(warnMsg);
+        warnAlert.setContentText(explanationMsg);
+        warnAlert.showAndWait();
     }
 }

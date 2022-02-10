@@ -1,6 +1,7 @@
 package com.tsel.home.project.booklibrary.data;
 
 import java.io.Serial;
+import java.util.Locale;
 import java.util.Objects;
 
 public class Book implements BaseEntity {
@@ -20,11 +21,17 @@ public class Book implements BaseEntity {
 
     @Override
     public String getKey() {
-        String compositeKey = name + "_" + author;
+        StringBuilder compositeKey = new StringBuilder();
+        compositeKey.append(name.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
+        compositeKey.append("_");
+        compositeKey.append(author.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
+
         if (numberInSeries != null) {
-            compositeKey += "_" + numberInSeries;
+            compositeKey.append("_");
+            compositeKey.append(numberInSeries);
         }
-        return compositeKey;
+
+        return compositeKey.toString();
     }
 
     public String getName() {
