@@ -1,12 +1,16 @@
 package com.tsel.home.project.booklibrary.controller;
 
 import com.tsel.home.project.booklibrary.dto.BookDTO;
+import com.tsel.home.project.booklibrary.search.SearchService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -19,6 +23,8 @@ import static java.util.stream.Collectors.toList;
 import static javafx.collections.FXCollections.observableArrayList;
 
 public class MainViewController extends AbstractViewController {
+
+    private static final SearchService SEARCH_SERVICE = new SearchService();
 
     private static final Map<String, String> TABLE_COLUMNS_SETTINGS;
 
@@ -39,7 +45,10 @@ public class MainViewController extends AbstractViewController {
     private Button searchButton;
 
     @FXML
-    private TableView<BookDTO> bookTable;
+    private TextField searchQueryField;
+
+    @FXML
+    private TableView<BookDTO> bookTableView;
 
     public MainViewController() {
         super("Book library", "main-view.fxml");
@@ -49,7 +58,7 @@ public class MainViewController extends AbstractViewController {
     @SuppressWarnings("unchecked")
     protected void afterInitScene(FXMLLoader loader) {
         initTableColumns(loader);
-        TableView<BookDTO> tableView = (TableView<BookDTO>) loader.getNamespace().get("bookTable");
+        TableView<BookDTO> tableView = (TableView<BookDTO>) loader.getNamespace().get("bookTableView");
         updateTableColumns(tableView);
     }
 
@@ -65,18 +74,18 @@ public class MainViewController extends AbstractViewController {
     public void addBook() {
         loadModalView("Add new book", "add-view.fxml", mainStage, null,
                 this, 300, -25);
-        updateTableColumns(bookTable);
+        updateTableColumns(bookTableView);
     }
 
     @FXML
     public void clickOnTable(MouseEvent mouseEvent) {
         if (isDoubleClick(mouseEvent)) {
-            BookDTO clickedEntity = bookTable.getSelectionModel().getSelectedItem();
+            BookDTO clickedEntity = bookTableView.getSelectionModel().getSelectedItem();
             String entityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
 
             loadModalView("Book info", "info-view.fxml", mainStage, entityKey,
                     this,  100, 0);
-            updateTableColumns(bookTable);
+            updateTableColumns(bookTableView);
         }
     }
 
@@ -84,12 +93,27 @@ public class MainViewController extends AbstractViewController {
         return MouseButton.PRIMARY.equals(mouseEvent.getButton()) && mouseEvent.getClickCount() >= 2;
     }
 
+    @FXML
+    private void searchLabelKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER) {
+            search();
+        }
+    }
+
+    @FXML
+    private void search() {
+        String searchQuery = searchQueryField.getText();
+        bookTableView.setItems(observableArrayList(SEARCH_SERVICE.search(searchQuery, getDtoBooks())));
+    }
+
     private void updateTableColumns(TableView<BookDTO> tableView) {
-        List<BookDTO> bookDTOS = BOOK_REPOSITORY.getAll()
+        tableView.setItems(observableArrayList(getDtoBooks()));
+    }
+
+    private List<BookDTO> getDtoBooks() {
+        return BOOK_REPOSITORY.getAll()
                 .stream()
                 .map(BOOK_CONVERTER::convert)
                 .collect(toList());
-
-        tableView.setItems(observableArrayList(bookDTOS));
     }
 }

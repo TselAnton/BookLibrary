@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -78,9 +79,7 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
 
     @Override
     public List<E> getAll() {
-        return repositoryMap.values()
-                .stream()
-                .toList();
+        return new ArrayList<>(repositoryMap.values());
     }
 
     @Override

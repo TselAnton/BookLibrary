@@ -42,6 +42,10 @@ public class BookConverter {
     }
 
      public String buildEntityKeyByDTO(BookDTO bookDTO) {
+        if (bookDTO == null) {
+            return null;
+        }
+
          StringBuilder compositeKey = new StringBuilder();
          compositeKey.append(bookDTO.getName().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
          compositeKey.append("_");
