@@ -22,10 +22,7 @@ import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractViewController {
 
-    private static final String RESOURCE_PATH = "/com/tsel/home/project/booklibrary/";
-
-    private final String title;
-    private final String resourceFile;
+    protected static final String RESOURCE_PATH = "/com/tsel/home/project/booklibrary/";
 
     protected Image iconImage = null;
 
@@ -35,6 +32,9 @@ public abstract class AbstractViewController {
     protected final static PublisherRepository PUBLISHER_REPOSITORY = PublisherRepository.getInstance();
 
     protected final static BookConverter BOOK_CONVERTER = new BookConverter();
+
+    private final String title;
+    private final String resourceFile;
 
     protected AbstractViewController(String title, String resourceFile) {
         this.title = title;

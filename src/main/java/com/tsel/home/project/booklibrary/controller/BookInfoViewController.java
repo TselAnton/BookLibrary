@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class BookInfoViewController extends AbstractViewController {
@@ -62,8 +63,19 @@ public class BookInfoViewController extends AbstractViewController {
 
     private Book book;
 
+    private Image defaultImg;
+
     public BookInfoViewController() {
         super(null, null);
+
+        try {
+            InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + "default.png");
+            defaultImg = new Image(requireNonNull(imageInputStream));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            //todo: log it
+        }
     }
 
     @Override
@@ -110,7 +122,10 @@ public class BookInfoViewController extends AbstractViewController {
             Path imgPath = Paths.get(book.getCoverImgAbsolutePath());
             if (Files.exists(imgPath)) {
                 try (InputStream inputStream = Files.newInputStream(imgPath)) {
-                    return new Image(inputStream);
+                    Image bookImage = new Image(inputStream);
+                    return bookImage.isError()
+                            ? defaultImg
+                            : bookImage;
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -118,8 +133,7 @@ public class BookInfoViewController extends AbstractViewController {
             }
         }
 
-        //todo: return default
-        return null;
+        return defaultImg;
     }
 
     @FXML
