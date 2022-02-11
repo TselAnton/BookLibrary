@@ -4,15 +4,12 @@ import com.tsel.home.project.booklibrary.data.Author;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
 import com.tsel.home.project.booklibrary.data.Publisher;
-import com.tsel.home.project.booklibrary.utils.StringUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
@@ -130,31 +127,11 @@ public class EditBookViewController extends AbstractEditViewController {
 
     @Override
     protected boolean doUpdate(Book newBook, Author newAuthor, Publisher newPublisher, Cycle newCycle) {
-        if (!book.getKey().equals(newBook.getKey())) {
-            BOOK_REPOSITORY.delete(book);
-        }
+        BOOK_REPOSITORY.delete(book);
+
         BOOK_REPOSITORY.save(newBook);
-
-        if (!book.getAuthor().equals(newBook.getAuthor())) {
-            if (isValueNotLinked(book.getAuthor(), Book::getAuthor)) {
-                AUTHOR_REPOSITORY.delete(new Author(book.getAuthor()));
-            }
-        }
         AUTHOR_REPOSITORY.save(newAuthor);
-
-        if (!book.getPublisher().equals(newBook.getPublisher())) {
-            if (isValueNotLinked(book.getPublisher(), Book::getPublisher)) {
-                PUBLISHER_REPOSITORY.delete(new Publisher(book.getPublisher()));
-            }
-        }
         PUBLISHER_REPOSITORY.save(newPublisher);
-
-        if (isNotBlank(book.getCycleName()) && isDifferentCycleName(book, newBook)) {
-            if (isValueNotLinked(book.getCycleName(), Book::getCycleName)) {
-                Cycle oldCycle = CYCLE_REPOSITORY.getByName(book.getCycleName());
-                CYCLE_REPOSITORY.delete(oldCycle);
-            }
-        }
 
         if (newCycle != null) {
             CYCLE_REPOSITORY.save(newCycle);
@@ -162,20 +139,5 @@ public class EditBookViewController extends AbstractEditViewController {
 
         parentController.updateControllerState(newBook.getKey());
         return true;
-    }
-
-    private boolean isValueNotLinked(String fieldValue, Function<Book, String> mapFunc) {
-        return BOOK_REPOSITORY.getAll()
-                .stream()
-                .map(mapFunc)
-                .filter(StringUtils::isNotBlank)
-                .noneMatch(value -> value.equals(fieldValue));
-    }
-
-    private boolean isDifferentCycleName(Book oldBook, Book newBook) {
-        String oldCycleName = oldBook.getCycleName();
-        String newCycleName = newBook.getCycleName();
-
-        return !oldCycleName.equals(newCycleName);
     }
 }

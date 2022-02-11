@@ -42,9 +42,6 @@ public class MainViewController extends AbstractViewController {
     private AnchorPane mainStage;
 
     @FXML
-    private Button searchButton;
-
-    @FXML
     private TextField searchQueryField;
 
     @FXML

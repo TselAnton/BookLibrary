@@ -141,7 +141,6 @@ public class BookInfoViewController extends AbstractViewController {
         if (answer.isPresent() && OK.equals(answer.get().getText())) {
             Stage stage = (Stage) deleteButton.getScene().getWindow();
             BOOK_REPOSITORY.delete(book);
-            // todo: Заодно удалять автора и цикл, если таковых не имеется
             stage.close();
         }
     }
