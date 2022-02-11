@@ -13,6 +13,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -22,7 +24,10 @@ import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractViewController {
 
+    protected static final Logger LOGGER = LogManager.getLogger(AbstractViewController.class);
     protected static final String RESOURCE_PATH = "/com/tsel/home/project/booklibrary/";
+
+    protected static final String OK = "OK";
 
     protected Image iconImage = null;
 
@@ -45,8 +50,7 @@ public abstract class AbstractViewController {
             iconImage = new Image(requireNonNull(imageInputStream));
 
         } catch (Exception e) {
-            e.printStackTrace();
-            //todo: log it
+            LOGGER.error("Exception while init abstract constructor", e);
         }
     }
 
@@ -69,8 +73,7 @@ public abstract class AbstractViewController {
             stage.show();
 
         } catch (Exception e) {
-            e.printStackTrace();
-            //todo: log it
+            LOGGER.error("Exception while start scene", e);
         }
     }
 
@@ -104,8 +107,7 @@ public abstract class AbstractViewController {
             stage.showAndWait();
 
         } catch (Exception e) {
-            e.printStackTrace();
-            //todo: log it
+            LOGGER.error("Exception while load model view", e);
         }
     }
 

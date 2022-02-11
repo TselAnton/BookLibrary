@@ -6,8 +6,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +27,7 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class BookInfoViewController extends AbstractViewController {
 
-    private static final String OK = "OK";
+    private static final Logger LOGGER = LogManager.getLogger(BookInfoViewController.class);
 
     @FXML
     private AnchorPane mainPane;
@@ -73,8 +77,7 @@ public class BookInfoViewController extends AbstractViewController {
             defaultImg = new Image(requireNonNull(imageInputStream));
 
         } catch (Exception e) {
-            e.printStackTrace();
-            //todo: log it
+            LOGGER.error("Exception while init BookInfoViewController", e);
         }
     }
 
@@ -96,6 +99,20 @@ public class BookInfoViewController extends AbstractViewController {
         }
 
         updateView();
+    }
+
+    @FXML
+    public void stageKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ESCAPE) {
+            Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Закрыть окно?", "");
+
+            if (answer.isPresent() && OK.equals(answer.get().getText())) {
+                Stage stage = (Stage) editBookButton.getScene().getWindow();
+                stage.close();
+            }
+        } else if (keyEvent.getCode() == KeyCode.ENTER) {
+            editBook();
+        }
     }
 
     private void updateView() {
@@ -145,10 +162,6 @@ public class BookInfoViewController extends AbstractViewController {
 
     @FXML
     public void deleteBook() {
-        Alert warnAlert = new Alert(CONFIRMATION);
-        warnAlert.setTitle("Внимание!");
-        warnAlert.setHeaderText("Вы уверены?");
-        warnAlert.setContentText("Книга будет безвозратно удалена из библиотеки");
         Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Вы уверены?",
                 "Книга будет безвозратно удалена из библиотеки");
 

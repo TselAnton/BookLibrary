@@ -1,26 +1,27 @@
 package com.tsel.home.project.booklibrary.controller;
 
+import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class MainViewController extends AbstractViewController {
 
@@ -78,16 +79,44 @@ public class MainViewController extends AbstractViewController {
     public void clickOnTable(MouseEvent mouseEvent) {
         if (isDoubleClick(mouseEvent)) {
             BookDTO clickedEntity = bookTableView.getSelectionModel().getSelectedItem();
-            String entityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
 
-            loadModalView("Book info", "info-view.fxml", mainStage, entityKey,
-                    this,  100, 0);
-            updateTableColumns(bookTableView);
+            if (clickedEntity != null) {
+                String entityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
+                loadModalView("Book info", "info-view.fxml", mainStage, entityKey,
+                        this, 100, 0);
+                updateTableColumns(bookTableView);
+            }
         }
     }
 
     private boolean isDoubleClick(MouseEvent mouseEvent) {
         return MouseButton.PRIMARY.equals(mouseEvent.getButton()) && mouseEvent.getClickCount() >= 2;
+    }
+
+    @FXML
+    public void tableViewKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.DELETE) {
+            BookDTO clickedEntity = bookTableView.getSelectionModel().getSelectedItem();
+
+            if (clickedEntity != null) {
+                Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Вы уверены?",
+                        "Книга будет безвозратно удалена из библиотеки");
+
+                if (answer.isPresent() && OK.equals(answer.get().getText())) {
+                    String deletedEntityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
+                    Book deletedEntity = BOOK_REPOSITORY.getByName(deletedEntityKey);
+                    BOOK_REPOSITORY.delete(deletedEntity);
+                    updateTableColumns(bookTableView);
+                }
+            }
+
+        } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
+            Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Закрыть приложение?", "");
+
+            if (answer.isPresent() && OK.equals(answer.get().getText())) {
+                System.exit(0);
+            }
+        }
     }
 
     @FXML

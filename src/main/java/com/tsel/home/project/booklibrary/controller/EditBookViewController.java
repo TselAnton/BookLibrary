@@ -5,17 +5,19 @@ import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
 import com.tsel.home.project.booklibrary.data.Publisher;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class EditBookViewController extends AbstractEditViewController {
 
@@ -97,6 +99,21 @@ public class EditBookViewController extends AbstractEditViewController {
             isEndedCycleCheckBox.setSelected(TRUE.equals(cycle.getEnded()));
             numberInCycleInput.setText(String.valueOf(book.getNumberInSeries()));
             totalCountInCycleInput.setText(String.valueOf(cycle.getBooksInCycle()));
+        }
+    }
+
+    @FXML
+    public void stageKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ESCAPE) {
+            Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Закрыть окно?",
+                    "Все несохранённые данные будут потеряны");
+
+            if (answer.isPresent() && OK.equals(answer.get().getText())) {
+                Stage stage = (Stage) cancelButton.getScene().getWindow();
+                stage.close();
+            }
+        } else if (keyEvent.getCode() == KeyCode.ENTER) {
+            editBook();
         }
     }
 
