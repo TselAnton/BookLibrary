@@ -151,7 +151,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                     "Количество страниц должно быть записано в виде целого числа");
             return;
         }
-        if (isNotBlank(shelfNumber) && stringToInt(shelfNumber) == null) {
+        if (stringToInt(shelfNumber) == null) {
             riseAlert(WARNING, "Ошибка","Неверно заполнен номер полки",
                     "Номер полки должен быть записан в виде целого числа");
             return;
