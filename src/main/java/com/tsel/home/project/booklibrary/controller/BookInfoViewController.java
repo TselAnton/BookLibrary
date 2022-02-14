@@ -3,6 +3,7 @@ package com.tsel.home.project.booklibrary.controller;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -12,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,6 +70,9 @@ public class BookInfoViewController extends AbstractViewController {
     @FXML
     private Button editBookButton;
 
+    @FXML
+    private GridPane bookInfoGrid;
+
     private Book book;
 
     private Image defaultImg;
@@ -107,12 +112,9 @@ public class BookInfoViewController extends AbstractViewController {
     @FXML
     public void stageKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Закрыть окно?", "");
+            Stage stage = (Stage) editBookButton.getScene().getWindow();
+            stage.close();
 
-            if (answer.isPresent() && OK.equals(answer.get().getText())) {
-                Stage stage = (Stage) editBookButton.getScene().getWindow();
-                stage.close();
-            }
         } else if (keyEvent.getCode() == KeyCode.ENTER) {
             editBook();
         }
