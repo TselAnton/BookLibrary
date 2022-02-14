@@ -5,6 +5,7 @@ import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -15,15 +16,18 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.util.stream.Collectors.toList;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
+import static javafx.stage.Modality.NONE;
 
 public class MainViewController extends AbstractViewController {
 
@@ -49,6 +53,8 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     private TableView<BookDTO> bookTableView;
+
+    private Stage lastOpenedBookViewStage;
 
     public MainViewController() {
         super("Book library", "main-view.fxml");
@@ -84,8 +90,12 @@ public class MainViewController extends AbstractViewController {
 
             if (clickedEntity != null) {
                 String entityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
-                loadModalView("Book info", "info-view.fxml", mainStage, entityKey,
-                        this, 100, 0);
+
+                if (lastOpenedBookViewStage != null) {
+                    lastOpenedBookViewStage.close();
+                }
+
+                loadBookView(mainStage, entityKey, this);
                 updateTableColumns(bookTableView);
             }
         }
@@ -143,5 +153,44 @@ public class MainViewController extends AbstractViewController {
                 .stream()
                 .map(BOOK_CONVERTER::convert)
                 .collect(toList());
+    }
+
+    protected void loadBookView(AnchorPane mainStage, String initEntityKey, AbstractViewController parentViewController) {
+        try {
+            FXMLLoader loader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + "info-view.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = new Stage() {
+                @Override
+                public void hide() {
+                    updateTableColumns(bookTableView);
+                    lastOpenedBookViewStage = null;
+                    super.hide();
+                }
+            };
+
+            stage.setResizable(false);
+            stage.setTitle("Book info");
+            stage.getIcons().add(iconImage);
+            stage.setScene(scene);
+            stage.initModality(NONE);
+
+            Stage primaryStage = (Stage) mainStage.getScene().getWindow();
+            stage.initOwner(primaryStage);
+
+            stage.setX(primaryStage.getX() + 100);
+            stage.setY(primaryStage.getY());
+
+            if (isNotBlank(initEntityKey)) {
+                AbstractViewController controller = loader.getController();
+                controller.initController(parentViewController, initEntityKey);
+            }
+
+            stage.show();
+            lastOpenedBookViewStage = stage;
+
+        } catch (Exception e) {
+            LOGGER.error("Exception while load model view", e);
+        }
     }
 }
