@@ -13,6 +13,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Optional;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
@@ -25,6 +26,8 @@ public abstract class AbstractEditViewController extends AbstractViewController 
 
     protected static final FileChooser FILE_CHOOSER = new FileChooser();
 
+    private File defaultFolder;
+
     public AbstractEditViewController() {
         super(null, null);
     }
@@ -36,6 +39,11 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                         TextField totalCountInCycleInput) {
 
         FILE_CHOOSER.setTitle("Выбрать обложку книги");
+
+        USER_SETTINGS_REPOSITORY.getLastChosenCoverFile()
+                .ifPresent(FILE_CHOOSER::setInitialDirectory);
+
+        defaultFolder = new File(System.getProperty("user.dir"));
 
         authorInput.setItems(initComboBoxValues(AUTHOR_REPOSITORY));
         publisherInput.setItems(initComboBoxValues(PUBLISHER_REPOSITORY));
@@ -73,9 +81,19 @@ public abstract class AbstractEditViewController extends AbstractViewController 
     protected void selectFileAsCover(Button selectFileButton, TextField imagePathTextField) {
         Stage stage = (Stage) selectFileButton.getScene().getWindow();
 
+        Optional<File> lastChosenFolderPath = USER_SETTINGS_REPOSITORY.getLastChosenCoverFile();
+
+        if (lastChosenFolderPath.isEmpty()) {
+            FILE_CHOOSER.setInitialDirectory(defaultFolder);
+        } else {
+            FILE_CHOOSER.setInitialDirectory(lastChosenFolderPath.get());
+        }
+
         File file = FILE_CHOOSER.showOpenDialog(stage);
         if (file != null) {
             imagePathTextField.setText(file.getAbsolutePath());
+
+            USER_SETTINGS_REPOSITORY.updateLastChosenCoverFile(file);
         }
     }
 

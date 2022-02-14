@@ -1,10 +1,7 @@
 package com.tsel.home.project.booklibrary.controller;
 
 import com.tsel.home.project.booklibrary.converter.BookConverter;
-import com.tsel.home.project.booklibrary.repository.impl.AuthorRepository;
-import com.tsel.home.project.booklibrary.repository.impl.BookRepository;
-import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
-import com.tsel.home.project.booklibrary.repository.impl.PublisherRepository;
+import com.tsel.home.project.booklibrary.repository.impl.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -35,6 +32,7 @@ public abstract class AbstractViewController {
     protected final static CycleRepository CYCLE_REPOSITORY = CycleRepository.getInstance();
     protected final static AuthorRepository AUTHOR_REPOSITORY = AuthorRepository.getInstance();
     protected final static PublisherRepository PUBLISHER_REPOSITORY = PublisherRepository.getInstance();
+    protected final static UserSettingsRepository USER_SETTINGS_REPOSITORY = UserSettingsRepository.getInstance();
 
     protected final static BookConverter BOOK_CONVERTER = new BookConverter();
 
