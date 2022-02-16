@@ -61,10 +61,12 @@ public abstract class AbstractViewController {
             FXMLLoader windowLoader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + resourceFile));
             Scene scene = new Scene(windowLoader.load());
 
-            stage.setResizable(false);
             stage.setTitle(title);
             stage.getIcons().add(iconImage);
             stage.setScene(scene);
+
+            stage.setMinWidth(812);
+            stage.setMinHeight(700);
 
             afterInitScene(windowLoader);
 
