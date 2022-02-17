@@ -4,20 +4,28 @@ import com.tsel.home.project.booklibrary.builder.BookBuilder;
 import com.tsel.home.project.booklibrary.builder.CycleBuilder;
 import com.tsel.home.project.booklibrary.data.*;
 import com.tsel.home.project.booklibrary.repository.FileRepository;
+import com.tsel.home.project.booklibrary.utils.AutoCompleteComboBoxListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.Alert.AlertType.WARNING;
@@ -51,6 +59,10 @@ public abstract class AbstractEditViewController extends AbstractViewController 
 
         cycleInput.setOnAction(event ->
                 updateCycleInfo(cycleInput, isEndedCycleCheckBox, totalCountInCycleInput));
+
+        new AutoCompleteComboBoxListener<>(authorInput);
+        new AutoCompleteComboBoxListener<>(publisherInput);
+        new AutoCompleteComboBoxListener<>(cycleInput);
     }
 
     private ObservableList<String> initComboBoxValues(FileRepository<?> repository) {
@@ -91,10 +103,30 @@ public abstract class AbstractEditViewController extends AbstractViewController 
 
         File file = FILE_CHOOSER.showOpenDialog(stage);
         if (file != null) {
-            imagePathTextField.setText(file.getAbsolutePath());
-
             USER_SETTINGS_REPOSITORY.updateLastChosenCoverFile(file);
+
+            if (isValidImage(file.getAbsolutePath())) {
+                imagePathTextField.setText(file.getAbsolutePath());
+            } else {
+                riseAlert(WARNING, "Ошибка", "Указанный файл невозможно открыть как картинку",
+                        "Файл имеет не поддерживаемое расширение или повреждён");
+            }
         }
+    }
+
+    private boolean isValidImage(String absolutePath) {
+        Path imgPath = Paths.get(absolutePath);
+        if (Files.exists(imgPath)) {
+            try (InputStream inputStream = Files.newInputStream(imgPath)) {
+                Image bookImage = new Image(inputStream);
+                return !bookImage.isError();
+
+            } catch (IOException e) {
+                LOGGER.error(format("Exception while load img %s", absolutePath), e);
+            }
+        }
+
+        return false;
     }
 
     protected void addBook(TextField nameInput,

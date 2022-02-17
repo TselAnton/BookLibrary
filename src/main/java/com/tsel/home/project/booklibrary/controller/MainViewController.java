@@ -204,7 +204,11 @@ public class MainViewController extends AbstractViewController {
     }
 
     private void updateTableColumns(TableView<BookDTO> bookTableView) {
-        bookTableView.setItems(observableArrayList(getDtoBooks()));
+        bookTableView.setItems(observableArrayList(
+                getDtoBooks().stream()
+                        .sorted(Comparator.comparing(BookDTO::getName))
+                        .toList()
+                ));
     }
 
     private List<BookDTO> getDtoBooks() {

@@ -150,7 +150,7 @@ public class BookInfoViewController extends AbstractViewController {
                             : bookImage;
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
                 }
             }
         }
