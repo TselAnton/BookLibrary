@@ -11,6 +11,7 @@ public class BookDTO {
     private String shelf;
     private String cycleName;
     private String cycleNumber;
+    private CheckBox cycleEnded;
     private CheckBox read;
 
     public String getName() {
@@ -53,6 +54,14 @@ public class BookDTO {
         this.cycleNumber = cycleNumber;
     }
 
+    public CheckBox getCycleEnded() {
+        return cycleEnded;
+    }
+
+    public void setCycleEnded(CheckBox cycleEnded) {
+        this.cycleEnded = cycleEnded;
+    }
+
     public CheckBox getRead() {
         return read;
     }
@@ -71,12 +80,13 @@ public class BookDTO {
                 && Objects.equals(shelf, bookDTO.shelf)
                 && Objects.equals(cycleName, bookDTO.cycleName)
                 && Objects.equals(cycleNumber, bookDTO.cycleNumber)
+                && Objects.equals(cycleEnded, bookDTO.cycleEnded)
                 && Objects.equals(read, bookDTO.read);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, author, shelf, cycleName, cycleNumber, read);
+        return Objects.hash(name, author, shelf, cycleName, cycleNumber, cycleEnded, read);
     }
 
     @Override
@@ -87,7 +97,8 @@ public class BookDTO {
                 ", shelf='" + shelf + '\'' +
                 ", cycleName='" + cycleName + '\'' +
                 ", cycleNumber='" + cycleNumber + '\'' +
-                ", read='" + read + '\'' +
+                ", cycleEnded=" + cycleEnded +
+                ", read=" + read +
                 '}';
     }
 }

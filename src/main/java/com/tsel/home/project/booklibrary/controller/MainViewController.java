@@ -3,6 +3,7 @@ package com.tsel.home.project.booklibrary.controller;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchService;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -29,11 +30,8 @@ public class MainViewController extends AbstractViewController {
 
     private static final SearchService SEARCH_SERVICE = new SearchService();
 
-    private static final Comparator<CheckBox> CHECK_BOX_COMPARATOR =
-            (checkBox1, checkBox2) -> Boolean.compare(checkBox2.isSelected(), checkBox1.isSelected());
-
-    private static final Comparator<String> STRING_NUMBER_COMPARATOR =
-            (strValue1, strValue2) -> Integer.compare(Integer.parseInt(strValue2), Integer.parseInt(strValue1));
+    private static final Comparator<String> STRING_NUMBER_COMPARATOR = comparingInt(Integer::parseInt);
+    private static final Comparator<String> NON_COMPARATOR = (x1, x2) -> 0;
 
     private static final Map<String, String> TABLE_COLUMNS_SETTINGS;
     private static final Map<String, Comparator> TABLE_COLUMNS_SORTING;
@@ -45,13 +43,16 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.put("shelfColumn", "shelf");
         TABLE_COLUMNS_SETTINGS.put("cycleColumn", "cycleName");
         TABLE_COLUMNS_SETTINGS.put("cycleNumberColumn", "cycleNumber");
+        TABLE_COLUMNS_SETTINGS.put("cycleEndColumn", "cycleEnded");
         TABLE_COLUMNS_SETTINGS.put("readColumn", "read");
 
         TABLE_COLUMNS_SORTING = new HashMap<>();
-        TABLE_COLUMNS_SORTING.put("readColumn", CHECK_BOX_COMPARATOR);
+        TABLE_COLUMNS_SORTING.put("readColumn", MainViewController::compareCheckBoxes);
+        TABLE_COLUMNS_SORTING.put("cycleEndColumn", MainViewController::compareCheckBoxes);
         TABLE_COLUMNS_SORTING.put("shelfColumn", STRING_NUMBER_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("nameColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("authorColumn", String.CASE_INSENSITIVE_ORDER);
+        TABLE_COLUMNS_SORTING.put("cycleColumn", NON_COMPARATOR);
     }
 
     @FXML
@@ -65,7 +66,7 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     private TableColumn<BookDTO, String> cycleColumn;
-    private boolean cycleColumnSortedByASC = false;
+    private boolean cycleColumnSortedByASC = true;
 
     private Stage lastOpenedBookViewStage;
 
@@ -76,23 +77,29 @@ public class MainViewController extends AbstractViewController {
     @Override
     @SuppressWarnings("unchecked")
     protected void afterInitScene(FXMLLoader loader) {
-        initTableColumns(loader);
         TableView<BookDTO> bookTableView = (TableView<BookDTO>) loader.getNamespace().get("bookTableView");
+        initTableColumns(loader, bookTableView);
         updateTableColumns(bookTableView);
         bookTableView.getItems().sort(comparing(BookDTO::getName));
     }
 
     @SuppressWarnings("unchecked")
-    private void initTableColumns(FXMLLoader loader) {
+    private void initTableColumns(FXMLLoader loader, TableView<BookDTO> bookTableView) {
         TABLE_COLUMNS_SETTINGS.forEach((columnName, fieldName) -> {
             TableColumn<BookDTO, ?> column = (TableColumn<BookDTO, ?>) loader.getNamespace().get(columnName);
             column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
-            column.setComparator((o1, o2) -> 0);
 
             if (TABLE_COLUMNS_SORTING.containsKey(columnName)) {
                 column.setComparator(TABLE_COLUMNS_SORTING.get(columnName));
             }
         });
+
+        // Add numeric for table raw's
+        TableColumn<BookDTO, Number> numberColumn =
+                (TableColumn<BookDTO, Number>) loader.getNamespace().get("numberColumn");
+
+        numberColumn.setCellValueFactory(
+                column-> new ReadOnlyObjectWrapper<>(bookTableView.getItems().indexOf(column.getValue()) + 1));
     }
 
     @FXML
@@ -104,34 +111,38 @@ public class MainViewController extends AbstractViewController {
             // Sort by cycle name + book number in cycle
             if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
                 if (cycleColumnSortedByASC) {
-                    bookTableView.getItems().sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder())).reversed()
-                            .thenComparing(this::comparatorByBookNumberInCycle));
+                    bookTableView.getItems()
+                            .sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
+                                .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
+                            );
                 } else {
-                    bookTableView.getItems().sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
-                            .thenComparing(this::comparatorByBookNumberInCycle));
+                    bookTableView.getItems()
+                            .sort(comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
+                                .reversed()
+                                .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle));
                 }
 
                 cycleColumnSortedByASC = !cycleColumnSortedByASC;
             } else {
-                cycleColumnSortedByASC = false;
+                cycleColumnSortedByASC = true;
             }
         }
     }
 
-    private int comparatorByBookNumberInCycle(BookDTO b1, BookDTO b2) {
-        Integer b1Number = getBookNumberInCycle(b1);
-        Integer b2Number = getBookNumberInCycle(b2);
+    private int comparatorByBookNumberInCycle(String bookNumber1, String bookNumber2) {
+        Integer number1 = getBookNumberInCycle(bookNumber1);
+        Integer number2 = getBookNumberInCycle(bookNumber2);
 
-        if (b1Number == null) {
-            return b2Number == null ? 0 : -1;
+        if (number1 == null) {
+            return number2 == null ? 0 : -1;
         }
 
-        return b2Number == null ? 1 : Integer.compare(b1Number, b2Number);
+        return number2 == null ? 1 : Integer.compare(number1, number2);
     }
 
-    private Integer getBookNumberInCycle(BookDTO bookDTO) {
-        return isNotBlank(bookDTO.getCycleNumber())
-                ? Integer.parseInt(bookDTO.getCycleNumber().split("/")[0])
+    private Integer getBookNumberInCycle(String bookNumber) {
+        return isNotBlank(bookNumber)
+                ? Integer.parseInt(bookNumber.split("/")[0])
                 : null;
     }
 
@@ -260,5 +271,12 @@ public class MainViewController extends AbstractViewController {
         return lastOpenedBookViewStage != null
                 ? getStageCoordinate.apply(lastOpenedBookViewStage)
                 : getStageCoordinate.apply(primaryStage);
+    }
+
+    private static int compareCheckBoxes(Object c1, Object c2) {
+        if (c1 == null) {
+            return c2 == null ? 0 : 1;
+        }
+        return c2 == null ? -1 : Boolean.compare(((CheckBox) c2).isSelected(), ((CheckBox) c1).isSelected());
     }
 }

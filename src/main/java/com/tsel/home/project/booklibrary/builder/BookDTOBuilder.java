@@ -10,6 +10,7 @@ public final class BookDTOBuilder {
     private String shelf;
     private String cycleName;
     private String cycleNumber;
+    private CheckBox cycleEnded;
     private CheckBox read;
 
     private BookDTOBuilder() {}
@@ -43,6 +44,11 @@ public final class BookDTOBuilder {
         return this;
     }
 
+    public BookDTOBuilder cycleEnded(CheckBox cycleEnded) {
+        this.cycleEnded = cycleEnded;
+        return this;
+    }
+
     public BookDTOBuilder read(CheckBox read) {
         this.read = read;
         return this;
@@ -55,6 +61,7 @@ public final class BookDTOBuilder {
         bookDTO.setShelf(shelf);
         bookDTO.setCycleName(cycleName);
         bookDTO.setCycleNumber(cycleNumber);
+        bookDTO.setCycleEnded(cycleEnded);
         bookDTO.setRead(read);
         return bookDTO;
     }

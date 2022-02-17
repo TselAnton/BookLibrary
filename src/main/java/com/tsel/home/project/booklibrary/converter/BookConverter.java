@@ -19,17 +19,14 @@ public class BookConverter {
     public BookDTO convert(Book book) {
         String cycleName = null;
         String cycleNumber = null;
+        Boolean isCycleEnded = null;
 
         if (isNotBlank(book.getCycleName())) {
             Cycle cycle = cycleRepository.getByName(book.getCycleName());
             cycleName = cycle.getName();
             cycleNumber = format("%d/%d", book.getNumberInSeries(), cycle.getBooksInCycle());
+            isCycleEnded = cycle.getEnded();
         }
-
-        CheckBox checkBox = new CheckBox();
-        checkBox.setSelected(book.getRead());
-        checkBox.setDisable(true);
-        checkBox.getStyleClass().add("disabled-check-box");
 
         return BookDTOBuilder.builder()
                 .name(book.getName())
@@ -37,8 +34,22 @@ public class BookConverter {
                 .shelf(String.valueOf(book.getBookshelf()))
                 .cycleName(cycleName)
                 .cycleNumber(cycleNumber)
-                .read(checkBox)
+                .cycleEnded(getCheckBox(isCycleEnded))
+                .read(getCheckBox(book.getRead()))
                 .build();
+    }
+
+    private CheckBox getCheckBox(Boolean isChecked) {
+        if (isChecked == null) {
+            return null;
+        }
+
+        CheckBox checkBox = new CheckBox();
+        checkBox.setSelected(isChecked);
+        checkBox.setDisable(true);
+        checkBox.getStyleClass().add("disabled-check-box");
+
+        return checkBox;
     }
 
      public String buildEntityKeyByDTO(BookDTO bookDTO) {
