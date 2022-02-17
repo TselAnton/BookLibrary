@@ -56,7 +56,13 @@ public class BookInfoViewController extends AbstractViewController {
     private CheckBox readCheck;
 
     @FXML
+    private Label cycleTitle;
+
+    @FXML
     private Label cycleLabel;
+
+    @FXML
+    private Label cycleEndedTitle;
 
     @FXML
     private CheckBox cycleEnded;
@@ -134,6 +140,17 @@ public class BookInfoViewController extends AbstractViewController {
 
             cycleLabel.setText(format("%s (%d / %d)", cycle.getName(), book.getNumberInSeries(), cycle.getBooksInCycle()));
             cycleEnded.setSelected(cycle.getEnded());
+
+            cycleTitle.setVisible(true);
+            cycleLabel.setVisible(true);
+            cycleEndedTitle.setVisible(true);
+            cycleEnded.setVisible(true);
+
+        } else {
+            cycleTitle.setVisible(false);
+            cycleLabel.setVisible(false);
+            cycleEndedTitle.setVisible(false);
+            cycleEnded.setVisible(false);
         }
 
         coverImage.setImage(resolveCover(book));

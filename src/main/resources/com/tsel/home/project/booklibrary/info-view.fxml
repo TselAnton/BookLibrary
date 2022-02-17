@@ -134,7 +134,7 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Цикл завершён:" GridPane.rowIndex="7">
+                  <Label fx:id="cycleEndedTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Цикл завершён:" GridPane.rowIndex="7">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -145,7 +145,7 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="226.0" text="Цикл:" GridPane.rowIndex="6">
+                  <Label fx:id="cycleTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="226.0" text="Цикл:" GridPane.rowIndex="6">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
