@@ -44,7 +44,7 @@ public abstract class AbstractViewController {
         this.resourceFile = resourceFile;
 
         try {
-            InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + "icon.png");
+            InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + "img/icon.png");
             iconImage = new Image(requireNonNull(imageInputStream));
 
         } catch (Exception e) {

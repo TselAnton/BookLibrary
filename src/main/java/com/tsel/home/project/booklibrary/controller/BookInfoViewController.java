@@ -92,7 +92,7 @@ public class BookInfoViewController extends AbstractViewController {
         super(null, null);
 
         try {
-            InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + "default.png");
+            InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + "img/default.png");
             defaultImg = new Image(requireNonNull(imageInputStream));
 
         } catch (Exception e) {
@@ -197,8 +197,8 @@ public class BookInfoViewController extends AbstractViewController {
 
     @FXML
     public void editBook() {
-        loadModalView("Edit book", "edit-view.fxml", mainPane, book.getKey(),
-                this, 0, -25);
+        loadModalView("Edit book", "view/edit-view.fxml", mainPane, book.getKey(),
+                this, 165, 0);
         updateView();
     }
 

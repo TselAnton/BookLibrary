@@ -77,7 +77,7 @@ public class MainViewController extends AbstractViewController {
     private Stage lastOpenedBookViewStage;
 
     public MainViewController() {
-        super("Book library", "main-view.fxml");
+        super("Book library", "view/main-view.fxml");
     }
 
     @Override
@@ -173,7 +173,7 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     public void addBook() {
-        loadModalView("Add new book", "add-view.fxml", mainStage, null,
+        loadModalView("Add new book", "view/add-view.fxml", mainStage, null,
                 this, 300, -25);
         updateTableColumns(bookTableView);
     }
@@ -256,7 +256,7 @@ public class MainViewController extends AbstractViewController {
 
     protected void loadBookView(AnchorPane mainStage, String initEntityKey, AbstractViewController parentViewController) {
         try {
-            FXMLLoader loader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + "info-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + "view/info-view.fxml"));
             Scene scene = new Scene(loader.load());
 
             Stage stage = new Stage() {

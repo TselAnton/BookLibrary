@@ -179,7 +179,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </TextField>
-                <Button fx:id="selectFileButton" maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#chooseBookCover" prefHeight="25.0" styleClass="default-button" stylesheets="@search-button.css" text="+" textFill="WHITE" GridPane.columnIndex="1">
+                <Button fx:id="selectFileButton" maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#chooseBookCover" prefHeight="25.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="+" textFill="WHITE" GridPane.columnIndex="1">
                     <GridPane.margin>
                         <Insets left="10.0" right="10.0" />
                     </GridPane.margin>
@@ -207,6 +207,6 @@
             </font>
         </Label>
     </AnchorPane>
-    <Button fx:id="addButton" layoutX="166.0" layoutY="624.0" mnemonicParsing="false" onAction="#addBook" styleClass="default-button" stylesheets="@search-button.css" text="Добавить" textFill="WHITE" />
-    <Button fx:id="cancelButton" layoutX="245.0" layoutY="624.0" mnemonicParsing="false" onAction="#cancelAdding" styleClass="default-button" stylesheets="@search-button.css" text="Отмена" textFill="WHITE" />
+    <Button fx:id="addButton" layoutX="166.0" layoutY="624.0" mnemonicParsing="false" onAction="#addBook" styleClass="default-button" stylesheets="@../css/search-button.css" text="Добавить" textFill="WHITE" />
+    <Button fx:id="cancelButton" layoutX="245.0" layoutY="624.0" mnemonicParsing="false" onAction="#cancelAdding" styleClass="default-button" stylesheets="@../css/search-button.css" text="Отмена" textFill="WHITE" />
 </AnchorPane>

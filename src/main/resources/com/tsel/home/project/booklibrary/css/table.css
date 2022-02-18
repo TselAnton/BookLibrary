@@ -1,0 +1,8 @@
+.table-row-cell:odd {
+    -fx-background-color: #E0F3EF;
+}
+
+.table-row-cell:focused {
+    -fx-background-color: #05A380;
+    -fx-table-cell-border-color: white;
+}
