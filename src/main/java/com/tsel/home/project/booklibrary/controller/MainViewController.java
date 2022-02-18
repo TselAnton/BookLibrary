@@ -31,7 +31,7 @@ public class MainViewController extends AbstractViewController {
     private static final SearchService SEARCH_SERVICE = new SearchService();
 
     private static final Comparator<String> STRING_NUMBER_COMPARATOR = comparingInt(Integer::parseInt);
-    private static final Comparator<String> NON_COMPARATOR = (x1, x2) -> 0;
+    private static final Comparator<Object> NON_COMPARATOR = (x1, x2) -> 0;
 
     private static final Map<String, String> TABLE_COLUMNS_SETTINGS;
     private static final Map<String, Comparator> TABLE_COLUMNS_SORTING;
@@ -45,6 +45,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.put("cycleNumberColumn", "cycleNumber");
         TABLE_COLUMNS_SETTINGS.put("cycleEndColumn", "cycleEnded");
         TABLE_COLUMNS_SETTINGS.put("readColumn", "read");
+        TABLE_COLUMNS_SETTINGS.put("pagesColumn", "pages");
 
         TABLE_COLUMNS_SORTING = new HashMap<>();
         TABLE_COLUMNS_SORTING.put("readColumn", MainViewController::compareCheckBoxes);
@@ -53,6 +54,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SORTING.put("nameColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("authorColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("cycleColumn", NON_COMPARATOR);
+        TABLE_COLUMNS_SORTING.put("pagesColumn", NON_COMPARATOR);
     }
 
     @FXML
@@ -67,6 +69,10 @@ public class MainViewController extends AbstractViewController {
     @FXML
     private TableColumn<BookDTO, String> cycleColumn;
     private boolean cycleColumnSortedByASC = true;
+
+    @FXML
+    private TableColumn<BookDTO, Integer> pagesColumn;
+    private boolean pagesColumnSortedByASC = true;
 
     private Stage lastOpenedBookViewStage;
 
@@ -125,6 +131,25 @@ public class MainViewController extends AbstractViewController {
                 cycleColumnSortedByASC = !cycleColumnSortedByASC;
             } else {
                 cycleColumnSortedByASC = true;
+            }
+
+            // Sort by pages + !read
+            if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
+                if (pagesColumnSortedByASC) {
+                    bookTableView.getItems()
+                            .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
+                                    .thenComparing(BookDTO::getPages));
+
+                } else {
+                    bookTableView.getItems()
+                            .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
+                                    .thenComparing(BookDTO::getPages)
+                                    .reversed());
+                }
+
+                pagesColumnSortedByASC = !pagesColumnSortedByASC;
+            } else {
+                pagesColumnSortedByASC = true;
             }
         }
     }

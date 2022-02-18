@@ -12,6 +12,7 @@ public final class BookDTOBuilder {
     private String cycleNumber;
     private CheckBox cycleEnded;
     private CheckBox read;
+    private Integer pages;
 
     private BookDTOBuilder() {}
 
@@ -54,6 +55,11 @@ public final class BookDTOBuilder {
         return this;
     }
 
+    public BookDTOBuilder pages(Integer pages) {
+        this.pages = pages;
+        return this;
+    }
+
     public BookDTO build() {
         BookDTO bookDTO = new BookDTO();
         bookDTO.setName(name);
@@ -63,6 +69,7 @@ public final class BookDTOBuilder {
         bookDTO.setCycleNumber(cycleNumber);
         bookDTO.setCycleEnded(cycleEnded);
         bookDTO.setRead(read);
+        bookDTO.setPages(pages);
         return bookDTO;
     }
 }

@@ -36,6 +36,7 @@ public class BookConverter {
                 .cycleNumber(cycleNumber)
                 .cycleEnded(getCheckBox(isCycleEnded))
                 .read(getCheckBox(book.getRead()))
+                .pages(book.getPages())
                 .build();
     }
 

@@ -153,7 +153,7 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Label fx:id="nameLabel" prefHeight="80.0" prefWidth="335.0" text="1231231231231231231231231231321321321321230" wrapText="true" GridPane.columnIndex="1">
+                  <Label fx:id="nameLabel" prefHeight="80.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1">
                      <font>
                         <Font size="14.0" />
                      </font>
