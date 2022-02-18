@@ -35,7 +35,9 @@ public class SearchService {
                 || isContainsValue(searchQuery, bookDTO.getShelf())
                 || isContainsValue(searchQuery, bookDTO.getCycleName())
                 || isContainsValue(searchQuery, bookDTO.getCycleNumber())
-                || isContainsBoolean(searchQuery, bookDTO.getRead());
+                || isContainsValue(searchQuery, String.valueOf(bookDTO.getPages()))
+                || isContainsBoolean(searchQuery, bookDTO.getRead())
+                || isContainsBoolean(searchQuery, bookDTO.getCycleEnded());
     }
 
     private boolean isContainsValue(String searchQuery, String field) {
@@ -43,7 +45,7 @@ public class SearchService {
     }
 
     private boolean isContainsBoolean(String searchQuery, CheckBox checkBox) {
-        return "true".equals(searchQuery) && checkBox.isSelected()
-                || "false".equals(searchQuery) && !checkBox.isSelected();
+        return "true".equals(searchQuery) && (checkBox != null && checkBox.isSelected())
+                || "false".equals(searchQuery) && (checkBox != null && !checkBox.isSelected());
     }
 }
