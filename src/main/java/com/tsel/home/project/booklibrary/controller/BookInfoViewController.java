@@ -14,9 +14,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.GridCell;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +35,9 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 public class BookInfoViewController extends AbstractViewController {
 
     private static final Logger LOGGER = LogManager.getLogger(BookInfoViewController.class);
+
+    private static final double NORMAL_FONT_SIZE = 18f;
+    private static final double SMALL_FONT_SIZE = 14f;
 
     @FXML
     private AnchorPane mainPane;
@@ -127,6 +132,10 @@ public class BookInfoViewController extends AbstractViewController {
     }
 
     private void updateView() {
+        updateFontSizeForLongNames(book.getName(), nameLabel);
+        updateFontSizeForLongNames(book.getAuthor(), authorLabel);
+        updateFontSizeForLongNames(book.getPublisher(), publisherLabel);
+
         nameLabel.setText(book.getName());
         authorLabel.setText(book.getAuthor());
         publisherLabel.setText(book.getPublisher());
@@ -136,6 +145,8 @@ public class BookInfoViewController extends AbstractViewController {
         readCheck.setSelected(book.getRead());
 
         if (isNotBlank(book.getCycleName())) {
+            updateFontSizeForLongNames(book.getCycleName(), cycleLabel);
+
             Cycle cycle = CYCLE_REPOSITORY.getByName(book.getCycleName());
 
             cycleLabel.setText(format("%s (%d / %d)", cycle.getName(), book.getNumberInSeries(), cycle.getBooksInCycle()));
@@ -154,6 +165,15 @@ public class BookInfoViewController extends AbstractViewController {
         }
 
         coverImage.setImage(resolveCover(book));
+    }
+
+    private void updateFontSizeForLongNames(String text, Label label) {
+        Font labelFont = label.getFont();
+        if (isNotBlank(text) && text.length() > 34) {
+            label.setFont(new Font(labelFont.getName(), SMALL_FONT_SIZE));
+        } else {
+            label.setFont(new Font(labelFont.getName(), NORMAL_FONT_SIZE));
+        }
     }
 
     private Image resolveCover(Book book) {

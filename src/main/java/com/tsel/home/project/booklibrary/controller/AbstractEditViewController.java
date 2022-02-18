@@ -227,24 +227,24 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         }
 
         Book newBook = BookBuilder.builder()
-                .name(bookName)
-                .author(author)
-                .publisher(publisher)
+                .name(bookName.trim())
+                .author(author.trim())
+                .publisher(publisher.trim())
                 .pages(stringToInt(pages))
                 .bookshelf(stringToInt(shelfNumber))
                 .read(isRead)
-                .cycleName(cycle)
+                .cycleName(cycle != null ? cycle.trim() : null)
                 .numberInSeries(stringToInt(numberInCycle))
                 .coverImgAbsolutePath(imagePath)
                 .build();
 
-        Author newAuthor = new Author(author);
-        Publisher newPublisher = new Publisher(publisher);
+        Author newAuthor = new Author(author.trim());
+        Publisher newPublisher = new Publisher(publisher.trim());
         Cycle newCycle = null;
 
         if (isNotBlank(cycle)) {
             newCycle = CycleBuilder.builder()
-                    .name(cycle)
+                    .name(cycle.trim())
                     .ended(isEndedCycle)
                     .booksInCycle(stringToInt(totalInCycle))
                     .build();
