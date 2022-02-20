@@ -7,6 +7,7 @@ public final class BookDTOBuilder {
 
     private String name;
     private String author;
+    private String publisher;
     private String shelf;
     private String cycleName;
     private String cycleNumber;
@@ -27,6 +28,11 @@ public final class BookDTOBuilder {
 
     public BookDTOBuilder author(String author) {
         this.author = author;
+        return this;
+    }
+
+    public BookDTOBuilder publisher(String publisher) {
+        this.publisher = publisher;
         return this;
     }
 
@@ -64,6 +70,7 @@ public final class BookDTOBuilder {
         BookDTO bookDTO = new BookDTO();
         bookDTO.setName(name);
         bookDTO.setAuthor(author);
+        bookDTO.setPublisher(publisher);
         bookDTO.setShelf(shelf);
         bookDTO.setCycleName(cycleName);
         bookDTO.setCycleNumber(cycleNumber);

@@ -6,10 +6,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -24,6 +21,7 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
         if (isStorageAlreadyExist()) {
             try {
                 repositoryMap = readStorageFile();
+                updateStorageKeys();
             } catch (FileNotFoundException e) {
                 throw new IllegalStateException(format("Problem while reading file: %s", storageFileName), e);
             }
@@ -60,6 +58,19 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(format("Cant cast object from: %s", storageFileName), e);
         }
+    }
+
+    private void updateStorageKeys() {
+        LinkedHashMap<String, E> updatedRepository = new LinkedHashMap<>();
+
+        Iterator<Map.Entry<String, E>> iterator = repositoryMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, E> entry = iterator.next();
+            updatedRepository.put(entry.getValue().getKey().toLowerCase(Locale.ROOT), entry.getValue());
+            iterator.remove();
+        }
+
+        repositoryMap.putAll(updatedRepository);
     }
 
     protected void updateStorageFile() {

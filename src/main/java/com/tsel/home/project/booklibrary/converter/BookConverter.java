@@ -31,6 +31,7 @@ public class BookConverter {
         return BookDTOBuilder.builder()
                 .name(book.getName())
                 .author(book.getAuthor())
+                .publisher(book.getPublisher())
                 .shelf(String.valueOf(book.getBookshelf()))
                 .cycleName(cycleName)
                 .cycleNumber(cycleNumber)
@@ -62,6 +63,13 @@ public class BookConverter {
          compositeKey.append(bookDTO.getName().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
          compositeKey.append("_");
          compositeKey.append(bookDTO.getAuthor().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
+         compositeKey.append("_");
+         compositeKey.append(bookDTO.getPublisher().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
+
+         if (isNotBlank(bookDTO.getCycleName())) {
+             compositeKey.append("_");
+             compositeKey.append(bookDTO.getCycleName().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
+         }
 
          if (isNotBlank(bookDTO.getCycleNumber())) {
              String bookNumberInBook = bookDTO.getCycleNumber().substring(0, bookDTO.getCycleNumber().indexOf("/"));

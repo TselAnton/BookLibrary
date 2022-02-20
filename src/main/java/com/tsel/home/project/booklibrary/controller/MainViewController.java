@@ -9,12 +9,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.*;
 import java.util.function.Function;
@@ -87,6 +90,17 @@ public class MainViewController extends AbstractViewController {
         initTableColumns(loader, bookTableView);
         updateTableColumns(bookTableView);
         bookTableView.getItems().sort(comparing(BookDTO::getName));
+
+        ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
+        Tooltip tooltip = new Tooltip(
+                "Поиск по прочитаному: read / nread\n" +
+                "Поиск по завершённым циклам: end / nend"
+        );
+        tooltip.setAutoHide(false);
+        tooltip.setFont(new Font(16f));
+        tooltip.setShowDelay(new Duration(500f));
+
+        Tooltip.install(signHelp, tooltip);
     }
 
     @SuppressWarnings("unchecked")

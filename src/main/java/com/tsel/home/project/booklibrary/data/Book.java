@@ -25,6 +25,13 @@ public class Book implements BaseEntity {
         compositeKey.append(name.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
         compositeKey.append("_");
         compositeKey.append(author.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
+        compositeKey.append("_");
+        compositeKey.append(publisher.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
+
+        if (cycleName != null) {
+            compositeKey.append("_");
+            compositeKey.append(cycleName.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
+        }
 
         if (numberInSeries != null) {
             compositeKey.append("_");

@@ -4,6 +4,7 @@ import com.tsel.home.project.booklibrary.dto.BookDTO;
 import javafx.scene.control.CheckBox;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -12,9 +13,15 @@ import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 
 public class SearchService {
 
+    private static final String READ_SEARCH_KEY = "read";
+    private static final String ENDED_CYCLE_SEARCH_KEY = "end";
+    private static final String REVERSE_ORDER = "n";
+
     public List<BookDTO> search(String searchQuery, List<BookDTO> bookDTOS) {
         if (isBlank(searchQuery)) {
-            return bookDTOS;
+            return bookDTOS.stream()
+                    .sorted(Comparator.comparing(BookDTO::getName))
+                    .toList();
         }
 
         String filteredSearchQuery = searchQuery.trim().toLowerCase(Locale.ROOT);
@@ -26,7 +33,9 @@ public class SearchService {
             }
         }
 
-        return result;
+        return result.stream()
+                .sorted(Comparator.comparing(BookDTO::getName))
+                .toList();
     }
 
     private boolean isAvailableByQuery(String searchQuery, BookDTO bookDTO) {
@@ -36,16 +45,23 @@ public class SearchService {
                 || isContainsValue(searchQuery, bookDTO.getCycleName())
                 || isContainsValue(searchQuery, bookDTO.getCycleNumber())
                 || isContainsValue(searchQuery, String.valueOf(bookDTO.getPages()))
-                || isContainsBoolean(searchQuery, bookDTO.getRead())
-                || isContainsBoolean(searchQuery, bookDTO.getCycleEnded());
+                || searchByKeyWord(searchQuery, bookDTO.getRead(), READ_SEARCH_KEY)
+                || searchByKeyWord(searchQuery, bookDTO.getCycleEnded(), ENDED_CYCLE_SEARCH_KEY);
     }
 
     private boolean isContainsValue(String searchQuery, String field) {
         return isNotBlank(field) && field.toLowerCase(Locale.ROOT).contains(searchQuery);
     }
 
-    private boolean isContainsBoolean(String searchQuery, CheckBox checkBox) {
-        return "true".equals(searchQuery) && (checkBox != null && checkBox.isSelected())
-                || "false".equals(searchQuery) && (checkBox != null && !checkBox.isSelected());
+    private boolean searchByKeyWord(String searchQuery, CheckBox checkBox, String searchKey) {
+        if (searchQuery.contains(searchKey)) {
+            if (searchQuery.startsWith(REVERSE_ORDER) && searchKey.equals(searchQuery.substring(1))) {
+                return checkBox != null && !checkBox.isSelected();
+            } else {
+                return searchKey.equals(searchQuery) && checkBox != null && checkBox.isSelected();
+            }
+        }
+
+        return false;
     }
 }
