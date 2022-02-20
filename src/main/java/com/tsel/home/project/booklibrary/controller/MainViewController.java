@@ -10,10 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -23,6 +20,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+import static java.lang.String.format;
 import static java.util.Comparator.*;
 import static java.util.stream.Collectors.toList;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -30,6 +28,11 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.stage.Modality.NONE;
 
 public class MainViewController extends AbstractViewController {
+
+    private static final String TABLE_SCALE_PATTERN = "-fx-font-size: %spt";
+    private static final int MIN_FONT = 9;
+    private static final int MAX_FONT = 16;
+    private int tableFont = MIN_FONT;
 
     private static final SearchService SEARCH_SERVICE = new SearchService();
 
@@ -91,16 +94,24 @@ public class MainViewController extends AbstractViewController {
         updateTableColumns(bookTableView);
         bookTableView.getItems().sort(comparing(BookDTO::getName));
 
-        ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
-        Tooltip tooltip = new Tooltip(
-                "Поиск по прочитаному: read / nread\n" +
-                "Поиск по завершённым циклам: end / nend"
-        );
-        tooltip.setAutoHide(false);
-        tooltip.setFont(new Font(16f));
-        tooltip.setShowDelay(new Duration(500f));
+        bookTableView.addEventFilter(ScrollEvent.ANY, scrollEvent -> updateTableScale(scrollEvent, bookTableView));
 
-        Tooltip.install(signHelp, tooltip);
+        addSearchTooltip(loader);
+    }
+
+    private void updateTableScale(ScrollEvent scrollEvent, TableView<BookDTO> bookTableView) {
+        if (scrollEvent.isControlDown()) {
+            if (scrollEvent.getDeltaY() >= 0) {
+                if (tableFont < MAX_FONT) {
+                    tableFont += 1;
+                }
+            } else {
+                if (tableFont > MIN_FONT) {
+                    tableFont -= 1;
+                }
+            }
+            bookTableView.setStyle(format(TABLE_SCALE_PATTERN, tableFont));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -251,6 +262,19 @@ public class MainViewController extends AbstractViewController {
     private void search() {
         String searchQuery = searchQueryField.getText();
         bookTableView.setItems(observableArrayList(SEARCH_SERVICE.search(searchQuery, getDtoBooks())));
+    }
+
+    private void addSearchTooltip(FXMLLoader loader) {
+        ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
+        Tooltip tooltip = new Tooltip(
+                "Поиск по прочитаному: read / nread\n" +
+                        "Поиск по завершённым циклам: end / nend"
+        );
+        tooltip.setAutoHide(false);
+        tooltip.setFont(new Font(16f));
+        tooltip.setShowDelay(new Duration(500f));
+
+        Tooltip.install(signHelp, tooltip);
     }
 
     private void updateTableColumns(TableView<BookDTO> bookTableView) {
