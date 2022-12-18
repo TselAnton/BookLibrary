@@ -32,7 +32,6 @@ public class BookConverter {
                 .name(book.getName())
                 .author(book.getAuthor())
                 .publisher(book.getPublisher())
-                .shelf(String.valueOf(book.getBookshelf()))
                 .cycleName(cycleName)
                 .cycleNumber(cycleNumber)
                 .cycleEnded(getCheckBox(isCycleEnded))

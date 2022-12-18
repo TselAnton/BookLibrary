@@ -13,11 +13,13 @@ public class Book implements BaseEntity {
     private String author;
     private String publisher;
     private Integer pages;
-    private Integer bookshelf;
     private Boolean read;
     private String cycleName;
     private Integer numberInSeries;
     private String coverImgAbsolutePath;
+
+    @Deprecated
+    private Integer bookshelf;
 
     @Override
     public String getKey() {
@@ -73,10 +75,12 @@ public class Book implements BaseEntity {
         this.pages = pages;
     }
 
+    @Deprecated
     public Integer getBookshelf() {
         return bookshelf;
     }
 
+    @Deprecated
     public void setBookshelf(Integer bookshelf) {
         this.bookshelf = bookshelf;
     }
@@ -122,7 +126,6 @@ public class Book implements BaseEntity {
                 && author.equals(book.author)
                 && publisher.equals(book.publisher)
                 && pages.equals(book.pages)
-                && Objects.equals(bookshelf, book.bookshelf)
                 && Objects.equals(read, book.read)
                 && Objects.equals(cycleName, book.cycleName)
                 && Objects.equals(numberInSeries, book.numberInSeries)
@@ -131,7 +134,7 @@ public class Book implements BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, author, publisher, pages, bookshelf, read, cycleName, numberInSeries, coverImgAbsolutePath);
+        return Objects.hash(name, author, publisher, pages, read, cycleName, numberInSeries, coverImgAbsolutePath);
     }
 
     @Override
@@ -141,7 +144,6 @@ public class Book implements BaseEntity {
                 ", author='" + author + '\'' +
                 ", publisher='" + publisher + '\'' +
                 ", pages=" + pages +
-                ", bookshelf=" + bookshelf +
                 ", read=" + read +
                 ", cycleName='" + cycleName + '\'' +
                 ", numberInSeries=" + numberInSeries +

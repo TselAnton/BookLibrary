@@ -1,9 +1,19 @@
 package com.tsel.home.project.booklibrary.controller;
 
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
+
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -18,19 +28,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.GridCell;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
-
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
-import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class BookInfoViewController extends AbstractViewController {
 
@@ -53,9 +50,6 @@ public class BookInfoViewController extends AbstractViewController {
 
     @FXML
     private Label pageCountLabel;
-
-    @FXML
-    private Label shelfLabel;
 
     @FXML
     private CheckBox readCheck;
@@ -140,7 +134,6 @@ public class BookInfoViewController extends AbstractViewController {
         authorLabel.setText(book.getAuthor());
         publisherLabel.setText(book.getPublisher());
         pageCountLabel.setText(String.valueOf(book.getPages()));
-        shelfLabel.setText(String.valueOf(book.getBookshelf()));
 
         readCheck.setSelected(book.getRead());
 

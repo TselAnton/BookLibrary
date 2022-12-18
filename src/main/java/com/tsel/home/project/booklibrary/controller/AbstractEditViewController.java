@@ -134,7 +134,6 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                            ComboBox<String> publisherInput,
                            TextField pagesCountInput,
                            CheckBox isReadCheckBox,
-                           TextField bookShelfNumberInput,
                            ComboBox<String> cycleInput,
                            CheckBox isEndedCycleCheckBox,
                            TextField numberInCycleInput,
@@ -147,8 +146,6 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         String publisher = getInputText(publisherInput);
         String pages = getInputText(pagesCountInput);
         boolean isRead = isChecked(isReadCheckBox);
-
-        String shelfNumber = getInputText(bookShelfNumberInput);
 
         String cycle = getInputText(cycleInput);
         boolean isEndedCycle = isChecked(isEndedCycleCheckBox);
@@ -181,11 +178,6 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         if (stringToInt(pages) == null) {
             riseAlert(WARNING, "Ошибка","Неверно заполнено количество страниц",
                     "Количество страниц должно быть записано в виде целого числа");
-            return;
-        }
-        if (stringToInt(shelfNumber) == null) {
-            riseAlert(WARNING, "Ошибка","Неверно заполнен номер полки",
-                    "Номер полки должен быть записан в виде целого числа");
             return;
         }
 
@@ -231,7 +223,6 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                 .author(author.trim())
                 .publisher(publisher.trim())
                 .pages(stringToInt(pages))
-                .bookshelf(stringToInt(shelfNumber))
                 .read(isRead)
                 .cycleName(cycle != null ? cycle.trim() : null)
                 .numberInSeries(stringToInt(numberInCycle))

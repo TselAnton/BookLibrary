@@ -9,7 +9,6 @@ public class BookDTO {
     private String name;
     private String author;
     private String publisher;
-    private String shelf;
     private String cycleName;
     private String cycleNumber;
     private CheckBox cycleEnded;
@@ -38,14 +37,6 @@ public class BookDTO {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
-    }
-
-    public String getShelf() {
-        return shelf;
-    }
-
-    public void setShelf(String shelf) {
-        this.shelf = shelf;
     }
 
     public String getCycleName() {
@@ -95,7 +86,6 @@ public class BookDTO {
         BookDTO bookDTO = (BookDTO) o;
         return Objects.equals(name, bookDTO.name)
                 && Objects.equals(author, bookDTO.author)
-                && Objects.equals(shelf, bookDTO.shelf)
                 && Objects.equals(publisher, bookDTO.publisher)
                 && Objects.equals(cycleName, bookDTO.cycleName)
                 && Objects.equals(cycleNumber, bookDTO.cycleNumber)
@@ -106,7 +96,7 @@ public class BookDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, author, publisher, shelf, cycleName, cycleNumber, cycleEnded, read, pages);
+        return Objects.hash(name, author, publisher, cycleName, cycleNumber, cycleEnded, read, pages);
     }
 
     @Override
@@ -115,7 +105,6 @@ public class BookDTO {
                 "name='" + name + '\'' +
                 ", author='" + author + '\'' +
                 ", publisher='" + publisher + '\'' +
-                ", shelf='" + shelf + '\'' +
                 ", cycleName='" + cycleName + '\'' +
                 ", cycleNumber='" + cycleNumber + '\'' +
                 ", cycleEnded=" + cycleEnded +

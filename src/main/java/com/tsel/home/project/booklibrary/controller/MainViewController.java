@@ -46,7 +46,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS = new HashMap<>();
         TABLE_COLUMNS_SETTINGS.put("nameColumn", "name");
         TABLE_COLUMNS_SETTINGS.put("authorColumn", "author");
-        TABLE_COLUMNS_SETTINGS.put("shelfColumn", "shelf");
+        TABLE_COLUMNS_SETTINGS.put("publisherColumn", "publisher");
         TABLE_COLUMNS_SETTINGS.put("cycleColumn", "cycleName");
         TABLE_COLUMNS_SETTINGS.put("cycleNumberColumn", "cycleNumber");
         TABLE_COLUMNS_SETTINGS.put("cycleEndColumn", "cycleEnded");

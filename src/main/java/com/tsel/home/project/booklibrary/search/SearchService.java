@@ -1,15 +1,14 @@
 package com.tsel.home.project.booklibrary.search;
 
-import com.tsel.home.project.booklibrary.dto.BookDTO;
-import javafx.scene.control.CheckBox;
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 
+import com.tsel.home.project.booklibrary.dto.BookDTO;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+import javafx.scene.control.CheckBox;
 
 public class SearchService {
 
@@ -41,7 +40,7 @@ public class SearchService {
     private boolean isAvailableByQuery(String searchQuery, BookDTO bookDTO) {
         return isContainsValue(searchQuery, bookDTO.getName())
                 || isContainsValue(searchQuery, bookDTO.getAuthor())
-                || isContainsValue(searchQuery, bookDTO.getShelf())
+                || isContainsValue(searchQuery, bookDTO.getPublisher())
                 || isContainsValue(searchQuery, bookDTO.getCycleName())
                 || isContainsValue(searchQuery, bookDTO.getCycleNumber())
                 || isContainsValue(searchQuery, String.valueOf(bookDTO.getPages()))

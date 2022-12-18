@@ -34,9 +34,6 @@ public class EditBookViewController extends AbstractEditViewController {
     private TextField pagesCountInput;
 
     @FXML
-    private TextField bookShelfNumberInput;
-
-    @FXML
     private CheckBox isReadCheckBox;
 
     @FXML
@@ -84,7 +81,6 @@ public class EditBookViewController extends AbstractEditViewController {
 
         nameInput.setText(book.getName());
         pagesCountInput.setText(String.valueOf(book.getPages()));
-        bookShelfNumberInput.setText(String.valueOf(book.getBookshelf()));
         imageInput.setText(book.getCoverImgAbsolutePath());
 
         isReadCheckBox.setSelected(TRUE.equals(book.getRead()));
@@ -138,8 +134,8 @@ public class EditBookViewController extends AbstractEditViewController {
 
     @FXML
     public void editBook() {
-        addBook(nameInput, authorInput, publisherInput, pagesCountInput, isReadCheckBox, bookShelfNumberInput,
-                cycleInput, isEndedCycleCheckBox, numberInCycleInput, totalCountInCycleInput, imageInput, editButton);
+        addBook(nameInput, authorInput, publisherInput, pagesCountInput, isReadCheckBox,
+            cycleInput, isEndedCycleCheckBox, numberInCycleInput, totalCountInCycleInput, imageInput, editButton);
     }
 
     @Override

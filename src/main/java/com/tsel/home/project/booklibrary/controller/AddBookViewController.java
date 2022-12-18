@@ -31,9 +31,6 @@ public class AddBookViewController extends AbstractEditViewController {
     private TextField pagesCountInput;
 
     @FXML
-    private TextField bookShelfNumberInput;
-
-    @FXML
     private CheckBox isReadCheckBox;
 
     @FXML
@@ -92,8 +89,8 @@ public class AddBookViewController extends AbstractEditViewController {
 
     @FXML
     public void addBook() {
-        addBook(nameInput, authorInput, publisherInput, pagesCountInput, isReadCheckBox, bookShelfNumberInput,
-                cycleInput, isEndedCycleCheckBox, numberInCycleInput, totalCountInCycleInput, imageInput, addButton);
+        addBook(nameInput, authorInput, publisherInput, pagesCountInput, isReadCheckBox,
+            cycleInput, isEndedCycleCheckBox, numberInCycleInput, totalCountInCycleInput, imageInput, addButton);
     }
 
     @Override

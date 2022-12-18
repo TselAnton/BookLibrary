@@ -57,13 +57,13 @@
             <TableView fx:id="bookTableView" layoutX="12.0" layoutY="52.0" onKeyPressed="#tableViewKeyPressed" onMouseClicked="#clickOnTable" onSort="#onSort" prefHeight="398.0" prefWidth="980.0" style="-fx-alignment: CENTER-RIGHT;" styleClass="table-row-cell" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="52.0">
               <columns>
                   <TableColumn fx:id="numberColumn" editable="false" maxWidth="100.0" prefWidth="40.0" sortable="false" text="№" />
-                <TableColumn fx:id="nameColumn" editable="false" prefWidth="319.0" text="Название" />
-                <TableColumn fx:id="authorColumn" maxWidth="1000.0" prefWidth="250.0" text="Автор" />
-                  <TableColumn fx:id="shelfColumn" maxWidth="200.0" prefWidth="90.0" style="-fx-alignment: BASELINE_CENTER;" text="Полка" />
+                  <TableColumn fx:id="nameColumn" editable="false" prefWidth="319.0" text="Название" />
+                  <TableColumn fx:id="authorColumn" maxWidth="1000.0" prefWidth="250.0" text="Автор" />
+                  <TableColumn fx:id="publisherColumn" maxWidth="200.0" prefWidth="90.0" style="-fx-alignment: BASELINE_CENTER;" text="Издание" />
                   <TableColumn fx:id="cycleColumn" maxWidth="2000.0" prefWidth="150.0" text="Цикл" />
                   <TableColumn fx:id="cycleNumberColumn" maxWidth="200.0" prefWidth="90.0" sortType="DESCENDING" sortable="false" style="-fx-alignment: BASELINE_CENTER;" text="Номер" />
-                  <TableColumn fx:id="cycleEndColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Завершён" />
                   <TableColumn fx:id="readColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Прочитано" />
+                  <TableColumn fx:id="cycleEndColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Завершён" />
                   <TableColumn fx:id="pagesColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Страницы" />
               </columns>
                <opaqueInsets>
