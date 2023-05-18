@@ -14,6 +14,7 @@ public class SearchService {
 
     private static final String READ_SEARCH_KEY = "read";
     private static final String ENDED_CYCLE_SEARCH_KEY = "end";
+    private static final String AUTOGRAPH_SEARCH_KEY = "sign";
     private static final String REVERSE_ORDER = "n";
 
     public List<BookDTO> search(String searchQuery, List<BookDTO> bookDTOS) {
@@ -45,7 +46,8 @@ public class SearchService {
                 || isContainsValue(searchQuery, bookDTO.getCycleNumber())
                 || isContainsValue(searchQuery, String.valueOf(bookDTO.getPages()))
                 || searchByKeyWord(searchQuery, bookDTO.getRead(), READ_SEARCH_KEY)
-                || searchByKeyWord(searchQuery, bookDTO.getCycleEnded(), ENDED_CYCLE_SEARCH_KEY);
+                || searchByKeyWord(searchQuery, bookDTO.getCycleEnded(), ENDED_CYCLE_SEARCH_KEY)
+                || searchByAutograph(searchQuery, bookDTO.isAutograph());
     }
 
     private boolean isContainsValue(String searchQuery, String field) {
@@ -61,6 +63,13 @@ public class SearchService {
             }
         }
 
+        return false;
+    }
+
+    private boolean searchByAutograph(String searchQuery, boolean boolValue) {
+        if (AUTOGRAPH_SEARCH_KEY.equals(searchQuery) || AUTOGRAPH_SEARCH_KEY.equals(searchQuery.substring(1))) {
+            return searchQuery.startsWith(REVERSE_ORDER) != boolValue;
+        }
         return false;
     }
 }

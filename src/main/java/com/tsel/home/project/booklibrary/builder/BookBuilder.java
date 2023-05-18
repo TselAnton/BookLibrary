@@ -10,6 +10,7 @@ public final class BookBuilder {
     private Integer pages;
     private Integer bookshelf;
     private Boolean read;
+    private Boolean autograph;
     private String cycleName;
     private Integer numberInSeries;
     private String coverImgAbsolutePath;
@@ -50,6 +51,11 @@ public final class BookBuilder {
         return this;
     }
 
+    public BookBuilder autograph(Boolean autograph) {
+        this.autograph = autograph;
+        return this;
+    }
+
     public BookBuilder cycleName(String cycleName) {
         this.cycleName = cycleName;
         return this;
@@ -73,6 +79,7 @@ public final class BookBuilder {
         book.setPages(pages);
         book.setBookshelf(bookshelf);
         book.setRead(read);
+        book.setAutograph(autograph);
         book.setCycleName(cycleName);
         book.setNumberInSeries(numberInSeries);
         book.setCoverImgAbsolutePath(coverImgAbsolutePath);

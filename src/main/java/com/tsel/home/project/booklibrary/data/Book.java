@@ -14,6 +14,7 @@ public class Book implements BaseEntity {
     private String publisher;
     private Integer pages;
     private Boolean read;
+    private Boolean autograph;
     private String cycleName;
     private Integer numberInSeries;
     private String coverImgAbsolutePath;
@@ -93,6 +94,14 @@ public class Book implements BaseEntity {
         this.read = read;
     }
 
+    public Boolean getAutograph() {
+        return autograph;
+    }
+
+    public void setAutograph(Boolean autograph) {
+        this.autograph = autograph;
+    }
+
     public String getCycleName() {
         return cycleName;
     }
@@ -127,6 +136,7 @@ public class Book implements BaseEntity {
                 && publisher.equals(book.publisher)
                 && pages.equals(book.pages)
                 && Objects.equals(read, book.read)
+                && Objects.equals(autograph, book.autograph)
                 && Objects.equals(cycleName, book.cycleName)
                 && Objects.equals(numberInSeries, book.numberInSeries)
                 && Objects.equals(coverImgAbsolutePath, book.coverImgAbsolutePath);
@@ -145,6 +155,7 @@ public class Book implements BaseEntity {
                 ", publisher='" + publisher + '\'' +
                 ", pages=" + pages +
                 ", read=" + read +
+                ", autograph=" + autograph +
                 ", cycleName='" + cycleName + '\'' +
                 ", numberInSeries=" + numberInSeries +
                 ", coverImgAbsolutePath=" + coverImgAbsolutePath +

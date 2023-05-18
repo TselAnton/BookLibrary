@@ -130,7 +130,7 @@ public class MainViewController extends AbstractViewController {
                 (TableColumn<BookDTO, Number>) loader.getNamespace().get("numberColumn");
 
         numberColumn.setCellValueFactory(
-                column-> new ReadOnlyObjectWrapper<>(bookTableView.getItems().indexOf(column.getValue()) + 1));
+                column -> new ReadOnlyObjectWrapper<>(bookTableView.getItems().indexOf(column.getValue()) + 1));
     }
 
     @FXML
@@ -232,7 +232,7 @@ public class MainViewController extends AbstractViewController {
 
             if (clickedEntity != null) {
                 Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Вы уверены?",
-                        "Книга будет безвозратно удалена из библиотеки");
+                        "Книга будет безвозвратно удалена из библиотеки");
 
                 if (answer.isPresent() && OK.equals(answer.get().getText())) {
                     String deletedEntityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
@@ -266,10 +266,12 @@ public class MainViewController extends AbstractViewController {
 
     private void addSearchTooltip(FXMLLoader loader) {
         ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
-        Tooltip tooltip = new Tooltip(
-                "Поиск по прочитаному: read / nread\n" +
-                        "Поиск по завершённым циклам: end / nend"
+        Tooltip tooltip = new Tooltip(""
+            + "Поиск по прочитанному: read / nread\n"
+            + "Поиск по завершённым циклам: end / nend\n"
+            + "Поиск по автографам: sign / nsing\n"
         );
+
         tooltip.setAutoHide(false);
         tooltip.setFont(new Font(16f));
         tooltip.setShowDelay(new Duration(500f));

@@ -61,4 +61,18 @@ public class BookRepository extends AbstractFileRepository<Book> {
                 .filter(StringUtils::isNotBlank)
                 .noneMatch(field -> field.equals(value));
     }
+
+    @Override
+    protected void updateNewFields() {
+        repositoryMap.values()
+            .forEach(book ->
+                book.setAutograph(
+                    book.getAutograph() != null
+                        ? book.getAutograph()
+                        : false
+                )
+            );
+
+        updateStorageFile();
+    }
 }

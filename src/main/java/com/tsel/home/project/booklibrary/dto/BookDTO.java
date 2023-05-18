@@ -13,6 +13,7 @@ public class BookDTO {
     private String cycleNumber;
     private CheckBox cycleEnded;
     private CheckBox read;
+    private boolean autograph;
     private Integer pages;
 
     public String getName() {
@@ -71,6 +72,14 @@ public class BookDTO {
         this.read = read;
     }
 
+    public boolean isAutograph() {
+        return autograph;
+    }
+
+    public void setAutograph(boolean autograph) {
+        this.autograph = autograph;
+    }
+
     public Integer getPages() {
         return pages;
     }
@@ -91,12 +100,13 @@ public class BookDTO {
                 && Objects.equals(cycleNumber, bookDTO.cycleNumber)
                 && Objects.equals(cycleEnded, bookDTO.cycleEnded)
                 && Objects.equals(read, bookDTO.read)
+                && Objects.equals(autograph, bookDTO.autograph)
                 && Objects.equals(pages, bookDTO.pages);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, author, publisher, cycleName, cycleNumber, cycleEnded, read, pages);
+        return Objects.hash(name, author, publisher, cycleName, cycleNumber, cycleEnded, read, autograph, pages);
     }
 
     @Override
@@ -109,6 +119,7 @@ public class BookDTO {
                 ", cycleNumber='" + cycleNumber + '\'' +
                 ", cycleEnded=" + cycleEnded +
                 ", read=" + read +
+                ", autograph=" + autograph +
                 ", pages=" + pages +
                 '}';
     }

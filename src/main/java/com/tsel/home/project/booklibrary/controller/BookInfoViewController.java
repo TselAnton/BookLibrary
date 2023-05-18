@@ -55,6 +55,9 @@ public class BookInfoViewController extends AbstractViewController {
     private CheckBox readCheck;
 
     @FXML
+    private CheckBox autographCheck;
+
+    @FXML
     private Label cycleTitle;
 
     @FXML
@@ -136,6 +139,7 @@ public class BookInfoViewController extends AbstractViewController {
         pageCountLabel.setText(String.valueOf(book.getPages()));
 
         readCheck.setSelected(book.getRead());
+        autographCheck.setSelected(Boolean.TRUE.equals(book.getAutograph()));
 
         if (isNotBlank(book.getCycleName())) {
             updateFontSizeForLongNames(book.getCycleName(), cycleLabel);

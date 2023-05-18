@@ -12,6 +12,7 @@ public final class BookDTOBuilder {
     private String cycleNumber;
     private CheckBox cycleEnded;
     private CheckBox read;
+    private boolean autograph;
     private Integer pages;
 
     private BookDTOBuilder() {}
@@ -55,6 +56,11 @@ public final class BookDTOBuilder {
         return this;
     }
 
+    public BookDTOBuilder autograph(Boolean autograph) {
+        this.autograph = Boolean.TRUE.equals(autograph);
+        return this;
+    }
+
     public BookDTOBuilder pages(Integer pages) {
         this.pages = pages;
         return this;
@@ -69,6 +75,7 @@ public final class BookDTOBuilder {
         bookDTO.setCycleNumber(cycleNumber);
         bookDTO.setCycleEnded(cycleEnded);
         bookDTO.setRead(read);
+        bookDTO.setAutograph(autograph);
         bookDTO.setPages(pages);
         return bookDTO;
     }

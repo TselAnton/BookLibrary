@@ -1,22 +1,21 @@
 package com.tsel.home.project.booklibrary.repository.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.tsel.home.project.booklibrary.builder.BookBuilder;
 import com.tsel.home.project.booklibrary.data.Book;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 class BookRepositoryTest {
 
@@ -37,7 +36,7 @@ class BookRepositoryTest {
 
     @Test
     public void alreadyCreatedStorageFileShouldUsed() throws IOException {
-        Map<Long, Book> books = new HashMap<>();
+        Map<Long, Book> books = new LinkedHashMap<>();
         books.put(1L, createBook(1L));
         books.put(2L, createBook(2L));
         books.put(3L, createBook(3L));
@@ -55,12 +54,13 @@ class BookRepositoryTest {
 
     private Book createBook(long number) {
         return BookBuilder.builder()
-                .name("name" + number)
-                .publisher("publisher" + number)
-                .author("author" + number)
-                .pages(100)
-                .bookshelf(1)
-                .read(true)
-                .build();
+            .name("name" + number)
+            .publisher("publisher" + number)
+            .author("author" + number)
+            .pages(100)
+            .bookshelf(1)
+            .read(true)
+            .autograph(false)
+            .build();
     }
 }

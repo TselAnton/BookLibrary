@@ -21,6 +21,7 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
         if (isStorageAlreadyExist()) {
             try {
                 repositoryMap = readStorageFile();
+                updateNewFields();
                 updateStorageKeys();
             } catch (FileNotFoundException e) {
                 throw new IllegalStateException(format("Problem while reading file: %s", storageFileName), e);
@@ -82,6 +83,8 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
             throw new IllegalStateException(format("Problem while writing in the file: %s", storageFileName), e);
         }
     }
+
+    protected void updateNewFields() {}
 
     @Override
     public E getByName(String compositeKey) {

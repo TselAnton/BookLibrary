@@ -134,6 +134,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                            ComboBox<String> publisherInput,
                            TextField pagesCountInput,
                            CheckBox isReadCheckBox,
+                           CheckBox isAutographCheckBox,
                            ComboBox<String> cycleInput,
                            CheckBox isEndedCycleCheckBox,
                            TextField numberInCycleInput,
@@ -224,6 +225,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                 .publisher(publisher.trim())
                 .pages(stringToInt(pages))
                 .read(isRead)
+                .autograph(isChecked(isAutographCheckBox))
                 .cycleName(cycle != null ? cycle.trim() : null)
                 .numberInSeries(stringToInt(numberInCycle))
                 .coverImgAbsolutePath(imagePath)
