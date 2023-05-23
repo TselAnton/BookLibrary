@@ -87,6 +87,7 @@ public class EditBookViewController extends AbstractEditViewController {
         imageInput.setText(book.getCoverImgAbsolutePath());
 
         isReadCheckBox.setSelected(TRUE.equals(book.getRead()));
+        isAutographCheckBox.setSelected(TRUE.equals(book.getAutograph()));
 
         initComboBoxValue(authorInput, book::getAuthor);
         initComboBoxValue(publisherInput, book::getPublisher);
