@@ -1,23 +1,26 @@
 package com.tsel.home.project.booklibrary.controller;
 
-import com.tsel.home.project.booklibrary.data.Author;
-import com.tsel.home.project.booklibrary.data.Book;
-import com.tsel.home.project.booklibrary.data.Cycle;
-import com.tsel.home.project.booklibrary.data.Publisher;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
-
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
+
+import com.tsel.home.project.booklibrary.data.Author;
+import com.tsel.home.project.booklibrary.data.Book;
+import com.tsel.home.project.booklibrary.data.Cycle;
+import com.tsel.home.project.booklibrary.data.Publisher;
+import java.util.Optional;
+import java.util.function.Supplier;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 
 public class EditBookViewController extends AbstractEditViewController {
 

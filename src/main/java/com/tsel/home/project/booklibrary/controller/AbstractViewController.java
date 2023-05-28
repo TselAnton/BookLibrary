@@ -1,7 +1,15 @@
 package com.tsel.home.project.booklibrary.controller;
 
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+
 import com.tsel.home.project.booklibrary.converter.BookConverter;
-import com.tsel.home.project.booklibrary.repository.impl.*;
+import com.tsel.home.project.booklibrary.repository.impl.AuthorRepository;
+import com.tsel.home.project.booklibrary.repository.impl.BookRepository;
+import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
+import com.tsel.home.project.booklibrary.repository.impl.PublisherRepository;
+import com.tsel.home.project.booklibrary.repository.impl.UserSettingsRepository;
+import com.tsel.home.project.booklibrary.utils.ImageProvider;
+import java.util.Optional;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -13,20 +21,14 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.InputStream;
-import java.util.Optional;
-
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
-import static java.util.Objects.requireNonNull;
-
 public abstract class AbstractViewController {
 
+    public static final String RESOURCE_PATH = "/com/tsel/home/project/booklibrary/";
     protected static final Logger LOGGER = LogManager.getLogger(AbstractViewController.class);
-    protected static final String RESOURCE_PATH = "/com/tsel/home/project/booklibrary/";
 
     protected static final String OK = "OK";
 
-    protected Image iconImage = null;
+    protected Image iconImage;
 
     protected final static BookRepository BOOK_REPOSITORY = BookRepository.getInstance();
     protected final static CycleRepository CYCLE_REPOSITORY = CycleRepository.getInstance();
@@ -35,6 +37,7 @@ public abstract class AbstractViewController {
     protected final static UserSettingsRepository USER_SETTINGS_REPOSITORY = UserSettingsRepository.getInstance();
 
     protected final static BookConverter BOOK_CONVERTER = new BookConverter();
+    protected final ImageProvider imageProvider = new ImageProvider();
 
     private final String title;
     private final String resourceFile;
@@ -42,14 +45,7 @@ public abstract class AbstractViewController {
     protected AbstractViewController(String title, String resourceFile) {
         this.title = title;
         this.resourceFile = resourceFile;
-
-        try {
-            InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + "img/icon.png");
-            iconImage = new Image(requireNonNull(imageInputStream));
-
-        } catch (Exception e) {
-            LOGGER.error("Exception while init abstract constructor", e);
-        }
+        this.iconImage = imageProvider.getDefaultImage();
     }
 
     public void initController(AbstractViewController parentController, String entityKey) {}

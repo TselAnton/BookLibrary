@@ -1,10 +1,29 @@
 package com.tsel.home.project.booklibrary.controller;
 
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.control.Alert.AlertType.WARNING;
+
 import com.tsel.home.project.booklibrary.builder.BookBuilder;
 import com.tsel.home.project.booklibrary.builder.CycleBuilder;
-import com.tsel.home.project.booklibrary.data.*;
+import com.tsel.home.project.booklibrary.data.Author;
+import com.tsel.home.project.booklibrary.data.BaseEntity;
+import com.tsel.home.project.booklibrary.data.Book;
+import com.tsel.home.project.booklibrary.data.Cycle;
+import com.tsel.home.project.booklibrary.data.Publisher;
 import com.tsel.home.project.booklibrary.repository.FileRepository;
 import com.tsel.home.project.booklibrary.utils.AutoCompleteComboBoxListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -13,22 +32,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
-
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
-import static java.lang.Boolean.TRUE;
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.scene.control.Alert.AlertType.WARNING;
 
 public abstract class AbstractEditViewController extends AbstractViewController {
 

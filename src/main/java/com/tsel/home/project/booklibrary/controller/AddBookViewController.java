@@ -1,20 +1,22 @@
 package com.tsel.home.project.booklibrary.controller;
 
+import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
+import static javafx.scene.control.Alert.AlertType.WARNING;
+
 import com.tsel.home.project.booklibrary.data.Author;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
 import com.tsel.home.project.booklibrary.data.Publisher;
-import com.tsel.home.project.booklibrary.utils.AutoCompleteComboBoxListener;
+import java.util.Optional;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-
-import java.util.Optional;
-
-import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
-import static javafx.scene.control.Alert.AlertType.WARNING;
 
 public class AddBookViewController extends AbstractEditViewController {
 

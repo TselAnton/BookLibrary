@@ -2,28 +2,20 @@ package com.tsel.home.project.booklibrary.controller;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -78,23 +70,10 @@ public class BookInfoViewController extends AbstractViewController {
     @FXML
     private Button editBookButton;
 
-    @FXML
-    private GridPane bookInfoGrid;
-
     private Book book;
-
-    private Image defaultImg;
 
     public BookInfoViewController() {
         super(null, null);
-
-        try {
-            InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + "img/default.png");
-            defaultImg = new Image(requireNonNull(imageInputStream));
-
-        } catch (Exception e) {
-            LOGGER.error("Exception while init BookInfoViewController", e);
-        }
     }
 
     @Override
@@ -161,7 +140,7 @@ public class BookInfoViewController extends AbstractViewController {
             cycleEnded.setVisible(false);
         }
 
-        coverImage.setImage(resolveCover(book));
+        coverImage.setImage(imageProvider.resolveCover(book));
     }
 
     private void updateFontSizeForLongNames(String text, Label label) {
@@ -171,25 +150,6 @@ public class BookInfoViewController extends AbstractViewController {
         } else {
             label.setFont(new Font(labelFont.getName(), NORMAL_FONT_SIZE));
         }
-    }
-
-    private Image resolveCover(Book book) {
-        if (isNotBlank(book.getCoverImgAbsolutePath())) {
-            Path imgPath = Paths.get(book.getCoverImgAbsolutePath());
-            if (Files.exists(imgPath)) {
-                try (InputStream inputStream = Files.newInputStream(imgPath)) {
-                    Image bookImage = new Image(inputStream);
-                    return bookImage.isError()
-                            ? defaultImg
-                            : bookImage;
-
-                } catch (IOException e) {
-                    LOGGER.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
-                }
-            }
-        }
-
-        return defaultImg;
     }
 
     @FXML
