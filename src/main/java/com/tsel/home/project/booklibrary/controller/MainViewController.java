@@ -68,6 +68,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.put("cycleEndColumn", "cycleEnded");
         TABLE_COLUMNS_SETTINGS.put("readColumn", "read");
         TABLE_COLUMNS_SETTINGS.put("pagesColumn", "pages");
+        TABLE_COLUMNS_SETTINGS.put("imageColumn", "cover");
 
         TABLE_COLUMNS_SORTING = new HashMap<>();
         TABLE_COLUMNS_SORTING.put("readColumn", MainViewController::compareCheckBoxes);

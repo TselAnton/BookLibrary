@@ -1,12 +1,13 @@
 package com.tsel.home.project.booklibrary.dto;
 
-import javafx.scene.control.CheckBox;
-
 import java.util.Objects;
+import javafx.scene.control.CheckBox;
+import javafx.scene.image.ImageView;
 
 public class BookDTO {
 
     private String name;
+    private ImageView cover;
     private String author;
     private String publisher;
     private String cycleName;
@@ -86,6 +87,14 @@ public class BookDTO {
 
     public void setPages(Integer pages) {
         this.pages = pages;
+    }
+
+    public ImageView getCover() {
+        return cover;
+    }
+
+    public void setCover(ImageView cover) {
+        this.cover = cover;
     }
 
     @Override

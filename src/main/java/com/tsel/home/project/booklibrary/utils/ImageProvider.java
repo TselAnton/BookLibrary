@@ -32,7 +32,7 @@ public class ImageProvider {
         }
     }
 
-    public Image getDefaultImage() {
+    public Image getDefaultCover() {
         return this.defaultImg;
     }
 

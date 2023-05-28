@@ -45,7 +45,7 @@ public abstract class AbstractViewController {
     protected AbstractViewController(String title, String resourceFile) {
         this.title = title;
         this.resourceFile = resourceFile;
-        this.iconImage = imageProvider.getDefaultImage();
+        this.iconImage = imageProvider.getDefaultCover();
     }
 
     public void initController(AbstractViewController parentController, String entityKey) {}

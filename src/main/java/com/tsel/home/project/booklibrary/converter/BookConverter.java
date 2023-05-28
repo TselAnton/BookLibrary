@@ -38,6 +38,7 @@ public class BookConverter {
                 .read(getCheckBox(book.getRead()))
                 .autograph(book.getAutograph())
                 .pages(book.getPages())
+                .cover(book)
                 .build();
     }
 

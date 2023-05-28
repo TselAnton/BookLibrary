@@ -1,11 +1,17 @@
 package com.tsel.home.project.booklibrary.builder;
 
+import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
+import com.tsel.home.project.booklibrary.utils.ImageProvider;
 import javafx.scene.control.CheckBox;
+import javafx.scene.image.ImageView;
 
 public final class BookDTOBuilder {
 
+    private static final ImageProvider IMAGE_PROVIDER = new ImageProvider();
+
     private String name;
+    private ImageView cover;
     private String author;
     private String publisher;
     private String cycleName;
@@ -66,8 +72,17 @@ public final class BookDTOBuilder {
         return this;
     }
 
+    public BookDTOBuilder cover(Book book) {
+        var coverImageView = new ImageView(IMAGE_PROVIDER.resolveCover(book));
+        coverImageView.setFitWidth(12);
+        coverImageView.setPreserveRatio(true);
+        this.cover = coverImageView;
+        return this;
+    }
+
     public BookDTO build() {
         BookDTO bookDTO = new BookDTO();
+        bookDTO.setCover(cover);
         bookDTO.setName(name);
         bookDTO.setAuthor(author);
         bookDTO.setPublisher(publisher);
