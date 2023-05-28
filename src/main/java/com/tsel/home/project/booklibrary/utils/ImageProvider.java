@@ -24,16 +24,19 @@ public class ImageProvider {
 
     public ImageProvider() {
         try {
-            InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + "img/default.png");
-            defaultImg = new Image(requireNonNull(imageInputStream));
-
+            this.defaultImg = loadImage("img/default.png");
         } catch (Exception e) {
-            LOGGER.error("Exception while init BookInfoViewController", e);
+            LOGGER.error("Exception while init abstract constructor", e);
         }
     }
 
-    public Image getDefaultCover() {
-        return this.defaultImg;
+    public Image loadIcon() {
+        try {
+            return loadImage("img/icon.png");
+        } catch (Exception e) {
+            LOGGER.error("Exception while load icon", e);
+            return null;
+        }
     }
 
     public Image resolveCover(Book book) {
@@ -53,5 +56,10 @@ public class ImageProvider {
         }
 
         return defaultImg;
+    }
+
+    private Image loadImage(String path) {
+        InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + path);
+        return new Image(requireNonNull(imageInputStream));
     }
 }
