@@ -36,8 +36,8 @@ public abstract class AbstractViewController {
     protected final static PublisherRepository PUBLISHER_REPOSITORY = PublisherRepository.getInstance();
     protected final static UserSettingsRepository USER_SETTINGS_REPOSITORY = UserSettingsRepository.getInstance();
 
+    protected final static ImageProvider IMAGE_PROVIDER = ImageProvider.getInstance();
     protected final static BookConverter BOOK_CONVERTER = new BookConverter();
-    protected final ImageProvider imageProvider = new ImageProvider();
 
     private final String title;
     private final String resourceFile;
@@ -45,7 +45,7 @@ public abstract class AbstractViewController {
     protected AbstractViewController(String title, String resourceFile) {
         this.title = title;
         this.resourceFile = resourceFile;
-        this.iconImage = imageProvider.loadIcon();
+        this.iconImage = IMAGE_PROVIDER.loadIcon();
     }
 
     public void initController(AbstractViewController parentController, String entityKey) {}

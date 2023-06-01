@@ -161,6 +161,10 @@ public class EditBookViewController extends AbstractEditViewController {
     protected boolean doUpdate(Book newBook, Author newAuthor, Publisher newPublisher, Cycle newCycle) {
         BOOK_REPOSITORY.delete(book);
 
+        if (book != null && book.getCoverImgAbsolutePath() != null) {
+            IMAGE_PROVIDER.deleteImagesFromCache(book);
+        }
+
         BOOK_REPOSITORY.save(newBook);
         AUTHOR_REPOSITORY.save(newAuthor);
         PUBLISHER_REPOSITORY.save(newPublisher);

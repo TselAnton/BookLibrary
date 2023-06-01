@@ -8,7 +8,7 @@ import javafx.scene.image.ImageView;
 
 public final class BookDTOBuilder {
 
-    private static final ImageProvider IMAGE_PROVIDER = new ImageProvider();
+    private static final ImageProvider IMAGE_PROVIDER = ImageProvider.getInstance();
 
     private String name;
     private ImageView cover;
@@ -73,10 +73,7 @@ public final class BookDTOBuilder {
     }
 
     public BookDTOBuilder cover(Book book) {
-        var coverImageView = new ImageView(IMAGE_PROVIDER.resolveCover(book));
-        coverImageView.setFitWidth(12);
-        coverImageView.setPreserveRatio(true);
-        this.cover = coverImageView;
+        this.cover = new ImageView(IMAGE_PROVIDER.resolveSmallCover(book));
         return this;
     }
 

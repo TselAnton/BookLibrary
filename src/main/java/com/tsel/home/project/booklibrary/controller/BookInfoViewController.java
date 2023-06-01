@@ -140,7 +140,7 @@ public class BookInfoViewController extends AbstractViewController {
             cycleEnded.setVisible(false);
         }
 
-        coverImage.setImage(imageProvider.resolveCover(book));
+        coverImage.setImage(IMAGE_PROVIDER.resolveCover(book));
     }
 
     private void updateFontSizeForLongNames(String text, Label label) {
