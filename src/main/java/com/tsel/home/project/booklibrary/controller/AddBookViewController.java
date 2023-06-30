@@ -57,6 +57,9 @@ public class AddBookViewController extends AbstractEditViewController {
     private TextField totalCountInCycleInput;
 
     @FXML
+    private TextField priceInput;
+
+    @FXML
     private Button cancelButton;
 
     @FXML
@@ -106,6 +109,7 @@ public class AddBookViewController extends AbstractEditViewController {
             numberInCycleInput,
             totalCountInCycleInput,
             imageInput,
+            priceInput,
             addButton
         );
     }

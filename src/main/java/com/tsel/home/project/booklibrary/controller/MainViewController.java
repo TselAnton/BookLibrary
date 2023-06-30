@@ -15,16 +15,19 @@ import static javafx.stage.Modality.NONE;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchService;
+import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableColumn;
@@ -243,6 +246,26 @@ public class MainViewController extends AbstractViewController {
     }
 
     @FXML
+    public void getBooksPrice() {
+        double fullPrice = bookTableView.getItems()
+            .stream()
+            .map(BookDTO::getPrice)
+            .filter(Objects::nonNull)
+            .reduce(Double::sum)
+            .orElse(0.0);
+
+        int itemsSize = bookTableView.getItems().size();
+
+        riseAlert(AlertType.INFORMATION, "Стоимость книг", "Стоимость книг",
+            format("Стоимость %s %s: %s руб",
+                itemsSize,
+                itemsSize == 1 ? "книги" : "книг",
+                new DecimalFormat("###,###").format(fullPrice)
+            )
+        );
+    }
+
+    @FXML
     public void tableViewKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.DELETE) {
             BookDTO clickedEntity = bookTableView.getSelectionModel().getSelectedItem();
@@ -287,6 +310,7 @@ public class MainViewController extends AbstractViewController {
             + "Поиск по прочитанному: read / nread\n"
             + "Поиск по завершённым циклам: end / nend\n"
             + "Поиск по автографам: sign / nsing\n"
+            + "Поиск по цене: price[><=][цена] для поиска по цене / nprice для бесценных книг"
         );
 
         tooltip.setAutoHide(false);

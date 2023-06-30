@@ -18,6 +18,7 @@ public class Book implements BaseEntity {
     private String cycleName;
     private Integer numberInSeries;
     private String coverImgAbsolutePath;
+    private Double price;
 
     @Deprecated
     private Integer bookshelf;
@@ -124,6 +125,14 @@ public class Book implements BaseEntity {
 
     public void setCoverImgAbsolutePath(String coverImgAbsolutePath) {
         this.coverImgAbsolutePath = coverImgAbsolutePath;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     @Override

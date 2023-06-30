@@ -16,6 +16,7 @@ public class BookDTO {
     private CheckBox read;
     private boolean autograph;
     private Integer pages;
+    private Double price;
 
     public String getName() {
         return name;
@@ -97,6 +98,14 @@ public class BookDTO {
         this.cover = cover;
     }
 
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -110,12 +119,13 @@ public class BookDTO {
                 && Objects.equals(cycleEnded, bookDTO.cycleEnded)
                 && Objects.equals(read, bookDTO.read)
                 && Objects.equals(autograph, bookDTO.autograph)
-                && Objects.equals(pages, bookDTO.pages);
+                && Objects.equals(pages, bookDTO.pages)
+                && Objects.equals(price, bookDTO.price);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, author, publisher, cycleName, cycleNumber, cycleEnded, read, autograph, pages);
+        return Objects.hash(name, author, publisher, cycleName, cycleNumber, cycleEnded, read, autograph, pages, price);
     }
 
     @Override
@@ -130,6 +140,7 @@ public class BookDTO {
                 ", read=" + read +
                 ", autograph=" + autograph +
                 ", pages=" + pages +
+                ", price=" + price +
                 '}';
     }
 }

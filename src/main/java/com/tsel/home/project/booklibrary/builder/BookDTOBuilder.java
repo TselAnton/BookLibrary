@@ -20,6 +20,7 @@ public final class BookDTOBuilder {
     private CheckBox read;
     private boolean autograph;
     private Integer pages;
+    private Double price;
 
     private BookDTOBuilder() {}
 
@@ -77,6 +78,11 @@ public final class BookDTOBuilder {
         return this;
     }
 
+    public BookDTOBuilder price(Double price) {
+        this.price = price;
+        return this;
+    }
+
     public BookDTO build() {
         BookDTO bookDTO = new BookDTO();
         bookDTO.setCover(cover);
@@ -89,6 +95,7 @@ public final class BookDTOBuilder {
         bookDTO.setRead(read);
         bookDTO.setAutograph(autograph);
         bookDTO.setPages(pages);
+        bookDTO.setPrice(price);
         return bookDTO;
     }
 }

@@ -13,6 +13,7 @@ public final class BookBuilder {
     private Boolean autograph;
     private String cycleName;
     private Integer numberInSeries;
+    private Double price;
     private String coverImgAbsolutePath;
 
     private BookBuilder() {}
@@ -41,6 +42,7 @@ public final class BookBuilder {
         return this;
     }
 
+    @Deprecated
     public BookBuilder bookshelf(Integer bookshelf) {
         this.bookshelf = bookshelf;
         return this;
@@ -71,6 +73,11 @@ public final class BookBuilder {
         return this;
     }
 
+    public BookBuilder price(Double price) {
+        this.price = price;
+        return this;
+    }
+
     public Book build() {
         Book book = new Book();
         book.setName(name);
@@ -83,6 +90,7 @@ public final class BookBuilder {
         book.setCycleName(cycleName);
         book.setNumberInSeries(numberInSeries);
         book.setCoverImgAbsolutePath(coverImgAbsolutePath);
+        book.setPrice(price);
         return book;
     }
 }

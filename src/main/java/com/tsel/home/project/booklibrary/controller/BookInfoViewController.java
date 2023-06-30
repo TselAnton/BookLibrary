@@ -6,6 +6,7 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
+import java.text.DecimalFormat;
 import java.util.Optional;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -70,6 +71,9 @@ public class BookInfoViewController extends AbstractViewController {
     @FXML
     private Button editBookButton;
 
+    @FXML
+    private Label priceLabel;
+
     private Book book;
 
     public BookInfoViewController() {
@@ -116,6 +120,7 @@ public class BookInfoViewController extends AbstractViewController {
         authorLabel.setText(book.getAuthor());
         publisherLabel.setText(book.getPublisher());
         pageCountLabel.setText(String.valueOf(book.getPages()));
+        priceLabel.setText(resolvePrice(book.getPrice()));
 
         readCheck.setSelected(book.getRead());
         autographCheck.setSelected(Boolean.TRUE.equals(book.getAutograph()));
@@ -143,6 +148,12 @@ public class BookInfoViewController extends AbstractViewController {
         coverImage.setImage(IMAGE_PROVIDER.resolveCover(book));
     }
 
+    private String resolvePrice(Double price) {
+        if (price == null) return "Бесценно";
+        if (price == 0.0) return "Подарок";
+        return new DecimalFormat("###,###").format(price) + " руб.";
+    }
+
     private void updateFontSizeForLongNames(String text, Label label) {
         Font labelFont = label.getFont();
         if (isNotBlank(text) && text.length() > 34) {
@@ -162,7 +173,7 @@ public class BookInfoViewController extends AbstractViewController {
     @FXML
     public void deleteBook() {
         Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Вы уверены?",
-                "Книга будет безвозратно удалена из библиотеки");
+                "Книга будет безвозвратно удалена из библиотеки");
 
         if (answer.isPresent() && OK.equals(answer.get().getText())) {
             Stage stage = (Stage) deleteButton.getScene().getWindow();

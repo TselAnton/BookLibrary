@@ -143,6 +143,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                            TextField numberInCycleInput,
                            TextField totalCountInCycleInput,
                            TextField imageInput,
+                           TextField priceInput,
                            Button addButton) {
 
         String bookName = getInputText(nameInput);
@@ -159,65 +160,76 @@ public abstract class AbstractEditViewController extends AbstractViewController 
 
         String imagePath = getInputText(imageInput);
 
+        Double price = null;
+        try {
+            String priceText = getInputText(priceInput);
+            if (priceText != null && !priceText.isBlank()) {
+                price = Double.parseDouble(priceText.replaceAll(",", "."));
+            }
+        } catch (NumberFormatException e) {
+            riseAlert(WARNING, "Ошибка", "Стоимость указана не верно",
+                "В стоимости книги указаны не числовые символы");
+        }
+
         if (bookName == null) {
-            riseAlert(WARNING, "Ошибка","Название книги не заполнено",
+            riseAlert(WARNING, "Ошибка", "Название книги не заполнено",
                     "Название книги не может быть пустым");
             return;
         }
         if (author == null) {
-            riseAlert(WARNING, "Ошибка","Имя автора не заполнено",
+            riseAlert(WARNING, "Ошибка", "Имя автора не заполнено",
                     "Имя автора не может быть пустым");
             return;
         }
         if (publisher == null) {
-            riseAlert(WARNING, "Ошибка","Название издателя не заполнено",
+            riseAlert(WARNING, "Ошибка", "Название издателя не заполнено",
                     "Название издателя не может быть пустым");
             return;
         }
         if (pages == null) {
-            riseAlert(WARNING, "Ошибка","Количество страниц не заполнено",
+            riseAlert(WARNING, "Ошибка", "Количество страниц не заполнено",
                     "Количество страниц в книги не может быть пустым");
             return;
         }
         if (stringToInt(pages) == null) {
-            riseAlert(WARNING, "Ошибка","Неверно заполнено количество страниц",
+            riseAlert(WARNING, "Ошибка", "Неверно заполнено количество страниц",
                     "Количество страниц должно быть записано в виде целого числа");
             return;
         }
 
         // Cycle validations
         if (isNotBlank(numberInCycle) && stringToInt(numberInCycle) == null) {
-            riseAlert(WARNING, "Ошибка","Неверно заполнен номер книги в цикле",
+            riseAlert(WARNING, "Ошибка", "Неверно заполнен номер книги в цикле",
                     "Номер книги в цикле должен быть записан в виде целого числа");
             return;
         }
         if (isNotBlank(totalInCycle) && stringToInt(totalInCycle) == null) {
-            riseAlert(WARNING, "Ошибка","Неверно заполнено количество книги в цикле",
+            riseAlert(WARNING, "Ошибка", "Неверно заполнено количество книги в цикле",
                     "Количество книг в цикле должно быть записано в виде целого числа");
             return;
         }
         if (isBlank(cycle) && isEndedCycle) {
-            riseAlert(WARNING, "Ошибка","Название цикла не заполнено",
+            riseAlert(WARNING, "Ошибка", "Название цикла не заполнено",
                     "Указано, что цикл окончен, но название цикла при этом не может быть пустым");
             return;
         }
         if (isBlank(cycle) && isNotBlank(numberInCycle)) {
-            riseAlert(WARNING, "Ошибка","Название цикла не заполнено",
+            riseAlert(WARNING, "Ошибка", "Название цикла не заполнено",
                     "Указан номер книги в цикле, но название цикла при этом не может быть пустым");
             return;
         }
         if (isBlank(cycle) && isNotBlank(totalInCycle)) {
-            riseAlert(WARNING, "Ошибка","Название цикла не заполнено",
+            riseAlert(WARNING, "Ошибка", "Название цикла не заполнено",
                     "Указано количество книг в цикле, но название цикла при этом не может быть пустым");
             return;
         }
         if (isNotBlank(cycle) && isBlank(numberInCycle)) {
-            riseAlert(WARNING, "Ошибка","Неверно заполнен номер книги в цикле",
+            riseAlert(WARNING, "Ошибка", "Неверно заполнен номер книги в цикле",
                     "Указано название цикла, но номер книги в цикле при этом не может быть пустым");
             return;
         }
         if (isNotBlank(cycle) && isBlank(totalInCycle)) {
-            riseAlert(WARNING, "Ошибка","Неверно заполнено количество книги в цикле",
+            riseAlert(WARNING, "Ошибка", "Неверно заполнено количество книги в цикле",
                     "Указано название цикла, но количество книг в цикле при этом не может быть пустым");
             return;
         }
@@ -232,6 +244,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                 .cycleName(cycle != null ? cycle.trim() : null)
                 .numberInSeries(stringToInt(numberInCycle))
                 .coverImgAbsolutePath(imagePath)
+                .price(price)
                 .build();
 
         Author newAuthor = new Author(author.trim());

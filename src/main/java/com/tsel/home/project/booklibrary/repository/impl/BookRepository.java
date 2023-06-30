@@ -65,12 +65,14 @@ public class BookRepository extends AbstractFileRepository<Book> {
     @Override
     protected void updateNewFields() {
         repositoryMap.values()
-            .forEach(book ->
-                book.setAutograph(
-                    book.getAutograph() != null
-                        ? book.getAutograph()
-                        : false
-                )
+            .forEach(book -> {
+                    book.setAutograph(
+                        book.getAutograph() != null
+                            ? book.getAutograph()
+                            : false
+                    );
+                    book.setPrice(book.getPrice() == null ? null : book.getPrice());
+                }
             );
 
         updateStorageFile();

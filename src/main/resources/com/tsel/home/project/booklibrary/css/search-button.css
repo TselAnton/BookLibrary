@@ -1,5 +1,5 @@
 .search-button {
-    -icon-paint: #058264;
+    -icon-paint: #3A3D20;
     -fx-background-color: -icon-paint;
     -size: 30;
     -fx-min-height: -size;
@@ -11,15 +11,15 @@
 }
 
 .search-button:hover {
-    -icon-paint: #074E46;
+    -icon-paint: #8B936B;
 }
 
 .default-button {
-    -icon-paint: #058264;
+    -icon-paint: #8B936B;
     -fx-background-color: -icon-paint;
 }
 
 .default-button:hover {
-    -icon-paint: #074E46;
+    -icon-paint: #3A3D20;
     -fx-background-color: -icon-paint;
 }

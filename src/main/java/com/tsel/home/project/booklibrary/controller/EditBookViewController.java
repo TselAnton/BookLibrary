@@ -61,6 +61,9 @@ public class EditBookViewController extends AbstractEditViewController {
     private TextField totalCountInCycleInput;
 
     @FXML
+    private TextField priceInput;
+
+    @FXML
     private Button cancelButton;
 
     @FXML
@@ -95,6 +98,8 @@ public class EditBookViewController extends AbstractEditViewController {
         initComboBoxValue(authorInput, book::getAuthor);
         initComboBoxValue(publisherInput, book::getPublisher);
         initComboBoxValue(cycleInput, book::getCycleName);
+
+        priceInput.setText(book.getPrice() != null ? String.valueOf(book.getPrice()) : "");
 
         if (isNotBlank(book.getCycleName())) {
             Cycle cycle = CYCLE_REPOSITORY.getByName(book.getCycleName());
@@ -153,6 +158,7 @@ public class EditBookViewController extends AbstractEditViewController {
             numberInCycleInput,
             totalCountInCycleInput,
             imageInput,
+            priceInput,
             editButton
         );
     }

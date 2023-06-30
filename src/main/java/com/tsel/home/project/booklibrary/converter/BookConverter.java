@@ -39,6 +39,7 @@ public class BookConverter {
                 .autograph(book.getAutograph())
                 .pages(book.getPages())
                 .cover(book)
+                .price(book.getPrice())
                 .build();
     }
 
