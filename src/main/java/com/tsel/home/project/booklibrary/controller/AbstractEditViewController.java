@@ -144,6 +144,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                            TextField totalCountInCycleInput,
                            TextField imageInput,
                            TextField priceInput,
+                           CheckBox isHardCoverCheckBox,
                            Button addButton) {
 
         String bookName = getInputText(nameInput);
@@ -159,6 +160,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         String totalInCycle = getInputText(totalCountInCycleInput);
 
         String imagePath = getInputText(imageInput);
+        boolean isHardCover = isChecked(isHardCoverCheckBox);
 
         Double price = null;
         try {
@@ -245,6 +247,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                 .numberInSeries(stringToInt(numberInCycle))
                 .coverImgAbsolutePath(imagePath)
                 .price(price)
+                .hardCover(isHardCover)
                 .build();
 
         Author newAuthor = new Author(author.trim());

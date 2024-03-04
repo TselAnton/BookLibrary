@@ -18,6 +18,7 @@ public class BookRepository extends AbstractFileRepository<Book> {
     private static final CycleRepository CYCLE_REPOSITORY = CycleRepository.getInstance();
 
     private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-books-storage.txt";
+    private static final String TEST_PNG_COVER_PATH = "G:\\MyProjects\\IdeaProjects\\BookLibrary\\test_cover.png";
 
     private static BookRepository INSTANCE;
 
@@ -66,15 +67,31 @@ public class BookRepository extends AbstractFileRepository<Book> {
     protected void updateNewFields() {
         repositoryMap.values()
             .forEach(book -> {
-                    book.setAutograph(
-                        book.getAutograph() != null
-                            ? book.getAutograph()
-                            : false
-                    );
-                    book.setPrice(book.getPrice() == null ? null : book.getPrice());
+                    prepareAutograph(book);
+                    preparePrice(book);
+                    prepareHardCover(book);
+
+                    // Используется исключительно для тестого запуска
+                    // book.setCoverImgAbsolutePath(TEST_PNG_COVER_PATH);
                 }
             );
 
         updateStorageFile();
+    }
+
+    private void prepareAutograph(Book book) {
+        book.setAutograph(
+            book.getAutograph() != null
+                ? book.getAutograph()
+                : false
+        );
+    }
+
+    private void preparePrice(Book book) {
+        book.setPrice(book.getPrice() == null ? null : book.getPrice());
+    }
+
+    private void prepareHardCover(Book book) {
+        book.setHardCover(book.getHardCover() == null || book.getHardCover());
     }
 }

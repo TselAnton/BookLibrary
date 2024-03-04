@@ -40,6 +40,7 @@ public class BookConverter {
                 .pages(book.getPages())
                 .cover(book)
                 .price(book.getPrice())
+                .hardCover(getCheckBox(book.getHardCover()))
                 .build();
     }
 

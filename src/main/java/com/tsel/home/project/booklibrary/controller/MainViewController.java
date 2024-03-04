@@ -306,11 +306,13 @@ public class MainViewController extends AbstractViewController {
 
     private void addSearchTooltip(FXMLLoader loader) {
         ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
-        Tooltip tooltip = new Tooltip(""
-            + "Поиск по прочитанному: read / nread\n"
-            + "Поиск по завершённым циклам: end / nend\n"
-            + "Поиск по автографам: sign / nsing\n"
-            + "Поиск по цене: price[><=][цена] для поиска по цене / nprice для бесценных книг"
+        Tooltip tooltip = new Tooltip("""
+                Поиск по прочитанному: read / nread
+                Поиск по завершённым циклам: end / nend
+                Поиск по автографам: sign / nsing
+                Поиск по цене: price[><=][цена] для поиска по цене / nprice для бесценных книг
+                Поиск по твёрдой обложке: hardcover / nhardcover
+                """
         );
 
         tooltip.setAutoHide(false);

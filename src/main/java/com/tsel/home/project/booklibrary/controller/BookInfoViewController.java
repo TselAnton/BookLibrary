@@ -74,6 +74,9 @@ public class BookInfoViewController extends AbstractViewController {
     @FXML
     private Label priceLabel;
 
+    @FXML
+    private CheckBox isHardCoverCheckBox;
+
     private Book book;
 
     public BookInfoViewController() {
@@ -124,6 +127,7 @@ public class BookInfoViewController extends AbstractViewController {
 
         readCheck.setSelected(book.getRead());
         autographCheck.setSelected(Boolean.TRUE.equals(book.getAutograph()));
+        isHardCoverCheckBox.setSelected(Boolean.TRUE.equals(book.getHardCover()));
 
         if (isNotBlank(book.getCycleName())) {
             updateFontSizeForLongNames(book.getCycleName(), cycleLabel);

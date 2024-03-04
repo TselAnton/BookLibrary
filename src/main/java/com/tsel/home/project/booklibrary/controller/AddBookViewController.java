@@ -60,6 +60,9 @@ public class AddBookViewController extends AbstractEditViewController {
     private TextField priceInput;
 
     @FXML
+    private CheckBox isHardCoverCheckBox;
+
+    @FXML
     private Button cancelButton;
 
     @FXML
@@ -83,8 +86,12 @@ public class AddBookViewController extends AbstractEditViewController {
     @FXML
     public void stageKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            Optional<ButtonType> answer = riseAlert(CONFIRMATION, "Внимание!", "Закрыть окно?",
-                    "Все несохранённые данные будут потеряны");
+            Optional<ButtonType> answer = riseAlert(
+                    CONFIRMATION,
+                    "Внимание!",
+                    "Закрыть окно?",
+                    "Все несохранённые данные будут потеряны"
+            );
 
             if (answer.isPresent() && OK.equals(answer.get().getText())) {
                 Stage stage = (Stage) cancelButton.getScene().getWindow();
@@ -110,6 +117,7 @@ public class AddBookViewController extends AbstractEditViewController {
             totalCountInCycleInput,
             imageInput,
             priceInput,
+            isHardCoverCheckBox,
             addButton
         );
     }

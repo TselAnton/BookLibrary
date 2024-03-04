@@ -6,7 +6,7 @@
 
     <groupId>com.tsel.home.project</groupId>
     <artifactId>BookLibrary</artifactId>
-    <version>3.0</version>
+    <version>3.1</version>
     <name>BookLibrary</name>
     <packaging>jar</packaging>
 
@@ -151,6 +151,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <finalName>BookLibraryApp</finalName>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <transformers>
                                 <transformer implementation=

@@ -18,6 +18,8 @@ public class Book implements BaseEntity {
     private String cycleName;
     private Integer numberInSeries;
     private String coverImgAbsolutePath;
+
+    private Boolean hardCover;
     private Double price;
 
     @Deprecated
@@ -127,6 +129,14 @@ public class Book implements BaseEntity {
         this.coverImgAbsolutePath = coverImgAbsolutePath;
     }
 
+    public Boolean getHardCover() {
+        return hardCover;
+    }
+
+    public void setHardCover(Boolean hardCover) {
+        this.hardCover = hardCover;
+    }
+
     public Double getPrice() {
         return price;
     }
@@ -148,12 +158,24 @@ public class Book implements BaseEntity {
                 && Objects.equals(autograph, book.autograph)
                 && Objects.equals(cycleName, book.cycleName)
                 && Objects.equals(numberInSeries, book.numberInSeries)
-                && Objects.equals(coverImgAbsolutePath, book.coverImgAbsolutePath);
+                && Objects.equals(coverImgAbsolutePath, book.coverImgAbsolutePath)
+                && Objects.equals(hardCover, book.hardCover);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, author, publisher, pages, read, cycleName, numberInSeries, coverImgAbsolutePath);
+        return Objects.hash(
+                name,
+                author,
+                publisher,
+                pages,
+                read,
+                cycleName,
+                numberInSeries,
+                coverImgAbsolutePath,
+                hardCover,
+                price
+        );
     }
 
     @Override
@@ -167,7 +189,9 @@ public class Book implements BaseEntity {
                 ", autograph=" + autograph +
                 ", cycleName='" + cycleName + '\'' +
                 ", numberInSeries=" + numberInSeries +
+                ", hardCover=" + hardCover +
                 ", coverImgAbsolutePath=" + coverImgAbsolutePath +
+                ", price=" + price +
                 '}';
     }
 }

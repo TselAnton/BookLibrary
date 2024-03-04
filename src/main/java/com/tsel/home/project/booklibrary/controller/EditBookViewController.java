@@ -64,6 +64,9 @@ public class EditBookViewController extends AbstractEditViewController {
     private TextField priceInput;
 
     @FXML
+    private CheckBox isHardCoverCheckBox;
+
+    @FXML
     private Button cancelButton;
 
     @FXML
@@ -94,6 +97,7 @@ public class EditBookViewController extends AbstractEditViewController {
 
         isReadCheckBox.setSelected(TRUE.equals(book.getRead()));
         isAutographCheckBox.setSelected(TRUE.equals(book.getAutograph()));
+        isHardCoverCheckBox.setSelected(Boolean.TRUE.equals(book.getHardCover()));
 
         initComboBoxValue(authorInput, book::getAuthor);
         initComboBoxValue(publisherInput, book::getPublisher);
@@ -159,6 +163,7 @@ public class EditBookViewController extends AbstractEditViewController {
             totalCountInCycleInput,
             imageInput,
             priceInput,
+            isHardCoverCheckBox,
             editButton
         );
     }

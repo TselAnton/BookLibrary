@@ -15,6 +15,7 @@ public final class BookBuilder {
     private Integer numberInSeries;
     private Double price;
     private String coverImgAbsolutePath;
+    private Boolean hardCover;
 
     private BookBuilder() {}
 
@@ -78,6 +79,11 @@ public final class BookBuilder {
         return this;
     }
 
+    public BookBuilder hardCover(Boolean hardCover) {
+        this.hardCover = hardCover;
+        return this;
+    }
+
     public Book build() {
         Book book = new Book();
         book.setName(name);
@@ -91,6 +97,7 @@ public final class BookBuilder {
         book.setNumberInSeries(numberInSeries);
         book.setCoverImgAbsolutePath(coverImgAbsolutePath);
         book.setPrice(price);
+        book.setHardCover(hardCover);
         return book;
     }
 }
