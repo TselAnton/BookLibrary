@@ -2,7 +2,11 @@ package com.tsel.home.project.booklibrary.data;
 
 import java.io.Serial;
 import java.util.Objects;
+import lombok.Data;
+import lombok.ToString;
 
+@Data
+@ToString
 public class Author implements BaseEntity {
 
     @Serial
@@ -17,33 +21,5 @@ public class Author implements BaseEntity {
     @Override
     public String getKey() {
         return name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Author author = (Author) o;
-        return name.equals(author.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return "Author{" +
-                "name='" + name + '\'' +
-                '}';
     }
 }

@@ -85,6 +85,13 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SORTING.put("pagesColumn", NON_COMPARATOR);
     }
 
+    private static int compareCheckBoxes(Object c1, Object c2) {
+        if (c1 == null) {
+            return c2 == null ? 0 : 1;
+        }
+        return c2 == null ? -1 : Boolean.compare(((CheckBox) c2).isSelected(), ((CheckBox) c1).isSelected());
+    }
+
     @FXML
     private AnchorPane mainStage;
 
@@ -167,17 +174,18 @@ public class MainViewController extends AbstractViewController {
             if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
                 if (cycleColumnSortedByASC) {
                     bookTableView.getItems()
-                            .sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
+                        .sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
                                 .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
-                            );
+                        );
                 } else {
                     bookTableView.getItems()
-                            .sort(comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
-                                .reversed()
-                                .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle));
+                        .sort(comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
+                            .reversed()
+                            .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
+                        );
                 }
-
                 cycleColumnSortedByASC = !cycleColumnSortedByASC;
+
             } else {
                 cycleColumnSortedByASC = true;
             }
@@ -186,17 +194,19 @@ public class MainViewController extends AbstractViewController {
             if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
                 if (pagesColumnSortedByASC) {
                     bookTableView.getItems()
-                            .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
-                                    .thenComparing(BookDTO::getPages));
+                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
+                            .thenComparing(BookDTO::getPages)
+                        );
 
                 } else {
                     bookTableView.getItems()
-                            .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
-                                    .thenComparing(BookDTO::getPages)
-                                    .reversed());
+                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
+                            .thenComparing(BookDTO::getPages)
+                            .reversed()
+                        );
                 }
-
                 pagesColumnSortedByASC = !pagesColumnSortedByASC;
+
             } else {
                 pagesColumnSortedByASC = true;
             }
@@ -222,8 +232,15 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     public void addBook() {
-        loadModalView("Add new book", "view/add-view.fxml",
-            mainStage, null, this, 300, -25);
+        loadModalView(
+            "Add new book",
+            "view/add-view.fxml",
+            mainStage,
+            null,
+            this,
+            300,
+            -25
+        );
         updateTableColumns(bookTableView);
     }
 
@@ -329,9 +346,9 @@ public class MainViewController extends AbstractViewController {
 
     private List<BookDTO> getDtoBooks() {
         return BOOK_REPOSITORY.getAll()
-                .stream()
-                .map(BOOK_CONVERTER::convert)
-                .collect(toList());
+            .stream()
+            .map(BOOK_CONVERTER::convert)
+            .collect(toList());
     }
 
     protected void loadBookView(AnchorPane mainStage, String initEntityKey, AbstractViewController parentViewController) {
@@ -376,12 +393,5 @@ public class MainViewController extends AbstractViewController {
         return lastOpenedBookViewStage != null
                 ? getStageCoordinate.apply(lastOpenedBookViewStage)
                 : getStageCoordinate.apply(primaryStage);
-    }
-
-    private static int compareCheckBoxes(Object c1, Object c2) {
-        if (c1 == null) {
-            return c2 == null ? 0 : 1;
-        }
-        return c2 == null ? -1 : Boolean.compare(((CheckBox) c2).isSelected(), ((CheckBox) c1).isSelected());
     }
 }

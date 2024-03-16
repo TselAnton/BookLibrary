@@ -70,9 +70,6 @@ public class BookRepository extends AbstractFileRepository<Book> {
                     prepareAutograph(book);
                     preparePrice(book);
                     prepareHardCover(book);
-
-                    // Используется исключительно для тестого запуска
-                    // book.setCoverImgAbsolutePath(TEST_PNG_COVER_PATH);
                 }
             );
 

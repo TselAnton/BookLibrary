@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 
 import com.tsel.home.project.booklibrary.BaseTest;
-import com.tsel.home.project.booklibrary.builder.BookDTOBuilder;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import java.util.List;
 import javafx.scene.control.CheckBox;
@@ -46,7 +45,7 @@ class SearchServiceV2Test extends BaseTest {
 
     @BeforeEach
     public void init() {
-        book_1 = BookDTOBuilder.builder()
+        book_1 = BookDTO.builder()
             .name("Book 1 name")
             .author("Author 1")
             .publisher("Publisher 1")
@@ -60,7 +59,7 @@ class SearchServiceV2Test extends BaseTest {
             .pages(100)
             .build();
 
-        book_2 = BookDTOBuilder.builder()
+        book_2 = BookDTO.builder()
             .name("Book 2 name")
             .author("Author 2")
             .publisher("Publisher 1")
@@ -74,7 +73,7 @@ class SearchServiceV2Test extends BaseTest {
             .pages(200)
             .build();
 
-        book_3 = BookDTOBuilder.builder()
+        book_3 = BookDTO.builder()
             .name("Book 3 name")
             .author("Author 3")
             .publisher("Publisher 2")
@@ -88,7 +87,7 @@ class SearchServiceV2Test extends BaseTest {
             .pages(300)
             .build();
 
-        book_4 = BookDTOBuilder.builder()
+        book_4 = BookDTO.builder()
             .name("Book 4 name")
             .author("Author 1")
             .publisher("Publisher 3")
@@ -102,7 +101,7 @@ class SearchServiceV2Test extends BaseTest {
             .pages(400)
             .build();
 
-        book_5 = BookDTOBuilder.builder()
+        book_5 = BookDTO.builder()
             .name("Book 5 name")
             .author("Author 4")
             .publisher("Publisher 3")

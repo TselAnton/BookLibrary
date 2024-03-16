@@ -8,8 +8,6 @@ import static java.util.stream.Collectors.toList;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 
-import com.tsel.home.project.booklibrary.builder.BookBuilder;
-import com.tsel.home.project.booklibrary.builder.CycleBuilder;
 import com.tsel.home.project.booklibrary.data.Author;
 import com.tsel.home.project.booklibrary.data.BaseEntity;
 import com.tsel.home.project.booklibrary.data.Book;
@@ -236,7 +234,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
             return;
         }
 
-        Book newBook = BookBuilder.builder()
+        Book newBook = Book.builder()
                 .name(bookName.trim())
                 .author(author.trim())
                 .publisher(publisher.trim())
@@ -255,7 +253,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         Cycle newCycle = null;
 
         if (isNotBlank(cycle)) {
-            newCycle = CycleBuilder.builder()
+            newCycle = Cycle.builder()
                     .name(cycle.trim())
                     .ended(isEndedCycle)
                     .booksInCycle(stringToInt(totalInCycle))

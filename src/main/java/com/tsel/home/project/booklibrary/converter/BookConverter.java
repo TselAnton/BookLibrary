@@ -1,16 +1,14 @@
 package com.tsel.home.project.booklibrary.converter;
 
-import com.tsel.home.project.booklibrary.builder.BookDTOBuilder;
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+import static java.lang.String.format;
+
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
-import javafx.scene.control.CheckBox;
-
 import java.util.Locale;
-
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
-import static java.lang.String.format;
+import javafx.scene.control.CheckBox;
 
 public class BookConverter {
 
@@ -28,7 +26,7 @@ public class BookConverter {
             isCycleEnded = cycle.getEnded();
         }
 
-        return BookDTOBuilder.builder()
+        return BookDTO.builder()
                 .name(book.getName())
                 .author(book.getAuthor())
                 .publisher(book.getPublisher())

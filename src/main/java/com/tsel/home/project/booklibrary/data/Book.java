@@ -3,7 +3,22 @@ package com.tsel.home.project.booklibrary.data;
 import java.io.Serial;
 import java.util.Locale;
 import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Getter
+@Setter
+@Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(exclude = {"coverImgAbsolutePath", "bookshelf"})
 public class Book implements BaseEntity {
 
     @Serial
@@ -45,153 +60,5 @@ public class Book implements BaseEntity {
         }
 
         return compositeKey.toString();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getPublisher() {
-        return publisher;
-    }
-
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
-    }
-
-    public Integer getPages() {
-        return pages;
-    }
-
-    public void setPages(Integer pages) {
-        this.pages = pages;
-    }
-
-    @Deprecated
-    public Integer getBookshelf() {
-        return bookshelf;
-    }
-
-    @Deprecated
-    public void setBookshelf(Integer bookshelf) {
-        this.bookshelf = bookshelf;
-    }
-
-    public Boolean getRead() {
-        return read;
-    }
-
-    public void setRead(Boolean read) {
-        this.read = read;
-    }
-
-    public Boolean getAutograph() {
-        return autograph;
-    }
-
-    public void setAutograph(Boolean autograph) {
-        this.autograph = autograph;
-    }
-
-    public String getCycleName() {
-        return cycleName;
-    }
-
-    public void setCycleName(String cycleName) {
-        this.cycleName = cycleName;
-    }
-
-    public Integer getNumberInSeries() {
-        return numberInSeries;
-    }
-
-    public void setNumberInSeries(Integer numberInSeries) {
-        this.numberInSeries = numberInSeries;
-    }
-
-    public String getCoverImgAbsolutePath() {
-        return coverImgAbsolutePath;
-    }
-
-    public void setCoverImgAbsolutePath(String coverImgAbsolutePath) {
-        this.coverImgAbsolutePath = coverImgAbsolutePath;
-    }
-
-    public Boolean getHardCover() {
-        return hardCover;
-    }
-
-    public void setHardCover(Boolean hardCover) {
-        this.hardCover = hardCover;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Book book = (Book) o;
-        return name.equals(book.name)
-                && author.equals(book.author)
-                && publisher.equals(book.publisher)
-                && pages.equals(book.pages)
-                && Objects.equals(read, book.read)
-                && Objects.equals(autograph, book.autograph)
-                && Objects.equals(cycleName, book.cycleName)
-                && Objects.equals(numberInSeries, book.numberInSeries)
-                && Objects.equals(coverImgAbsolutePath, book.coverImgAbsolutePath)
-                && Objects.equals(hardCover, book.hardCover);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                name,
-                author,
-                publisher,
-                pages,
-                read,
-                cycleName,
-                numberInSeries,
-                coverImgAbsolutePath,
-                hardCover,
-                price
-        );
-    }
-
-    @Override
-    public String toString() {
-        return "Book{" +
-                "name='" + name + '\'' +
-                ", author='" + author + '\'' +
-                ", publisher='" + publisher + '\'' +
-                ", pages=" + pages +
-                ", read=" + read +
-                ", autograph=" + autograph +
-                ", cycleName='" + cycleName + '\'' +
-                ", numberInSeries=" + numberInSeries +
-                ", hardCover=" + hardCover +
-                ", coverImgAbsolutePath=" + coverImgAbsolutePath +
-                ", price=" + price +
-                '}';
     }
 }

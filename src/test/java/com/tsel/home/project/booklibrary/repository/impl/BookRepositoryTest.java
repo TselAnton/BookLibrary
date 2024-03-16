@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.tsel.home.project.booklibrary.builder.BookBuilder;
 import com.tsel.home.project.booklibrary.data.Book;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,7 +52,7 @@ class BookRepositoryTest {
     }
 
     private Book createBook(long number) {
-        return BookBuilder.builder()
+        return Book.builder()
             .name("name" + number)
             .author("author" + number)
             .publisher("publisher" + number)
