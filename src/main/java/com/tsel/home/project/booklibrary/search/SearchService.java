@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import javafx.scene.control.CheckBox;
 
+@Deprecated
 public class SearchService {
 
     private static final String REVERSE_ORDER = "n";
@@ -51,7 +52,7 @@ public class SearchService {
                 || isContainsValue(searchQuery, String.valueOf(bookDTO.getPages()))
                 || searchByKeyWord(searchQuery, bookDTO.getRead(), READ_SEARCH_KEY)
                 || searchByKeyWord(searchQuery, bookDTO.getCycleEnded(), ENDED_CYCLE_SEARCH_KEY)
-                || searchByAutograph(searchQuery, bookDTO.isAutograph())
+                || searchByAutograph(searchQuery, bookDTO.getAutograph().isSelected())
                 || searchByPrice(searchQuery, bookDTO.getPrice());
     }
 

@@ -18,7 +18,7 @@ public final class BookDTOBuilder {
     private String cycleNumber;
     private CheckBox cycleEnded;
     private CheckBox read;
-    private boolean autograph;
+    private CheckBox autograph;
     private Integer pages;
     private Double price;
     private CheckBox hardCover;
@@ -64,8 +64,8 @@ public final class BookDTOBuilder {
         return this;
     }
 
-    public BookDTOBuilder autograph(Boolean autograph) {
-        this.autograph = Boolean.TRUE.equals(autograph);
+    public BookDTOBuilder autograph(CheckBox autograph) {
+        this.autograph = autograph;
         return this;
     }
 

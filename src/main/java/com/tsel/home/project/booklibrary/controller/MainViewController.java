@@ -15,6 +15,7 @@ import static javafx.stage.Modality.NONE;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchService;
+import com.tsel.home.project.booklibrary.search.SearchServiceV2;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,15 +52,16 @@ public class MainViewController extends AbstractViewController {
     private static final String TABLE_SCALE_PATTERN = "-fx-font-size: %spt";
     private static final int MIN_FONT = 9;
     private static final int MAX_FONT = 16;
-    private int tableFont = MIN_FONT;
 
-    private static final SearchService SEARCH_SERVICE = new SearchService();
+    private static final SearchService SEARCH_SERVICE_V1 = new SearchService();
+    private static final SearchServiceV2 SEARCH_SERVICE_V2 = SearchServiceV2.INSTANCE;
 
     private static final Comparator<String> STRING_NUMBER_COMPARATOR = comparingInt(Integer::parseInt);
     private static final Comparator<Object> NON_COMPARATOR = (x1, x2) -> 0;
 
-    private static final Map<String, String> TABLE_COLUMNS_SETTINGS;
+    @SuppressWarnings("rawtypes")
     private static final Map<String, Comparator> TABLE_COLUMNS_SORTING;
+    private static final Map<String, String> TABLE_COLUMNS_SETTINGS;
 
     static {
         TABLE_COLUMNS_SETTINGS = new HashMap<>();
@@ -101,6 +103,8 @@ public class MainViewController extends AbstractViewController {
     private boolean pagesColumnSortedByASC = true;
 
     private Stage lastOpenedBookViewStage;
+
+    private int tableFont = MIN_FONT;
 
     public MainViewController() {
         super("Book library", "view/main-view.fxml");
@@ -218,8 +222,8 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     public void addBook() {
-        loadModalView("Add new book", "view/add-view.fxml", mainStage, null,
-                this, 300, -25);
+        loadModalView("Add new book", "view/add-view.fxml",
+            mainStage, null, this, 300, -25);
         updateTableColumns(bookTableView);
     }
 
@@ -298,23 +302,16 @@ public class MainViewController extends AbstractViewController {
         }
     }
 
+    //todo: price <= 100 обновляет список после просмотра карточки, нужно починить
     @FXML
     private void search() {
         String searchQuery = searchQueryField.getText();
-        bookTableView.setItems(observableArrayList(SEARCH_SERVICE.search(searchQuery, getDtoBooks())));
+        bookTableView.setItems(observableArrayList(SEARCH_SERVICE_V2.search(searchQuery, getDtoBooks())));
     }
 
     private void addSearchTooltip(FXMLLoader loader) {
         ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
-        Tooltip tooltip = new Tooltip("""
-                Поиск по прочитанному: read / nread
-                Поиск по завершённым циклам: end / nend
-                Поиск по автографам: sign / nsing
-                Поиск по цене: price[><=][цена] для поиска по цене / nprice для бесценных книг
-                Поиск по твёрдой обложке: hardcover / nhardcover
-                """
-        );
-
+        Tooltip tooltip = new Tooltip(SEARCH_SERVICE_V2.getGeneratedTooltip());
         tooltip.setAutoHide(false);
         tooltip.setFont(new Font(16f));
         tooltip.setShowDelay(new Duration(500f));

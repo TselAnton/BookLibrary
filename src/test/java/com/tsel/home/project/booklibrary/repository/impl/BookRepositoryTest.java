@@ -55,12 +55,13 @@ class BookRepositoryTest {
     private Book createBook(long number) {
         return BookBuilder.builder()
             .name("name" + number)
-            .publisher("publisher" + number)
             .author("author" + number)
+            .publisher("publisher" + number)
             .pages(100)
-            .bookshelf(1)
             .read(true)
+            .price(null)
             .autograph(false)
+            .hardCover(true)
             .build();
     }
 }

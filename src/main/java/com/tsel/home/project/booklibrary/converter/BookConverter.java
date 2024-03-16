@@ -36,7 +36,7 @@ public class BookConverter {
                 .cycleNumber(cycleNumber)
                 .cycleEnded(getCheckBox(isCycleEnded))
                 .read(getCheckBox(book.getRead()))
-                .autograph(book.getAutograph())
+                .autograph(getCheckBox(book.getAutograph()))
                 .pages(book.getPages())
                 .cover(book)
                 .price(book.getPrice())

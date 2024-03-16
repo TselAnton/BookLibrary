@@ -1,22 +1,44 @@
 package com.tsel.home.project.booklibrary.dto;
 
+import com.tsel.home.project.booklibrary.search.SearchField;
 import java.util.Objects;
 import javafx.scene.control.CheckBox;
 import javafx.scene.image.ImageView;
 
 public class BookDTO {
 
+    @SearchField(description = "Поиск по названию")
     private String name;
+
     private ImageView cover;
+
+    @SearchField(description = "Поиск по автору")
     private String author;
+
+    @SearchField(description = "Поиск по издателю")
     private String publisher;
+
+    @SearchField(description = "Поиск по названию цикла")
     private String cycleName;
+
     private String cycleNumber;
+
+    @SearchField(aliases = {"cycle", "цикл"}, description = "Поиск по законченным циклам")
     private CheckBox cycleEnded;
+
+    @SearchField(aliases = {"read", "прочитано"}, description = "Поиск по прочитанному")
     private CheckBox read;
-    private boolean autograph;
+
+    @SearchField(aliases = {"sign", "автограф"}, description = "Поиск по наличию автографа")
+    private CheckBox autograph;
+
+    @SearchField(aliases = {"pages", "страницы"}, description = "Поиск по количеству страниц")
     private Integer pages;
+
+    @SearchField(aliases = {"price", "цена"}, description = "Поиск по цене")
     private Double price;
+
+    @SearchField(aliases = {"hard", "твердая"}, description = "Поиск по наличию твердой обложки")
     private CheckBox hardCover;
 
     public String getName() {
@@ -75,11 +97,11 @@ public class BookDTO {
         this.read = read;
     }
 
-    public boolean isAutograph() {
+    public CheckBox getAutograph() {
         return autograph;
     }
 
-    public void setAutograph(boolean autograph) {
+    public void setAutograph(CheckBox autograph) {
         this.autograph = autograph;
     }
 
