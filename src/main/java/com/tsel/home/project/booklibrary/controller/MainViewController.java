@@ -7,6 +7,7 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 import static java.util.Comparator.nullsLast;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
@@ -14,8 +15,8 @@ import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
-import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.search.SearchServiceV2;
+import com.tsel.home.project.booklibrary.utils.StringUtils;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -31,9 +32,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.FocusModel;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -53,11 +56,16 @@ public class MainViewController extends AbstractViewController {
     private static final int MIN_FONT = 9;
     private static final int MAX_FONT = 16;
 
-    private static final SearchService SEARCH_SERVICE_V1 = new SearchService();
     private static final SearchServiceV2 SEARCH_SERVICE_V2 = SearchServiceV2.INSTANCE;
 
     private static final Comparator<String> STRING_NUMBER_COMPARATOR = comparingInt(Integer::parseInt);
     private static final Comparator<Object> NON_COMPARATOR = (x1, x2) -> 0;
+    private static final Comparator<CheckBox> CHECK_BOX_COMPARATOR = (c1, c2) -> {
+        if (c1 == null) {
+            return c2 == null ? 0 : 1;
+        }
+        return c2 == null ? -1 : Boolean.compare(c2.isSelected(), c1.isSelected());
+    };
 
     @SuppressWarnings("rawtypes")
     private static final Map<String, Comparator> TABLE_COLUMNS_SORTING;
@@ -76,20 +84,13 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.put("imageColumn", "cover");
 
         TABLE_COLUMNS_SORTING = new HashMap<>();
-        TABLE_COLUMNS_SORTING.put("readColumn", MainViewController::compareCheckBoxes);
-        TABLE_COLUMNS_SORTING.put("cycleEndColumn", MainViewController::compareCheckBoxes);
+        TABLE_COLUMNS_SORTING.put("readColumn", CHECK_BOX_COMPARATOR);
+        TABLE_COLUMNS_SORTING.put("cycleEndColumn", CHECK_BOX_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("shelfColumn", STRING_NUMBER_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("nameColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("authorColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("cycleColumn", NON_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("pagesColumn", NON_COMPARATOR);
-    }
-
-    private static int compareCheckBoxes(Object c1, Object c2) {
-        if (c1 == null) {
-            return c2 == null ? 0 : 1;
-        }
-        return c2 == null ? -1 : Boolean.compare(((CheckBox) c2).isSelected(), ((CheckBox) c1).isSelected());
     }
 
     @FXML
@@ -103,14 +104,14 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     private TableColumn<BookDTO, String> cycleColumn;
-    private boolean cycleColumnSortedByASC = true;
 
     @FXML
     private TableColumn<BookDTO, Integer> pagesColumn;
+
+    private boolean cycleColumnSortedByASC = true;
     private boolean pagesColumnSortedByASC = true;
 
-    private Stage lastOpenedBookViewStage;
-
+    private Stage latestOpenedBookViewStage;
     private int tableFont = MIN_FONT;
 
     public MainViewController() {
@@ -122,12 +123,32 @@ public class MainViewController extends AbstractViewController {
     protected void afterInitScene(FXMLLoader loader) {
         TableView<BookDTO> bookTableView = (TableView<BookDTO>) loader.getNamespace().get("bookTableView");
         initTableColumns(loader, bookTableView);
-        updateTableColumns(bookTableView);
-        bookTableView.getItems().sort(comparing(BookDTO::getName));
-
+        bookTableView.setItems(observableArrayList(
+            BOOK_REPOSITORY.getAll()
+                .stream()
+                .map(BOOK_CONVERTER::convert)
+                .sorted(Comparator.comparing(BookDTO::getName))
+                .collect(toList())
+            )
+        );
         bookTableView.addEventFilter(ScrollEvent.ANY, scrollEvent -> updateTableScale(scrollEvent, bookTableView));
-
         addSearchTooltip(loader);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initTableColumns(FXMLLoader loader, TableView<BookDTO> bookTableView) {
+        TABLE_COLUMNS_SETTINGS.forEach((columnName, fieldName) -> {
+            TableColumn<BookDTO, ?> column = (TableColumn<BookDTO, ?>) loader.getNamespace().get(columnName);
+            column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
+
+            if (TABLE_COLUMNS_SORTING.containsKey(columnName)) {
+                column.setComparator(TABLE_COLUMNS_SORTING.get(columnName));
+            }
+        });
+
+        // Add numeric for table raw's
+        TableColumn<BookDTO, Number> numberColumn = (TableColumn<BookDTO, Number>) loader.getNamespace().get("numberColumn");
+        numberColumn.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(bookTableView.getItems().indexOf(column.getValue()) + 1));
     }
 
     private void updateTableScale(ScrollEvent scrollEvent, TableView<BookDTO> bookTableView) {
@@ -145,83 +166,33 @@ public class MainViewController extends AbstractViewController {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void initTableColumns(FXMLLoader loader, TableView<BookDTO> bookTableView) {
-        TABLE_COLUMNS_SETTINGS.forEach((columnName, fieldName) -> {
-            TableColumn<BookDTO, ?> column = (TableColumn<BookDTO, ?>) loader.getNamespace().get(columnName);
-            column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
+    //TODO: переделать на кнопку с описанием
+    private void addSearchTooltip(FXMLLoader loader) {
+        ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
+        Tooltip tooltip = new Tooltip(SEARCH_SERVICE_V2.getGeneratedTooltip());
+        tooltip.setAutoHide(false);
+        tooltip.setFont(new Font(16f));
+        tooltip.setShowDelay(new Duration(500f));
 
-            if (TABLE_COLUMNS_SORTING.containsKey(columnName)) {
-                column.setComparator(TABLE_COLUMNS_SORTING.get(columnName));
-            }
-        });
-
-        // Add numeric for table raw's
-        TableColumn<BookDTO, Number> numberColumn =
-                (TableColumn<BookDTO, Number>) loader.getNamespace().get("numberColumn");
-
-        numberColumn.setCellValueFactory(
-                column -> new ReadOnlyObjectWrapper<>(bookTableView.getItems().indexOf(column.getValue()) + 1));
+        Tooltip.install(signHelp, tooltip);
     }
 
     @FXML
     public void onSort() {
-        if (bookTableView.getSortOrder().isEmpty()) {
-            // Nothing chosen. Sort by book name by default
-            bookTableView.getItems().sort(comparing(BookDTO::getName));
-        } else {
-            // Sort by cycle name + book number in cycle
+        if (!bookTableView.getSortOrder().isEmpty()) {
             if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
-                if (cycleColumnSortedByASC) {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
-                                .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
-                        );
-                } else {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
-                            .reversed()
-                            .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
-                        );
-                }
                 cycleColumnSortedByASC = !cycleColumnSortedByASC;
-
             } else {
                 cycleColumnSortedByASC = true;
             }
 
-            // Sort by pages + !read
             if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
-                if (pagesColumnSortedByASC) {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
-                            .thenComparing(BookDTO::getPages)
-                        );
-
-                } else {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
-                            .thenComparing(BookDTO::getPages)
-                            .reversed()
-                        );
-                }
                 pagesColumnSortedByASC = !pagesColumnSortedByASC;
-
             } else {
                 pagesColumnSortedByASC = true;
             }
         }
-    }
-
-    private int comparatorByBookNumberInCycle(String bookNumber1, String bookNumber2) {
-        Integer number1 = getBookNumberInCycle(bookNumber1);
-        Integer number2 = getBookNumberInCycle(bookNumber2);
-
-        if (number1 == null) {
-            return number2 == null ? 0 : -1;
-        }
-
-        return number2 == null ? 1 : Integer.compare(number1, number2);
+        bookTableView.getItems().sort(getSortComparator());
     }
 
     private Integer getBookNumberInCycle(String bookNumber) {
@@ -241,29 +212,72 @@ public class MainViewController extends AbstractViewController {
             300,
             -25
         );
-        updateTableColumns(bookTableView);
+//        updateTableColumns(this.bookTableView);
     }
 
     @FXML
     public void clickOnTable(MouseEvent mouseEvent) {
         if (isDoubleClick(mouseEvent)) {
             BookDTO clickedEntity = bookTableView.getSelectionModel().getSelectedItem();
-
             if (clickedEntity != null) {
                 String entityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
 
-                if (lastOpenedBookViewStage != null) {
-                    lastOpenedBookViewStage.close();
+                if (this.latestOpenedBookViewStage != null) {
+                    this.latestOpenedBookViewStage.close();
                 }
 
-                loadBookView(mainStage, entityKey, this);
-                updateTableColumns(bookTableView);
+                loadBookView(this.mainStage, entityKey, this);
+//                updateTableColumns();
             }
         }
     }
 
     private boolean isDoubleClick(MouseEvent mouseEvent) {
         return MouseButton.PRIMARY.equals(mouseEvent.getButton()) && mouseEvent.getClickCount() >= 2;
+    }
+
+    private void loadBookView(AnchorPane mainStage, String initEntityKey, AbstractViewController parentViewController) {
+        try {
+            FXMLLoader loader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + "view/info-view.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = new Stage() {
+                @Override
+                public void hide() {
+                    updateTableColumns();
+                    super.hide();
+                }
+            };
+
+            stage.setResizable(false);
+            stage.setTitle("Book info");
+            stage.getIcons().add(iconImage);
+            stage.setScene(scene);
+            stage.initModality(NONE);
+
+            Stage primaryStage = (Stage) mainStage.getScene().getWindow();
+            stage.initOwner(primaryStage);
+
+            stage.setX(resolveCoordinate(primaryStage, Stage::getX));
+            stage.setY(resolveCoordinate(primaryStage, Stage::getY));
+
+            if (isNotBlank(initEntityKey)) {
+                AbstractViewController controller = loader.getController();
+                controller.initController(parentViewController, initEntityKey);
+            }
+
+            stage.show();
+            latestOpenedBookViewStage = stage;
+
+        } catch (Exception e) {
+            LOGGER.error("Exception while load model view", e);
+        }
+    }
+
+    private double resolveCoordinate(Stage primaryStage, Function<Stage, Double> getStageCoordinate) {
+        return latestOpenedBookViewStage != null
+            ? getStageCoordinate.apply(latestOpenedBookViewStage)
+            : getStageCoordinate.apply(primaryStage);
     }
 
     @FXML
@@ -299,7 +313,7 @@ public class MainViewController extends AbstractViewController {
                     String deletedEntityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
                     Book deletedEntity = BOOK_REPOSITORY.getByName(deletedEntityKey);
                     BOOK_REPOSITORY.delete(deletedEntity);
-                    updateTableColumns(bookTableView);
+                    updateTableColumns();
                 }
             }
 
@@ -322,26 +336,72 @@ public class MainViewController extends AbstractViewController {
     //todo: price <= 100 обновляет список после просмотра карточки, нужно починить
     @FXML
     private void search() {
-        String searchQuery = searchQueryField.getText();
-        bookTableView.setItems(observableArrayList(SEARCH_SERVICE_V2.search(searchQuery, getDtoBooks())));
+        updateTableColumns();
     }
 
-    private void addSearchTooltip(FXMLLoader loader) {
-        ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
-        Tooltip tooltip = new Tooltip(SEARCH_SERVICE_V2.getGeneratedTooltip());
-        tooltip.setAutoHide(false);
-        tooltip.setFont(new Font(16f));
-        tooltip.setShowDelay(new Duration(500f));
+    //todo: нужно продумать работу сортировки и поиска, чтобы при обновлении страницы не терялись фильтры поиска и сортировки, если они есть
+    private void updateTableColumns() {
+        System.out.println("SELECTED: " + bookTableView.getSelectionModel().getSelectedItem());
+        System.out.println("FOCUSED: " + bookTableView.getFocusModel().getFocusedItem());
+        System.out.println("-----------");
 
-        Tooltip.install(signHelp, tooltip);
-    }
+        String searchQuery = ofNullable(searchQueryField)
+            .map(TextInputControl::getText)
+            .orElse(null);
 
-    private void updateTableColumns(TableView<BookDTO> bookTableView) {
-        bookTableView.setItems(observableArrayList(
-                getDtoBooks().stream()
-                        .sorted(Comparator.comparing(BookDTO::getName))
-                        .toList()
-                ));
+        Comparator<BookDTO> booksComparator = getSortComparator();
+        String focusedBookKey = ofNullable(bookTableView.getFocusModel())
+            .map(FocusModel::getFocusedItem)
+            .map(BOOK_CONVERTER::buildEntityKeyByDTO)
+            .orElse(null);
+
+        var focusedBook = ofNullable(bookTableView.getFocusModel())
+            .map(FocusModel::getFocusedItem)
+//            .map(BOOK_CONVERTER::buildEntityKeyByDTO)
+            .orElse(null);
+
+        List<BookDTO> bookDTOListWithFiltersAndSorting = SEARCH_SERVICE_V2.search(searchQuery, getDtoBooks())
+            .stream()
+            .sorted(booksComparator)
+            .toList();
+
+        int focusRowIndex = bookDTOListWithFiltersAndSorting.stream()
+            .map(BOOK_CONVERTER::buildEntityKeyByDTO)
+            .toList()
+            .indexOf(focusedBookKey);
+
+//        bookTableView.getItems().removeAll();
+//        bookTableView.getItems().addAll(bookDTOListWithFiltersAndSorting);
+        bookTableView.setItems(observableArrayList(bookDTOListWithFiltersAndSorting));
+//        bookTableView.getFocusModel().focus(focusRowIndex);
+//        bookTableView.getSelectionModel().select(focusRowIndex);
+
+//        System.out.println("FOCUS INDEX = " + focusRowIndex);
+//        System.out.println("ITEMS INDEX = " + bookTableView.getItems().indexOf(focusedBook));
+
+
+        System.out.println("SELECTED: " + bookTableView.getSelectionModel().getSelectedItem());
+        System.out.println("FOCUSED: " + bookTableView.getFocusModel().getFocusedItem());
+        System.out.println("============\n");
+
+
+
+//        bookTableView.setItems(observableArrayList(
+//            getDtoBooks().stream()
+//                .sorted(Comparator.comparing(BookDTO::getName))
+//                .toList()
+//            )
+//        );
+
+//        if (StringUtils.isNotBlank(this.cursorBookKey)) {
+//            bookTableView.getSelectionModel().focus(
+//                bookTableView.getItems()
+//                    .stream()
+//                    .map(BOOK_CONVERTER::buildEntityKeyByDTO)
+//                    .toList()
+//                    .indexOf(cursorBookKey)
+//            );
+//        }
     }
 
     private List<BookDTO> getDtoBooks() {
@@ -351,47 +411,48 @@ public class MainViewController extends AbstractViewController {
             .collect(toList());
     }
 
-    protected void loadBookView(AnchorPane mainStage, String initEntityKey, AbstractViewController parentViewController) {
-        try {
-            FXMLLoader loader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + "view/info-view.fxml"));
-            Scene scene = new Scene(loader.load());
+    private Comparator<BookDTO> getSortComparator() {
+        if (bookTableView.getSortOrder().isEmpty()) {
+            // Nothing chosen. Sort by book name by default
+            return comparing(BookDTO::getName);
+        }
 
-            Stage stage = new Stage() {
-                @Override
-                public void hide() {
-                    updateTableColumns(bookTableView);
-                    super.hide();
-                }
-            };
-
-            stage.setResizable(false);
-            stage.setTitle("Book info");
-            stage.getIcons().add(iconImage);
-            stage.setScene(scene);
-            stage.initModality(NONE);
-
-            Stage primaryStage = (Stage) mainStage.getScene().getWindow();
-            stage.initOwner(primaryStage);
-
-            stage.setX(resolveCoordinate(primaryStage, Stage::getX));
-            stage.setY(resolveCoordinate(primaryStage, Stage::getY));
-
-            if (isNotBlank(initEntityKey)) {
-                AbstractViewController controller = loader.getController();
-                controller.initController(parentViewController, initEntityKey);
+        // Sort by cycle name + book number in cycle
+        if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
+            if (cycleColumnSortedByASC) {
+                return comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
+                    .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle);
             }
 
-            stage.show();
-            lastOpenedBookViewStage = stage;
-
-        } catch (Exception e) {
-            LOGGER.error("Exception while load model view", e);
+            return comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
+                .reversed()
+                .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle);
         }
+
+        // Sort by pages + !read
+        if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
+            if (pagesColumnSortedByASC) {
+                return comparing(BookDTO::getRead,
+                    (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
+                    .thenComparing(BookDTO::getPages);
+            }
+
+            return comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
+                .thenComparing(BookDTO::getPages)
+                .reversed();
+        }
+
+        return comparing(BookDTO::getName);
     }
 
-    private double resolveCoordinate(Stage primaryStage, Function<Stage, Double> getStageCoordinate) {
-        return lastOpenedBookViewStage != null
-                ? getStageCoordinate.apply(lastOpenedBookViewStage)
-                : getStageCoordinate.apply(primaryStage);
+    private int comparatorByBookNumberInCycle(String bookNumber1, String bookNumber2) {
+        Integer number1 = getBookNumberInCycle(bookNumber1);
+        Integer number2 = getBookNumberInCycle(bookNumber2);
+
+        if (number1 == null) {
+            return number2 == null ? 0 : -1;
+        }
+
+        return number2 == null ? 1 : Integer.compare(number1, number2);
     }
 }
