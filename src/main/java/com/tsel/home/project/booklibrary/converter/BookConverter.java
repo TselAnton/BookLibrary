@@ -40,6 +40,8 @@ public class BookConverter implements Converter<Book, BookDTO> {
                 .cover(book)
                 .price(book.getPrice())
                 .hardCover(getCheckBox(book.getHardCover()))
+                .audiobookSites(book.getAudiobookSites())
+                .hasAnyAudioBookSite(getCheckBox(!book.getAudiobookSites().isEmpty()))
                 .build();
     }
 

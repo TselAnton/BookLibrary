@@ -121,11 +121,13 @@ public class AudioBookSiteController extends AbstractViewController {
             if (answer.isPresent() && OK.equals(answer.get().getText())) {
                 String deletedEntityKey = AUDIO_BOOK_SITE_CONVERTER.buildEntityKeyByDTO(clickedEntity);
                 AudioBookSite deletedEntity = AUDIO_BOOK_SITE_REPOSITORY.getByName(deletedEntityKey);
-                //todo: Удалять все упоминания сайтов аудиокниг в книгах
-//                    BOOK_REPOSITORY.getAll()
-//                        .stream()
-//                        .filter(book -> book)
-//                        .forEach();
+                BOOK_REPOSITORY.getAll()
+                    .stream()
+                    .filter(book -> !book.getAudiobookSites().isEmpty())
+                    .forEach(book -> {
+                        book.getAudiobookSites().remove(deletedEntity.getKey());
+                        BOOK_REPOSITORY.save(book);
+                    });
 
                 AUDIO_BOOK_SITE_REPOSITORY.delete(deletedEntity);
                 updateBookSiteTableItems();
