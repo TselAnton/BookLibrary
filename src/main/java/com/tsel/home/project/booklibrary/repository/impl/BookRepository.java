@@ -18,7 +18,6 @@ public class BookRepository extends AbstractFileRepository<Book> {
     private static final CycleRepository CYCLE_REPOSITORY = CycleRepository.getInstance();
 
     private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-books-storage.txt";
-    private static final String TEST_PNG_COVER_PATH = "G:\\MyProjects\\IdeaProjects\\BookLibrary\\test_cover.png";
 
     private static BookRepository INSTANCE;
 

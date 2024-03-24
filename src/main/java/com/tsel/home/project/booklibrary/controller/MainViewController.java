@@ -14,7 +14,6 @@ import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
-import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.search.SearchServiceV2;
 import java.text.DecimalFormat;
 import java.util.Comparator;
@@ -53,7 +52,6 @@ public class MainViewController extends AbstractViewController {
     private static final int MIN_FONT = 9;
     private static final int MAX_FONT = 16;
 
-    private static final SearchService SEARCH_SERVICE_V1 = new SearchService();
     private static final SearchServiceV2 SEARCH_SERVICE_V2 = SearchServiceV2.INSTANCE;
 
     private static final Comparator<String> STRING_NUMBER_COMPARATOR = comparingInt(Integer::parseInt);
@@ -324,6 +322,20 @@ public class MainViewController extends AbstractViewController {
     private void search() {
         String searchQuery = searchQueryField.getText();
         bookTableView.setItems(observableArrayList(SEARCH_SERVICE_V2.search(searchQuery, getDtoBooks())));
+    }
+
+    @FXML
+    private void manageAudioBookSites() {
+        loadModalView(
+            "Audio Book Sites",
+            "view/audio-book-sites-view.fxml",
+            mainStage,
+            null,
+            this,
+            300,
+            -25
+        );
+        updateTableColumns(bookTableView);
     }
 
     private void addSearchTooltip(FXMLLoader loader) {

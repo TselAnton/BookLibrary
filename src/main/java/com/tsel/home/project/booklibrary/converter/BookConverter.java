@@ -10,10 +10,11 @@ import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
 import java.util.Locale;
 import javafx.scene.control.CheckBox;
 
-public class BookConverter {
+public class BookConverter implements Converter<Book, BookDTO> {
 
     private final CycleRepository cycleRepository = CycleRepository.getInstance();
 
+    @Override
     public BookDTO convert(Book book) {
         String cycleName = null;
         String cycleNumber = null;
@@ -55,7 +56,8 @@ public class BookConverter {
         return checkBox;
     }
 
-     public String buildEntityKeyByDTO(BookDTO bookDTO) {
+    @Override
+    public String buildEntityKeyByDTO(BookDTO bookDTO) {
         if (bookDTO == null) {
             return null;
         }
@@ -80,5 +82,5 @@ public class BookConverter {
          }
 
          return compositeKey.toString();
-     }
+    }
 }

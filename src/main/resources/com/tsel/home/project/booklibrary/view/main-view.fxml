@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainStage" minHeight="700.0" minWidth="812.0" prefHeight="700.0" prefWidth="1252.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.MainViewController">
+<AnchorPane fx:id="mainStage" minHeight="700.0" minWidth="812.0" prefHeight="700.0" prefWidth="1252.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/20.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.MainViewController">
    <children>
       <AnchorPane maxHeight="240.0" minHeight="125.0" prefHeight="240.0" prefWidth="1226.0" style="-fx-background-color: #8B936B;" AnchorPane.bottomAnchor="460.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -60,6 +60,7 @@
                         <Rectangle2D />
                      </viewport>
                   </ImageView>
+                  <Button fx:id="audioBookSiteButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#manageAudioBookSites" prefHeight="30.0" prefWidth="30.0" styleClass="audio-book-sites-table-button" stylesheets="@../css/audiobook-site-table-button.css" />
                </children>
             </HBox>
             <TableView fx:id="bookTableView" layoutX="12.0" layoutY="52.0" onKeyPressed="#tableViewKeyPressed" onMouseClicked="#clickOnTable" onSort="#onSort" prefHeight="398.0" prefWidth="980.0" style="-fx-alignment: CENTER-RIGHT; -fx-background-color: #C7CCB3;" styleClass="table-row-cell" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="52.0">
