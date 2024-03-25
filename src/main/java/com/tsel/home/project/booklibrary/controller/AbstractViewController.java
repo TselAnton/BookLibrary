@@ -46,7 +46,7 @@ public abstract class AbstractViewController {
         this.iconImage = IMAGE_PROVIDER.loadIcon();
     }
 
-    public void initController(AbstractViewController parentController, String entityKey) {}
+    public void initController(AbstractViewController parentController, Object... initParameters) {}
 
     public void updateControllerState(String entityKey) {}
 
@@ -73,9 +73,15 @@ public abstract class AbstractViewController {
 
     protected void afterInitScene(FXMLLoader loader) {}
 
-    protected void loadModalView(String modalViewTitle, String modalViewResourceFile, AnchorPane mainStage,
-                                 String initEntityKey, AbstractViewController parentViewController,
-                                 int moveByX, int moveByY) {
+    protected void loadModalView(
+        String modalViewTitle,
+        String modalViewResourceFile,
+        AnchorPane mainStage,
+        AbstractViewController parentViewController,
+        int moveByX,
+        int moveByY,
+        Object... initParameters) {
+
         try {
             FXMLLoader loader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + modalViewResourceFile));
             Scene scene = new Scene(loader.load());
@@ -94,7 +100,7 @@ public abstract class AbstractViewController {
             stage.setY(primaryStage.getY() + moveByY);
 
             AbstractViewController controller = loader.getController();
-            controller.initController(parentViewController, initEntityKey);
+            controller.initController(parentViewController, initParameters);
             controller.afterInitScene(loader);
 
             stage.showAndWait();

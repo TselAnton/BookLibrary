@@ -36,9 +36,6 @@ public class AudioBookSiteController extends AbstractViewController {
     private static final AudioBookSiteConverter AUDIO_BOOK_SITE_CONVERTER = new AudioBookSiteConverter();
 
     @FXML
-    private Button closeButton;
-
-    @FXML
     private TextField addAudioBookSiteTextField;
 
     @FXML
@@ -67,10 +64,11 @@ public class AudioBookSiteController extends AbstractViewController {
 
     private TableColumn<AudioBookSiteDTO, Number> initAudioBookSiteNumberColumn() {
         TableColumn<AudioBookSiteDTO, Number> numberColumn = new TableColumn<>();
-        numberColumn.setPrefWidth(10);
-        numberColumn.setMinWidth(50);
+        numberColumn.setPrefWidth(30);
+        numberColumn.setMinWidth(30);
         numberColumn.setMaxWidth(100);
         numberColumn.setText("№");
+        numberColumn.setStyle("-fx-alignment: BASELINE_CENTER");
         numberColumn.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(audioBookSiteTable.getItems().indexOf(column.getValue()) + 1));
         return numberColumn;
     }
@@ -79,12 +77,13 @@ public class AudioBookSiteController extends AbstractViewController {
         Callback<TableColumn<AudioBookSiteDTO, String>, TableCell<AudioBookSiteDTO, String>> audioBookSiteNameCellFactory =
             (TableColumn<AudioBookSiteDTO, String> param) -> new AudioBookSiteNameEditableColumn();
 
+        // 272
         TableColumn<AudioBookSiteDTO, String> audioBookSiteNameColumn = new TableColumn<>();
-        audioBookSiteNameColumn.setCellFactory(audioBookSiteNameCellFactory);
-        audioBookSiteNameColumn.setPrefWidth(394);
-        audioBookSiteNameColumn.setMinWidth(394);
+        audioBookSiteNameColumn.setPrefWidth(262);
+        audioBookSiteNameColumn.setMinWidth(262);
         audioBookSiteNameColumn.setMaxWidth(1000);
         audioBookSiteNameColumn.setText("Название");
+        audioBookSiteNameColumn.setCellFactory(audioBookSiteNameCellFactory);
         audioBookSiteNameColumn.setCellValueFactory(column -> new SimpleObjectProperty<>(column.getValue().getName()));
         return audioBookSiteNameColumn;
     }
@@ -139,18 +138,17 @@ public class AudioBookSiteController extends AbstractViewController {
     public void addAudioBookSite() {
         String audioBookSiteName = this.addAudioBookSiteTextField.getText();
         if (isBlank(audioBookSiteName)) {
-            //todo: Сделать нужно какую-нибудь пометку, что текст пустой (красную рамку или типа того)
             return;
         }
 
         AudioBookSite audioBookSite = new AudioBookSite(audioBookSiteName);
         AUDIO_BOOK_SITE_REPOSITORY.save(audioBookSite);
         updateBookSiteTableItems();
+        addAudioBookSiteTextField.setText(null);
     }
 
-    @FXML
-    public void closeStage() {
-        Stage stage = (Stage) closeButton.getScene().getWindow();
+    private void closeStage() {
+        Stage stage = (Stage) addAudioBookSiteTextField.getScene().getWindow();
         stage.close();
     }
 

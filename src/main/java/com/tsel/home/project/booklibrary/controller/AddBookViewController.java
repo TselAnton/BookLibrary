@@ -7,6 +7,8 @@ import com.tsel.home.project.booklibrary.data.Author;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
 import com.tsel.home.project.booklibrary.data.Publisher;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,9 +18,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class AddBookViewController extends AbstractEditViewController {
+
+    @FXML
+    private AnchorPane addBookStage;
 
     @FXML
     private TextField nameInput;
@@ -67,6 +73,9 @@ public class AddBookViewController extends AbstractEditViewController {
 
     @FXML
     private Button addButton;
+
+    private final List<String> audioBookSites = new ArrayList<>();
+
 
     @FXML
     public void initialize() {
@@ -118,7 +127,8 @@ public class AddBookViewController extends AbstractEditViewController {
             imageInput,
             priceInput,
             isHardCoverCheckBox,
-            addButton
+            addButton,
+            audioBookSites
         );
     }
 
@@ -139,5 +149,18 @@ public class AddBookViewController extends AbstractEditViewController {
         BOOK_REPOSITORY.save(newBook);
 
         return true;
+    }
+
+    @FXML
+    public void addAudioBookSites() {
+        loadModalView(
+            "Connect audiobook sites",
+            "view/audio-book-sites-connections-view.fxml",
+            addBookStage,
+            this,
+            300,
+            -25,
+            audioBookSites
+        );
     }
 }

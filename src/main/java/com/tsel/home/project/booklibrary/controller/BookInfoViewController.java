@@ -84,7 +84,8 @@ public class BookInfoViewController extends AbstractViewController {
     }
 
     @Override
-    public void initController(AbstractViewController parentController, String bookKey) {
+    public void initController(AbstractViewController parentController, Object... initParameters) {
+        String bookKey = (String) initParameters[0];
         book = BOOK_REPOSITORY.getByName(bookKey);
         if (book == null) {
             throw new IllegalStateException(format("Not found book by key = %s for book info controller", bookKey));
@@ -169,8 +170,13 @@ public class BookInfoViewController extends AbstractViewController {
 
     @FXML
     public void editBook() {
-        loadModalView("Edit book", "view/edit-view.fxml", mainPane, book.getKey(),
-                this, 165, 0);
+        loadModalView(
+            "Edit book", "view/edit-view.fxml",
+            mainPane,
+            this,
+            165,
+            0,
+            book.getKey());
         updateView();
     }
 

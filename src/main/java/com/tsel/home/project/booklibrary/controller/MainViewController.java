@@ -72,6 +72,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.put("readColumn", "read");
         TABLE_COLUMNS_SETTINGS.put("pagesColumn", "pages");
         TABLE_COLUMNS_SETTINGS.put("imageColumn", "cover");
+        TABLE_COLUMNS_SETTINGS.put("audioBookSiteGeneratedColumn", "hasAnyAudioBookSite");
 
         TABLE_COLUMNS_SORTING = new HashMap<>();
         TABLE_COLUMNS_SORTING.put("readColumn", MainViewController::compareCheckBoxes);
@@ -81,6 +82,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SORTING.put("authorColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("cycleColumn", NON_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("pagesColumn", NON_COMPARATOR);
+        TABLE_COLUMNS_SORTING.put("audioBookSiteGeneratedColumn", MainViewController::compareCheckBoxes);
     }
 
     private static int compareCheckBoxes(Object c1, Object c2) {
@@ -234,7 +236,6 @@ public class MainViewController extends AbstractViewController {
             "Add new book",
             "view/add-view.fxml",
             mainStage,
-            null,
             this,
             300,
             -25
@@ -327,13 +328,12 @@ public class MainViewController extends AbstractViewController {
     @FXML
     private void manageAudioBookSites() {
         loadModalView(
-            "Audio Book Sites",
+            "Audiobook sites",
             "view/audio-book-sites-view.fxml",
             mainStage,
-            null,
             this,
-            300,
-            -25
+            500,
+            50
         );
         updateTableColumns(bookTableView);
     }

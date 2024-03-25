@@ -7,6 +7,9 @@ import com.tsel.home.project.booklibrary.data.Publisher;
 import com.tsel.home.project.booklibrary.repository.AbstractFileRepository;
 import com.tsel.home.project.booklibrary.utils.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
@@ -18,6 +21,13 @@ public class BookRepository extends AbstractFileRepository<Book> {
     private static final CycleRepository CYCLE_REPOSITORY = CycleRepository.getInstance();
 
     private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-books-storage.txt";
+
+    private static final List<Consumer<Book>> PREPARE_FUNCTIONS = List.of(
+        book -> book.setPrice(book.getPrice() == null ? null : book.getPrice()),
+        book -> book.setHardCover(book.getHardCover() == null || book.getHardCover()),
+        book -> book.setAudiobookSites(book.getAudiobookSites() == null ? new ArrayList<>() : book.getAudiobookSites()),
+        book -> book.setAutograph(book.getAutograph() != null ? book.getAutograph() : false)
+    );
 
     private static BookRepository INSTANCE;
 
@@ -64,30 +74,7 @@ public class BookRepository extends AbstractFileRepository<Book> {
 
     @Override
     protected void updateNewFields() {
-        repositoryMap.values()
-            .forEach(book -> {
-                    prepareAutograph(book);
-                    preparePrice(book);
-                    prepareHardCover(book);
-                }
-            );
-
+        repositoryMap.values().forEach(book -> PREPARE_FUNCTIONS.forEach(prepareFunction -> prepareFunction.accept(book)));
         updateStorageFile();
-    }
-
-    private void prepareAutograph(Book book) {
-        book.setAutograph(
-            book.getAutograph() != null
-                ? book.getAutograph()
-                : false
-        );
-    }
-
-    private void preparePrice(Book book) {
-        book.setPrice(book.getPrice() == null ? null : book.getPrice());
-    }
-
-    private void prepareHardCover(Book book) {
-        book.setHardCover(book.getHardCover() == null || book.getHardCover());
     }
 }

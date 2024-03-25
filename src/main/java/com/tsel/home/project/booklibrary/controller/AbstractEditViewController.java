@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -143,7 +144,8 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                            TextField imageInput,
                            TextField priceInput,
                            CheckBox isHardCoverCheckBox,
-                           Button addButton) {
+                           Button addButton,
+                           List<String> audioBookSites) {
 
         String bookName = getInputText(nameInput);
         String author = getInputText(authorInput);
@@ -246,6 +248,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
                 .coverImgAbsolutePath(imagePath)
                 .price(price)
                 .hardCover(isHardCover)
+                .audiobookSites(audioBookSites)
                 .build();
 
         Author newAuthor = new Author(author.trim());
