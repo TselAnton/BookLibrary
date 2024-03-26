@@ -158,8 +158,8 @@ public class AddBookViewController extends AbstractEditViewController {
             "view/audio-book-sites-connections-edit-view.fxml",
             addBookStage,
             this,
-            300,
-            -25,
+            500,
+            0,
             audioBookSites
         );
     }

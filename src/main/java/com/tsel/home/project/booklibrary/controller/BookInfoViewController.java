@@ -19,12 +19,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class BookInfoViewController extends AbstractViewController {
-
-    private static final Logger LOGGER = LogManager.getLogger(BookInfoViewController.class);
 
     private static final double NORMAL_FONT_SIZE = 18f;
     private static final double SMALL_FONT_SIZE = 14f;
@@ -179,7 +175,7 @@ public class BookInfoViewController extends AbstractViewController {
             mainPane,
             this,
             165,
-            0,
+            -25,
             book.getKey()
         );
         updateView();

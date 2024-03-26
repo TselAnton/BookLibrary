@@ -201,8 +201,8 @@ public class EditBookViewController extends AbstractEditViewController {
             "view/audio-book-sites-connections-edit-view.fxml",
             editBookStage,
             this,
-            300,
-            -25,
+            500,
+            0,
             book.getAudiobookSites()
         );
     }

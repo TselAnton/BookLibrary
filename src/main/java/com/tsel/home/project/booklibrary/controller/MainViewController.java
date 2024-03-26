@@ -237,8 +237,8 @@ public class MainViewController extends AbstractViewController {
             "view/add-view.fxml",
             mainStage,
             this,
-            300,
-            -25
+            400,
+            15
         );
         updateTableColumns(bookTableView);
     }
@@ -385,8 +385,8 @@ public class MainViewController extends AbstractViewController {
             Stage primaryStage = (Stage) mainStage.getScene().getWindow();
             stage.initOwner(primaryStage);
 
-            stage.setX(resolveCoordinate(primaryStage, Stage::getX));
-            stage.setY(resolveCoordinate(primaryStage, Stage::getY));
+            stage.setX(resolveCoordinate(Stage::getX, 550));
+            stage.setY(resolveCoordinate(Stage::getY, 150));
 
             if (isNotBlank(initEntityKey)) {
                 AbstractViewController controller = loader.getController();
@@ -401,9 +401,9 @@ public class MainViewController extends AbstractViewController {
         }
     }
 
-    private double resolveCoordinate(Stage primaryStage, Function<Stage, Double> getStageCoordinate) {
+    private double resolveCoordinate(Function<Stage, Double> getStageCoordinate, double defaultCoordinate) {
         return lastOpenedBookViewStage != null
-                ? getStageCoordinate.apply(lastOpenedBookViewStage)
-                : getStageCoordinate.apply(primaryStage);
+            ? getStageCoordinate.apply(lastOpenedBookViewStage)
+            : defaultCoordinate;
     }
 }
