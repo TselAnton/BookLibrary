@@ -14,7 +14,6 @@ import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
-import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.search.SearchServiceV2;
 import java.text.DecimalFormat;
 import java.util.Comparator;
@@ -53,7 +52,6 @@ public class MainViewController extends AbstractViewController {
     private static final int MIN_FONT = 9;
     private static final int MAX_FONT = 16;
 
-    private static final SearchService SEARCH_SERVICE_V1 = new SearchService();
     private static final SearchServiceV2 SEARCH_SERVICE_V2 = SearchServiceV2.INSTANCE;
 
     private static final Comparator<String> STRING_NUMBER_COMPARATOR = comparingInt(Integer::parseInt);
@@ -74,6 +72,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.put("readColumn", "read");
         TABLE_COLUMNS_SETTINGS.put("pagesColumn", "pages");
         TABLE_COLUMNS_SETTINGS.put("imageColumn", "cover");
+        TABLE_COLUMNS_SETTINGS.put("audioBookSiteGeneratedColumn", "hasAnyAudioBookSite");
 
         TABLE_COLUMNS_SORTING = new HashMap<>();
         TABLE_COLUMNS_SORTING.put("readColumn", MainViewController::compareCheckBoxes);
@@ -83,6 +82,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SORTING.put("authorColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("cycleColumn", NON_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("pagesColumn", NON_COMPARATOR);
+        TABLE_COLUMNS_SORTING.put("audioBookSiteGeneratedColumn", MainViewController::compareCheckBoxes);
     }
 
     private static int compareCheckBoxes(Object c1, Object c2) {
@@ -236,10 +236,9 @@ public class MainViewController extends AbstractViewController {
             "Add new book",
             "view/add-view.fxml",
             mainStage,
-            null,
             this,
-            300,
-            -25
+            400,
+            15
         );
         updateTableColumns(bookTableView);
     }
@@ -326,6 +325,19 @@ public class MainViewController extends AbstractViewController {
         bookTableView.setItems(observableArrayList(SEARCH_SERVICE_V2.search(searchQuery, getDtoBooks())));
     }
 
+    @FXML
+    private void manageAudioBookSites() {
+        loadModalView(
+            "Audiobook sites",
+            "view/audio-book-sites-view.fxml",
+            mainStage,
+            this,
+            500,
+            50
+        );
+        updateTableColumns(bookTableView);
+    }
+
     private void addSearchTooltip(FXMLLoader loader) {
         ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
         Tooltip tooltip = new Tooltip(SEARCH_SERVICE_V2.getGeneratedTooltip());
@@ -373,8 +385,8 @@ public class MainViewController extends AbstractViewController {
             Stage primaryStage = (Stage) mainStage.getScene().getWindow();
             stage.initOwner(primaryStage);
 
-            stage.setX(resolveCoordinate(primaryStage, Stage::getX));
-            stage.setY(resolveCoordinate(primaryStage, Stage::getY));
+            stage.setX(resolveCoordinate(Stage::getX, 550));
+            stage.setY(resolveCoordinate(Stage::getY, 150));
 
             if (isNotBlank(initEntityKey)) {
                 AbstractViewController controller = loader.getController();
@@ -389,9 +401,9 @@ public class MainViewController extends AbstractViewController {
         }
     }
 
-    private double resolveCoordinate(Stage primaryStage, Function<Stage, Double> getStageCoordinate) {
+    private double resolveCoordinate(Function<Stage, Double> getStageCoordinate, double defaultCoordinate) {
         return lastOpenedBookViewStage != null
-                ? getStageCoordinate.apply(lastOpenedBookViewStage)
-                : getStageCoordinate.apply(primaryStage);
+            ? getStageCoordinate.apply(lastOpenedBookViewStage)
+            : defaultCoordinate;
     }
 }

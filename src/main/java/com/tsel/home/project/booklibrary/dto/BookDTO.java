@@ -3,6 +3,7 @@ package com.tsel.home.project.booklibrary.dto;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.search.SearchField;
 import com.tsel.home.project.booklibrary.utils.ImageProvider;
+import java.util.List;
 import javafx.scene.control.CheckBox;
 import javafx.scene.image.ImageView;
 import lombok.AllArgsConstructor;
@@ -56,6 +57,10 @@ public class BookDTO {
     @SearchField(aliases = {"hard", "твердая"}, description = "Поиск по наличию твердой обложки")
     private CheckBox hardCover;
 
+    @SearchField(aliases = {"audiobook", "аудиокнига"}, description = "Поиск по наличию аудиокниги на любом сайте")
+    private CheckBox hasAnyAudioBookSite;
+
+    private List<String> audiobookSites;
 
     public static class BookDTOBuilder {
 

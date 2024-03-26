@@ -1,7 +1,5 @@
 package com.tsel.home.project.booklibrary.controller;
 
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
-
 import com.tsel.home.project.booklibrary.converter.BookConverter;
 import com.tsel.home.project.booklibrary.repository.impl.AuthorRepository;
 import com.tsel.home.project.booklibrary.repository.impl.BookRepository;
@@ -10,7 +8,6 @@ import com.tsel.home.project.booklibrary.repository.impl.PublisherRepository;
 import com.tsel.home.project.booklibrary.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.utils.ImageProvider;
 import java.util.Optional;
-import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -49,7 +46,7 @@ public abstract class AbstractViewController {
         this.iconImage = IMAGE_PROVIDER.loadIcon();
     }
 
-    public void initController(AbstractViewController parentController, String entityKey) {}
+    public void initController(AbstractViewController parentController, Object... initParameters) {}
 
     public void updateControllerState(String entityKey) {}
 
@@ -76,9 +73,15 @@ public abstract class AbstractViewController {
 
     protected void afterInitScene(FXMLLoader loader) {}
 
-    protected void loadModalView(String modalViewTitle, String modalViewResourceFile, AnchorPane mainStage,
-                                 String initEntityKey, AbstractViewController parentViewController,
-                                 int moveByX, int moveByY) {
+    protected void loadModalView(
+        String modalViewTitle,
+        String modalViewResourceFile,
+        AnchorPane mainStage,
+        AbstractViewController parentViewController,
+        int moveByX,
+        int moveByY,
+        Object... initParameters) {
+
         try {
             FXMLLoader loader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + modalViewResourceFile));
             Scene scene = new Scene(loader.load());
@@ -96,10 +99,9 @@ public abstract class AbstractViewController {
             stage.setX(primaryStage.getX() + moveByX);
             stage.setY(primaryStage.getY() + moveByY);
 
-            if (isNotBlank(initEntityKey)) {
-                AbstractViewController controller = loader.getController();
-                controller.initController(parentViewController, initEntityKey);
-            }
+            AbstractViewController controller = loader.getController();
+            controller.initController(parentViewController, initParameters);
+            controller.afterInitScene(loader);
 
             stage.showAndWait();
 

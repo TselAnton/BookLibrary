@@ -1,11 +1,11 @@
 package com.tsel.home.project.booklibrary.data;
 
 import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,9 +33,9 @@ public class Book implements BaseEntity {
     private String cycleName;
     private Integer numberInSeries;
     private String coverImgAbsolutePath;
-
     private Boolean hardCover;
     private Double price;
+    private List<String> audiobookSites = new ArrayList<>();
 
     @Deprecated
     private Integer bookshelf;

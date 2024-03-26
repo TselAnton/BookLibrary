@@ -19,12 +19,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class BookInfoViewController extends AbstractViewController {
-
-    private static final Logger LOGGER = LogManager.getLogger(BookInfoViewController.class);
 
     private static final double NORMAL_FONT_SIZE = 18f;
     private static final double SMALL_FONT_SIZE = 14f;
@@ -72,6 +68,9 @@ public class BookInfoViewController extends AbstractViewController {
     private Button editBookButton;
 
     @FXML
+    private Button viewAudioBookSites;
+
+    @FXML
     private Label priceLabel;
 
     @FXML
@@ -84,7 +83,8 @@ public class BookInfoViewController extends AbstractViewController {
     }
 
     @Override
-    public void initController(AbstractViewController parentController, String bookKey) {
+    public void initController(AbstractViewController parentController, Object... initParameters) {
+        String bookKey = (String) initParameters[0];
         book = BOOK_REPOSITORY.getByName(bookKey);
         if (book == null) {
             throw new IllegalStateException(format("Not found book by key = %s for book info controller", bookKey));
@@ -150,6 +150,7 @@ public class BookInfoViewController extends AbstractViewController {
         }
 
         coverImage.setImage(IMAGE_PROVIDER.resolveCover(book));
+        viewAudioBookSites.setVisible(book.getAudiobookSites() != null && !book.getAudiobookSites().isEmpty());
     }
 
     private String resolvePrice(Double price) {
@@ -169,8 +170,27 @@ public class BookInfoViewController extends AbstractViewController {
 
     @FXML
     public void editBook() {
-        loadModalView("Edit book", "view/edit-view.fxml", mainPane, book.getKey(),
-                this, 165, 0);
+        loadModalView(
+            "Edit book", "view/edit-view.fxml",
+            mainPane,
+            this,
+            165,
+            -25,
+            book.getKey()
+        );
+        updateView();
+    }
+
+    @FXML
+    public void audioBookSitesView() {
+        loadModalView(
+            "Audio Book Sites", "view/audio-book-sites-connections-view.fxml",
+            mainPane,
+            this,
+            165,
+            0,
+            book.getAudiobookSites()
+        );
         updateView();
     }
 

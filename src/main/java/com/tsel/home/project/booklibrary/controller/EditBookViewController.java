@@ -20,9 +20,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class EditBookViewController extends AbstractEditViewController {
+
+    @FXML
+    private AnchorPane editBookStage;
 
     @FXML
     private TextField nameInput;
@@ -76,16 +80,17 @@ public class EditBookViewController extends AbstractEditViewController {
     private AbstractViewController parentController;
 
     @Override
-    public void initController(AbstractViewController parentController, String entityKey) {
+    public void initController(AbstractViewController parentController, Object... initParameters) {
         init(authorInput, publisherInput, cycleInput, isEndedCycleCheckBox, totalCountInCycleInput);
 
-        if (isBlank(entityKey)) {
+        String bookKey = (String) initParameters[0];
+        if (isBlank(bookKey)) {
             throw new IllegalStateException("Entity key for edit controller is blank!");
         }
 
-        Book book = BOOK_REPOSITORY.getByName(entityKey);
+        Book book = BOOK_REPOSITORY.getByName(bookKey);
         if (book == null) {
-            throw new IllegalStateException(format("Book by key = \"%s\" not found for edit controller!", entityKey));
+            throw new IllegalStateException(format("Book by key = \"%s\" not found for edit controller!", bookKey));
         }
 
         this.book = book;
@@ -164,7 +169,8 @@ public class EditBookViewController extends AbstractEditViewController {
             imageInput,
             priceInput,
             isHardCoverCheckBox,
-            editButton
+            editButton,
+            book.getAudiobookSites()
         );
     }
 
@@ -186,5 +192,18 @@ public class EditBookViewController extends AbstractEditViewController {
 
         parentController.updateControllerState(newBook.getKey());
         return true;
+    }
+
+    @FXML
+    public void addAudioBookSites() {
+        loadModalView(
+            "Connect audiobook sites",
+            "view/audio-book-sites-connections-edit-view.fxml",
+            editBookStage,
+            this,
+            500,
+            0,
+            book.getAudiobookSites()
+        );
     }
 }

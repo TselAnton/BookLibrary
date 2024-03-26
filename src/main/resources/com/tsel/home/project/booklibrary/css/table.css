@@ -8,5 +8,5 @@
 
 .table-row-cell:focused {
     -fx-background-color: #8B936B;
-    -fx-table-cell-border-color: orange;
+    -fx-table-cell-border-color: #EDEDED;
 }

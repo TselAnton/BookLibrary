@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainStage" minHeight="700.0" minWidth="812.0" prefHeight="700.0" prefWidth="1252.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.MainViewController">
+<AnchorPane fx:id="mainStage" minHeight="700.0" minWidth="812.0" prefHeight="700.0" prefWidth="1252.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.MainViewController">
    <children>
       <AnchorPane maxHeight="240.0" minHeight="125.0" prefHeight="240.0" prefWidth="1226.0" style="-fx-background-color: #8B936B;" AnchorPane.bottomAnchor="460.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -59,7 +59,11 @@
                      <viewport>
                         <Rectangle2D />
                      </viewport>
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
                   </ImageView>
+                  <Button fx:id="audioBookSiteButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#manageAudioBookSites" prefHeight="30.0" prefWidth="30.0" styleClass="audio-book-sites-table-button" stylesheets="@../css/audiobook-site-table-button.css" />
                </children>
             </HBox>
             <TableView fx:id="bookTableView" layoutX="12.0" layoutY="52.0" onKeyPressed="#tableViewKeyPressed" onMouseClicked="#clickOnTable" onSort="#onSort" prefHeight="398.0" prefWidth="980.0" style="-fx-alignment: CENTER-RIGHT; -fx-background-color: #C7CCB3;" styleClass="table-row-cell" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="52.0">
@@ -67,12 +71,13 @@
                   <TableColumn fx:id="imageColumn" editable="false" maxWidth="100.0" prefWidth="30.0" sortable="false" style="-fx-alignment: BASELINE_CENTER;" />
                   <TableColumn fx:id="numberColumn" editable="false" maxWidth="100.0" prefWidth="50.0" sortable="false" style="-fx-alignment: BASELINE_CENTER;" text="№" />
                   <TableColumn fx:id="nameColumn" editable="false" prefWidth="319.0" text="Название" />
-                  <TableColumn fx:id="authorColumn" maxWidth="1000.0" prefWidth="250.0" text="Автор" />
+                  <TableColumn fx:id="authorColumn" maxWidth="1000.0" prefWidth="180.0" text="Автор" />
                   <TableColumn fx:id="publisherColumn" maxWidth="200.0" prefWidth="90.0" style="-fx-alignment: BASELINE_CENTER;" text="Издание" />
                   <TableColumn fx:id="cycleColumn" maxWidth="2000.0" prefWidth="150.0" text="Цикл" />
-                  <TableColumn fx:id="cycleNumberColumn" maxWidth="200.0" prefWidth="90.0" sortType="DESCENDING" sortable="false" style="-fx-alignment: BASELINE_CENTER;" text="Номер" />
-                  <TableColumn fx:id="readColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Прочитано" />
+                  <TableColumn fx:id="cycleNumberColumn" maxWidth="80.0" minWidth="80.0" sortType="DESCENDING" sortable="false" style="-fx-alignment: BASELINE_CENTER;" text="Номер" />
                   <TableColumn fx:id="cycleEndColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Завершён" />
+                  <TableColumn fx:id="readColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Прочитано" />
+                  <TableColumn fx:id="audioBookSiteGeneratedColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Аудио" />
                   <TableColumn fx:id="pagesColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Страницы" />
               </columns>
                <opaqueInsets>

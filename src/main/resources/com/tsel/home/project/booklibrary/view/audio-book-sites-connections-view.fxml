@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#stageKeyPressed" prefHeight="675.0" prefWidth="484.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.AudioBookSiteConnectionViewController">
+    <children>
+        <AnchorPane layoutY="-1.0" prefHeight="125.0" prefWidth="484.0" style="-fx-background-color: #8B936B;">
+            <children>
+                <Label layoutX="15.0" layoutY="26.0" text="AudioBook" textFill="#3a3d20">
+                    <font>
+                        <Font name="Cambria Bold" size="60.0" />
+                    </font>
+                </Label>
+                <Label layoutX="322.0" layoutY="26.0" text="Site" textFill="#f7f3f2">
+                    <font>
+                        <Font name="Cambria Bold" size="60.0" />
+                    </font>
+                </Label>
+            </children>
+        </AnchorPane>
+      <TableView fx:id="audioBookSiteTable" layoutX="23.0" layoutY="139.0" onKeyPressed="#stageKeyPressed" prefHeight="498.0" prefWidth="444.0" style="-fx-alignment: CENTER-RIGHT; -fx-background-color: #C7CCB3;" styleClass="table-row-cell" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="140.0">
+         <stylesheets>
+            <URL value="@../css/table.css" />
+            <URL value="@../css/check-box.css" />
+         </stylesheets>
+      </TableView>
+    </children>
+</AnchorPane>
