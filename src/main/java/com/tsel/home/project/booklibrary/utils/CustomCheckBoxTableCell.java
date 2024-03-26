@@ -13,10 +13,10 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 /**
- * Данный класс позволяет создать CheckBox колонку с возможностью отслеживать евенты самих CheckBox
+ * CheckBox колонка с отслеживанием отслеживать евентов самих CheckBox
  */
 @SuppressWarnings("unchecked")
-public class CustomCheckBoxTableCell<S,T> extends TableCell<S,T> {
+public abstract class CustomCheckBoxTableCell<S> extends TableCell<S, CheckBox> {
 
     private final CheckBox checkBox;
     private String id;
@@ -26,7 +26,8 @@ public class CustomCheckBoxTableCell<S,T> extends TableCell<S,T> {
     private ObservableValue<Boolean> booleanProperty;
 
     public CustomCheckBoxTableCell() {
-        this.getStyleClass().add("check-box-table-cell");
+        this.getStyleClass().add("check-box");
+        this.setStyle("-fx-alignment: CENTER");
 
         this.checkBox = new CheckBox();
         this.checkBox.setOnAction(this::handleActionEvent);
@@ -53,14 +54,14 @@ public class CustomCheckBoxTableCell<S,T> extends TableCell<S,T> {
         this.checkBox.setSelected(selected);
     }
 
-    private final ObjectProperty<StringConverter<T>> converter =
+    private final ObjectProperty<StringConverter<CheckBox>> converter =
         new SimpleObjectProperty<>(this, "converter") {protected void invalidated() {updateShowLabel();}};
 
-    public final ObjectProperty<StringConverter<T>> converterProperty() {
+    public final ObjectProperty<StringConverter<CheckBox>> converterProperty() {
         return converter;
     }
 
-    public final StringConverter<T> getConverter() {
+    public final StringConverter<CheckBox> getConverter() {
         return converterProperty().get();
     }
 
@@ -76,14 +77,19 @@ public class CustomCheckBoxTableCell<S,T> extends TableCell<S,T> {
     }
 
     @Override
-    public void updateItem(T item, boolean empty) {
+    public void updateItem(CheckBox item, boolean empty) {
         super.updateItem(item, empty);
+
+        if (item != null) {
+            this.setCheckBoxId(item.getId());
+            this.setCheckBoxSelected(setSelectedOnInit(item.getId()));
+        }
 
         if (empty) {
             setText(null);
             setGraphic(null);
         } else {
-            StringConverter<T> c = getConverter();
+            StringConverter<CheckBox> c = getConverter();
 
             if (showLabel) {
                 setText(c.toString(item));
@@ -106,6 +112,8 @@ public class CustomCheckBoxTableCell<S,T> extends TableCell<S,T> {
             ));
         }
     }
+
+    protected abstract boolean setSelectedOnInit(String checkBoxId);
 
     private void updateShowLabel() {
         this.showLabel = converter != null;

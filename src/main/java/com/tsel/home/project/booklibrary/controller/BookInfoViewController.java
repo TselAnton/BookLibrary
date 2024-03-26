@@ -72,6 +72,9 @@ public class BookInfoViewController extends AbstractViewController {
     private Button editBookButton;
 
     @FXML
+    private Button viewAudioBookSites;
+
+    @FXML
     private Label priceLabel;
 
     @FXML
@@ -151,6 +154,7 @@ public class BookInfoViewController extends AbstractViewController {
         }
 
         coverImage.setImage(IMAGE_PROVIDER.resolveCover(book));
+        viewAudioBookSites.setVisible(book.getAudiobookSites() != null && !book.getAudiobookSites().isEmpty());
     }
 
     private String resolvePrice(Double price) {
@@ -176,7 +180,21 @@ public class BookInfoViewController extends AbstractViewController {
             this,
             165,
             0,
-            book.getKey());
+            book.getKey()
+        );
+        updateView();
+    }
+
+    @FXML
+    public void audioBookSitesView() {
+        loadModalView(
+            "Audio Book Sites", "view/audio-book-sites-connections-view.fxml",
+            mainPane,
+            this,
+            165,
+            0,
+            book.getAudiobookSites()
+        );
         updateView();
     }
 

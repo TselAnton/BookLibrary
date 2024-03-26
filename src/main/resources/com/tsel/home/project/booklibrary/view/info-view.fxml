@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
 
 <AnchorPane fx:id="mainPane" maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="812.0" prefHeight="600.0" prefWidth="812.0" style="-fx-background-color: #F7F3F2;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.BookInfoViewController">
    <children>
@@ -33,12 +39,12 @@
                </padding>
             </Label>
             <ImageView fx:id="coverImage" fitHeight="351.0" fitWidth="242.0" layoutX="16.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="45.0" />
-            <Button fx:id="editBookButton" layoutX="14.0" layoutY="417.0" mnemonicParsing="false" onAction="#editBook" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Изменить" textFill="WHITE">
+            <Button fx:id="editBookButton" layoutX="14.0" layoutY="417.0" mnemonicParsing="false" onAction="#editBook" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Изменить" textFill="WHITE" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="675.0">
                <font>
                   <Font size="14.0" />
                </font>
             </Button>
-            <Button fx:id="deleteButton" layoutX="148.0" layoutY="417.0" mnemonicParsing="false" onAction="#deleteBook" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Удалить" textFill="WHITE">
+            <Button fx:id="deleteButton" layoutX="148.0" layoutY="417.0" mnemonicParsing="false" onAction="#deleteBook" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Удалить" textFill="WHITE" AnchorPane.leftAnchor="145.0">
                <font>
                   <Font size="14.0" />
                </font>
@@ -268,6 +274,11 @@
                   <Font name="System Bold" size="20.0" />
                </font>
             </Label>
+            <Button fx:id="viewAudioBookSites" layoutX="296.0" layoutY="417.0" mnemonicParsing="false" onAction="#audioBookSitesView" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Аудиокниги" textFill="WHITE" AnchorPane.leftAnchor="300.0">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
    </children>

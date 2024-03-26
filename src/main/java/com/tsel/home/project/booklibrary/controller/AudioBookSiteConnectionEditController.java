@@ -32,9 +32,9 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AudioBookSiteConnectionController extends AbstractViewController {
+public class AudioBookSiteConnectionEditController extends AbstractViewController {
 
-    private static final Logger LOGGER = LogManager.getLogger(AudioBookSiteConnectionController.class);
+    private static final Logger LOGGER = LogManager.getLogger(AudioBookSiteConnectionEditController.class);
 
     private static final AudioBookSiteRepository AUDIO_BOOK_SITE_REPOSITORY = AudioBookSiteRepository.getInstance();
     private static final AudioBookSiteConverter AUDIO_BOOK_SITE_CONVERTER = new AudioBookSiteConverter();
@@ -51,8 +51,8 @@ public class AudioBookSiteConnectionController extends AbstractViewController {
     private List<String> audioBookSites;
     private final Map<String, Boolean> checkedAudioBookItemsMap = new HashMap<>();
 
-    public AudioBookSiteConnectionController() {
-        super("Audio Book Sites", "view/audio-book-sites-connections-view");
+    public AudioBookSiteConnectionEditController() {
+        super("Audio Book Sites", "view/audio-book-sites-connections-edit-view.fxml");
     }
 
     @Override
@@ -92,6 +92,7 @@ public class AudioBookSiteConnectionController extends AbstractViewController {
         numberColumn.setPrefWidth(10);
         numberColumn.setMinWidth(50);
         numberColumn.setMaxWidth(100);
+        numberColumn.setStyle("-fx-alignment: BASELINE_CENTER");
         numberColumn.setText("№");
         numberColumn.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(audioBookSiteTable.getItems().indexOf(column.getValue()) + 1));
         return numberColumn;
@@ -105,7 +106,19 @@ public class AudioBookSiteConnectionController extends AbstractViewController {
         connectionColumn.setText("Наличие");
 
         Callback<TableColumn<AudioBookSiteDTO, CheckBox>, TableCell<AudioBookSiteDTO, CheckBox>> audioBookSiteConnectionCellFactory =
-            (TableColumn<AudioBookSiteDTO, CheckBox> param) -> new AudioBookSiteConnectionEditableTableCell();
+            (TableColumn<AudioBookSiteDTO, CheckBox> param) -> new CustomCheckBoxTableCell<>() {
+                @Override
+                protected boolean setSelectedOnInit(String checkBoxId) {
+                    return checkedAudioBookItemsMap.get(checkBoxId);
+                }
+
+                @Override
+                protected void handleActionEvent(ActionEvent event) {
+                    LOGGER.debug("Handle event for checkBox '{}', status: {}", this.getCheckBoxId(),
+                        this.isCheckBoxSelected());
+                    checkedAudioBookItemsMap.put(this.getCheckBoxId(), this.isCheckBoxSelected());
+                }
+            };
 
         connectionColumn.setCellFactory(audioBookSiteConnectionCellFactory);
         connectionColumn.setCellValueFactory(column -> {
@@ -161,24 +174,6 @@ public class AudioBookSiteConnectionController extends AbstractViewController {
         if (answer.isPresent() && OK.equals(answer.get().getText())) {
             Stage stage = (Stage) cancelButton.getScene().getWindow();
             stage.close();
-        }
-    }
-
-    public class AudioBookSiteConnectionEditableTableCell extends CustomCheckBoxTableCell<AudioBookSiteDTO, CheckBox> {
-
-        @Override
-        public void updateItem(CheckBox item, boolean empty) {
-            super.updateItem(item, empty);
-            if (item != null) {
-                this.setCheckBoxId(item.getId());
-                this.setCheckBoxSelected(checkedAudioBookItemsMap.get(item.getId()));
-            }
-        }
-
-        @Override
-        protected void handleActionEvent(ActionEvent event) {
-            LOGGER.debug("Handle event for checkBox '{}', status: {}", this.getCheckBoxId(), this.isCheckBoxSelected());
-            checkedAudioBookItemsMap.put(this.getCheckBoxId(), this.isCheckBoxSelected());
         }
     }
 }

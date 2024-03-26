@@ -198,7 +198,7 @@ public class EditBookViewController extends AbstractEditViewController {
     public void addAudioBookSites() {
         loadModalView(
             "Connect audiobook sites",
-            "view/audio-book-sites-connections-view.fxml",
+            "view/audio-book-sites-connections-edit-view.fxml",
             editBookStage,
             this,
             300,
