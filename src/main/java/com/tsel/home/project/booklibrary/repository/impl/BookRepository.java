@@ -38,7 +38,7 @@ public class BookRepository extends AbstractFileRepository<Book> {
         return INSTANCE;
     }
 
-    protected BookRepository(String storageFileName) {
+    public BookRepository(String storageFileName) {
         super(storageFileName);
     }
 
