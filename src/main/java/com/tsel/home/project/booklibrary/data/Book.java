@@ -4,6 +4,7 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,12 +19,15 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"coverImgAbsolutePath", "bookshelf"})
+@EqualsAndHashCode(exclude = "coverImgAbsolutePath")
 public class Book implements BaseEntity {
+
+    //todo: в качестве ключей использовать реальные идентификаторы
 
     @Serial
     private static final long serialVersionUID = -88421120419730807L;
 
+    private UUID key;
     private String name;
     private String author;
     private String publisher;
@@ -36,9 +40,6 @@ public class Book implements BaseEntity {
     private Boolean hardCover;
     private Double price;
     private List<String> audiobookSites = new ArrayList<>();
-
-    @Deprecated
-    private Integer bookshelf;
 
     @Override
     public String getKey() {

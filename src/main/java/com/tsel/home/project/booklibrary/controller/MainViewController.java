@@ -1,5 +1,6 @@
 package com.tsel.home.project.booklibrary.controller;
 
+import static com.tsel.home.project.booklibrary.search.SearchServiceV2.INDENDITY_PREDICATE;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -9,7 +10,9 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 import static java.util.Comparator.nullsLast;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.collections.FXCollections.observableList;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.stage.Modality.NONE;
 
@@ -21,12 +24,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -119,6 +125,10 @@ public class MainViewController extends AbstractViewController {
 
     private int tableFont = MIN_FONT;
 
+    private static ObservableList<BookDTO> observableList;
+    private static SortedList<BookDTO> sortedList;
+    private static FilteredList<BookDTO> filteredList;
+
     public MainViewController() {
         super("Book library", "view/main-view.fxml");
     }
@@ -128,8 +138,12 @@ public class MainViewController extends AbstractViewController {
     protected void afterInitScene(FXMLLoader loader) {
         TableView<BookDTO> bookTableView = (TableView<BookDTO>) loader.getNamespace().get("bookTableView");
         initTableColumns(loader, bookTableView);
-        updateTableColumns(bookTableView);
-        bookTableView.getItems().sort(comparing(BookDTO::getName));
+
+        observableList = observableList(getDtoBooks());
+        filteredList = observableList.filtered(INDENDITY_PREDICATE);
+        sortedList = new SortedList<>(filteredList);
+        bookTableView.setItems(sortedList);
+        sortedList.comparatorProperty().bind(bookTableView.comparatorProperty());
 
         bookTableView.addEventFilter(ScrollEvent.ANY, scrollEvent -> updateTableScale(scrollEvent, bookTableView));
 
@@ -185,51 +199,52 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     public void onSort() {
-        if (bookTableView.getSortOrder().isEmpty()) {
-            // Nothing chosen. Sort by book name by default
-            bookTableView.getItems().sort(comparing(BookDTO::getName));
-        } else {
-            // Sort by cycle name + book number in cycle
-            if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
-                if (cycleColumnSortedByASC) {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
-                                .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
-                        );
-                } else {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
-                            .reversed()
-                            .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
-                        );
-                }
-                cycleColumnSortedByASC = !cycleColumnSortedByASC;
 
-            } else {
-                cycleColumnSortedByASC = true;
-            }
-
-            // Sort by pages + !read
-            if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
-                if (pagesColumnSortedByASC) {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
-                            .thenComparing(BookDTO::getPages)
-                        );
-
-                } else {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
-                            .thenComparing(BookDTO::getPages)
-                            .reversed()
-                        );
-                }
-                pagesColumnSortedByASC = !pagesColumnSortedByASC;
-
-            } else {
-                pagesColumnSortedByASC = true;
-            }
-        }
+//        if (bookTableView.getSortOrder().isEmpty()) {
+//            // Nothing chosen. Sort by book name by default
+//            bookTableView.getItems().sort(comparing(BookDTO::getName));
+//        } else {
+//            // Sort by cycle name + book number in cycle
+//            if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
+//                if (cycleColumnSortedByASC) {
+//                    bookTableView.getItems()
+//                        .sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
+//                                .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
+//                        );
+//                } else {
+//                    bookTableView.getItems()
+//                        .sort(comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
+//                            .reversed()
+//                            .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
+//                        );
+//                }
+//                cycleColumnSortedByASC = !cycleColumnSortedByASC;
+//
+//            } else {
+//                cycleColumnSortedByASC = true;
+//            }
+//
+//            // Sort by pages + !read
+//            if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
+//                if (pagesColumnSortedByASC) {
+//                    bookTableView.getItems()
+//                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
+//                            .thenComparing(BookDTO::getPages)
+//                        );
+//
+//                } else {
+//                    bookTableView.getItems()
+//                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
+//                            .thenComparing(BookDTO::getPages)
+//                            .reversed()
+//                        );
+//                }
+//                pagesColumnSortedByASC = !pagesColumnSortedByASC;
+//
+//            } else {
+//                pagesColumnSortedByASC = true;
+//            }
+//        }
     }
 
     private int comparatorByBookNumberInCycle(String bookNumber1, String bookNumber2) {
@@ -259,7 +274,7 @@ public class MainViewController extends AbstractViewController {
             400,
             15
         );
-        updateTableColumns(bookTableView);
+        updateTableColumns();
     }
 
     @FXML
@@ -275,7 +290,7 @@ public class MainViewController extends AbstractViewController {
                 }
 
                 loadBookView(mainStage, entityKey, this);
-                updateTableColumns(bookTableView);
+                updateTableColumns();
             }
         }
     }
@@ -324,7 +339,7 @@ public class MainViewController extends AbstractViewController {
             500,
             50
         );
-        updateTableColumns(bookTableView);
+        updateTableColumns();
     }
 
     @FXML
@@ -342,7 +357,7 @@ public class MainViewController extends AbstractViewController {
         }
 
         loadBookView(mainStage, entityKey, this);
-        updateTableColumns(bookTableView);
+        updateTableColumns();
     }
 
     @FXML
@@ -358,7 +373,7 @@ public class MainViewController extends AbstractViewController {
                     String deletedEntityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
                     Book deletedEntity = BOOK_REPOSITORY.getByName(deletedEntityKey);
                     BOOK_REPOSITORY.delete(deletedEntity);
-                    updateTableColumns(bookTableView);
+                    updateTableColumns();
                 }
             }
 
@@ -382,15 +397,40 @@ public class MainViewController extends AbstractViewController {
     @FXML
     private void search() {
         String searchQuery = searchQueryField.getText();
-        bookTableView.setItems(observableArrayList(SEARCH_SERVICE_V2.search(searchQuery, getDtoBooks())));
+        filteredList.setPredicate(SEARCH_SERVICE_V2.getSearchPredicate(searchQuery));
     }
 
-    private void updateTableColumns(TableView<BookDTO> bookTableView) {
-        bookTableView.setItems(observableArrayList(
-                getDtoBooks().stream()
-                        .sorted(Comparator.comparing(BookDTO::getName))
-                        .toList()
-                ));
+    private void updateTableColumns() {
+        Map<String, BookDTO> repositoryBookDTOMap = getDtoBooks()
+            .stream()
+            .collect(toMap(BOOK_CONVERTER::buildEntityKeyByDTO, Function.identity()));
+
+        Map<String, BookDTO> tableBookDtoMap = bookTableView.getItems()
+            .stream()
+            .collect(toMap(BOOK_CONVERTER::buildEntityKeyByDTO, Function.identity()));
+
+        if (repositoryBookDTOMap.size() != tableBookDtoMap.size()) {
+            // Удаляем отсутвующие
+            tableBookDtoMap.entrySet()
+                .stream()
+                .filter(bookEntry -> !repositoryBookDTOMap.containsKey(bookEntry.getKey()))
+                .map(Entry::getValue)
+                .forEach(bookDTO -> observableList.remove(bookDTO));
+
+            // Добавляем новые
+            repositoryBookDTOMap.entrySet()
+                .stream()
+                .filter(bookEntry -> !tableBookDtoMap.containsKey(bookEntry.getKey()))
+                .map(Entry::getValue)
+                .forEach(bookDTO -> observableList.add(bookDTO));
+        }
+
+        tableBookDtoMap.forEach((bookKey, bookDTOForUpdate) -> {
+                BookDTO bookDTO = repositoryBookDTOMap.get(bookKey);
+                if (bookDTO != null) {
+                    bookDTOForUpdate.updateInnerFields(bookDTO);
+                }
+            });
     }
 
     private List<BookDTO> getDtoBooks() {
@@ -408,7 +448,7 @@ public class MainViewController extends AbstractViewController {
             Stage stage = new Stage() {
                 @Override
                 public void hide() {
-                    updateTableColumns(bookTableView);
+                    updateTableColumns();
                     super.hide();
                 }
             };

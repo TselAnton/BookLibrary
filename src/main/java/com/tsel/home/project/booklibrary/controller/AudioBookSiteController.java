@@ -77,7 +77,6 @@ public class AudioBookSiteController extends AbstractViewController {
         Callback<TableColumn<AudioBookSiteDTO, String>, TableCell<AudioBookSiteDTO, String>> audioBookSiteNameCellFactory =
             (TableColumn<AudioBookSiteDTO, String> param) -> new AudioBookSiteNameEditableColumn();
 
-        // 272
         TableColumn<AudioBookSiteDTO, String> audioBookSiteNameColumn = new TableColumn<>();
         audioBookSiteNameColumn.setPrefWidth(262);
         audioBookSiteNameColumn.setMinWidth(262);
@@ -120,14 +119,6 @@ public class AudioBookSiteController extends AbstractViewController {
             if (answer.isPresent() && OK.equals(answer.get().getText())) {
                 String deletedEntityKey = AUDIO_BOOK_SITE_CONVERTER.buildEntityKeyByDTO(clickedEntity);
                 AudioBookSite deletedEntity = AUDIO_BOOK_SITE_REPOSITORY.getByName(deletedEntityKey);
-                BOOK_REPOSITORY.getAll()
-                    .stream()
-                    .filter(book -> !book.getAudiobookSites().isEmpty())
-                    .forEach(book -> {
-                        book.getAudiobookSites().remove(deletedEntity.getKey());
-                        BOOK_REPOSITORY.save(book);
-                    });
-
                 AUDIO_BOOK_SITE_REPOSITORY.delete(deletedEntity);
                 updateBookSiteTableItems();
             }

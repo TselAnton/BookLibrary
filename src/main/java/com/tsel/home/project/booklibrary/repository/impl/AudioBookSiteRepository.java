@@ -6,6 +6,7 @@ import com.tsel.home.project.booklibrary.repository.AbstractFileRepository;
 public class AudioBookSiteRepository extends AbstractFileRepository<AudioBookSite> {
 
     private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-audio-book-site-storage.txt";
+    private static final BookRepository BOOK_REPOSITORY = BookRepository.getInstance();
 
     private static AudioBookSiteRepository INSTANCE;
 
@@ -18,5 +19,17 @@ public class AudioBookSiteRepository extends AbstractFileRepository<AudioBookSit
 
     protected AudioBookSiteRepository(String storageFileName) {
         super(storageFileName);
+    }
+
+    @Override
+    public void delete(AudioBookSite entity) {
+        BOOK_REPOSITORY.getAll()
+            .stream()
+            .filter(book -> !book.getAudiobookSites().isEmpty())
+            .forEach(book -> {
+                book.getAudiobookSites().remove(entity.getKey());
+                BOOK_REPOSITORY.save(book);
+            });
+        super.delete(entity);
     }
 }

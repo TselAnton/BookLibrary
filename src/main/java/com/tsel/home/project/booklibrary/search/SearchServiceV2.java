@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -30,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 
 public class SearchServiceV2 {
 
+    public static final Predicate<BookDTO> INDENDITY_PREDICATE = dto -> true;
     public static final SearchServiceV2 INSTANCE = new SearchServiceV2();
 
     private static final Logger LOGGER = LogManager.getLogger(SearchServiceV2.class);
@@ -45,8 +47,15 @@ public class SearchServiceV2 {
         initialize();
     }
 
-    public String getGeneratedTooltip() {
-        return generatedTooltip;
+    public Predicate<BookDTO> getSearchPredicate(String searchQuery) {
+        if (isBlank(searchQuery)) {
+            LOGGER.debug("Search query is empty");
+            return dto -> true;
+        }
+
+        LOGGER.debug("Start search by query '{}'", searchQuery);
+        BaseOperand searchOperands = prepareSearchQuery(searchQuery);
+        return dto -> filterByLogicalOperators(searchOperands, dto);
     }
 
     /**
