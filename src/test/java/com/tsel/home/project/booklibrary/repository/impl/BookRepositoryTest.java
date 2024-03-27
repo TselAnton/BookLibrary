@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -61,6 +62,7 @@ class BookRepositoryTest {
             .price(null)
             .autograph(false)
             .hardCover(true)
+            .audiobookSites(new ArrayList<>())
             .build();
     }
 }

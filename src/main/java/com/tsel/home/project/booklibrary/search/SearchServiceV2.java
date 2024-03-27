@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,6 +37,8 @@ public class SearchServiceV2 {
     private static final Pattern OPERATOR_PATTERN = Pattern.compile("(.*?) (AND|И|OR|ИЛИ) (.*?)");
 
     private final Map<Field, SearchFieldDefinition> fieldDefinitionMap = new ConcurrentHashMap<>();
+
+    @Getter
     private String generatedTooltip;
 
     private SearchServiceV2() {
@@ -147,7 +150,7 @@ public class SearchServiceV2 {
     private void initializeFieldsSearchTooltip(List<Field> searchFields) {
         StringBuilder stringFieldsTooltipBuilder = new StringBuilder();
         StringBuilder tooltipBuilder = new StringBuilder(
-            format("Поиск через условие: %s и %s\n",
+            format("Поиск через условие: [%s] и [%s]\n",
                 arrayToString(AND.getNames()),
                 arrayToString(OR.getNames())
             ));
@@ -162,7 +165,7 @@ public class SearchServiceV2 {
 
             } else {
                 SearchFilter searchFilter = SearchFilterFactory.getSearchFilter(searchField.getType());
-                tooltipBuilder.append(format("%s %s, %s\n",
+                tooltipBuilder.append(format("- %s: %s, %s\n",
                     searchFieldAnnotation.description(),
                     arrayToString(searchFieldAnnotation.aliases()),
                     searchFilter.getTooltipInfo()
@@ -183,6 +186,6 @@ public class SearchServiceV2 {
     }
 
     private String arrayToString(List<String> names) {
-        return "[" + String.join(" или ", names) + "]";
+        return "\"" + String.join("\" или \"", names) + "\"";
     }
 }

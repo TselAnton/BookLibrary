@@ -2,14 +2,11 @@
 
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
-<?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
@@ -41,29 +38,22 @@
             <HBox layoutX="196.0" layoutY="13.0" prefHeight="25.0" prefWidth="994.0" AnchorPane.leftAnchor="196.0" AnchorPane.rightAnchor="24.0">
                <children>
                   <TextField fx:id="searchQueryField" onKeyPressed="#searchLabelKeyPressed" prefHeight="25.0" prefWidth="743.0" />
-                  <ImageView fx:id="signHelp" fitHeight="25.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../img/sign.png" />
-                     </image>
-                     <viewport>
-                        <Rectangle2D />
-                     </viewport>
+                  <Button fx:id="searchHelpButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#showSearchHelp" prefHeight="30.0" prefWidth="30.0" styleClass="search-help-button" stylesheets="@../css/main-view-buttons.css">
                      <HBox.margin>
-                        <Insets left="15.0" right="5.0" />
+                        <Insets left="10.0" right="5.0" />
                      </HBox.margin>
-                  </ImageView>
-                  <ImageView fx:id="priceButton" fitHeight="25.0" fitWidth="30.0" onMouseClicked="#getBooksPrice" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../img/price.png" />
-                     </image>
-                     <viewport>
-                        <Rectangle2D />
-                     </viewport>
+                  </Button>
+                  <Button fx:id="priceButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#showBooksPrice" prefHeight="30.0" prefWidth="30.0" styleClass="count-price-button" stylesheets="@../css/main-view-buttons.css">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
-                  </ImageView>
-                  <Button fx:id="audioBookSiteButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#manageAudioBookSites" prefHeight="30.0" prefWidth="30.0" styleClass="audio-book-sites-table-button" stylesheets="@../css/audiobook-site-table-button.css" />
+                  </Button>
+                  <Button fx:id="audioBookSiteButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#manageAudioBookSites" prefHeight="30.0" prefWidth="30.0" styleClass="audio-book-sites-table-button" stylesheets="@../css/main-view-buttons.css" />
+                  <Button fx:id="randomBookButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#chooseRandomBook" prefHeight="30.0" prefWidth="30.0" styleClass="random-book-button" stylesheets="@../css/main-view-buttons.css">
+                     <HBox.margin>
+                        <Insets left="5.0" />
+                     </HBox.margin>
+                  </Button>
                </children>
             </HBox>
             <TableView fx:id="bookTableView" layoutX="12.0" layoutY="52.0" onKeyPressed="#tableViewKeyPressed" onMouseClicked="#clickOnTable" onSort="#onSort" prefHeight="398.0" prefWidth="980.0" style="-fx-alignment: CENTER-RIGHT; -fx-background-color: #C7CCB3;" styleClass="table-row-cell" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="52.0">

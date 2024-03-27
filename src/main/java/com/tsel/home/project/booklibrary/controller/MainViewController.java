@@ -2,6 +2,7 @@ package com.tsel.home.project.booklibrary.controller;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
+import static java.util.Arrays.stream;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
@@ -22,12 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Function;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableColumn;
@@ -51,6 +55,8 @@ public class MainViewController extends AbstractViewController {
     private static final String TABLE_SCALE_PATTERN = "-fx-font-size: %spt";
     private static final int MIN_FONT = 9;
     private static final int MAX_FONT = 16;
+
+    private static final Random RANDOM = new Random(1412423095L);
 
     private static final SearchServiceV2 SEARCH_SERVICE_V2 = SearchServiceV2.INSTANCE;
 
@@ -127,7 +133,20 @@ public class MainViewController extends AbstractViewController {
 
         bookTableView.addEventFilter(ScrollEvent.ANY, scrollEvent -> updateTableScale(scrollEvent, bookTableView));
 
-        addSearchTooltip(loader);
+        addTooltip("searchHelpButton", "Подсказки для поисковых команд", loader);
+        addTooltip("priceButton", "Посчитать стоимость выбранных книг", loader);
+        addTooltip("audioBookSiteButton", "Управление сайтами аудиокниг", loader);
+        addTooltip("randomBookButton", "Показать случайную книгу из выбранных", loader);
+    }
+
+    private void addTooltip(String buttonName, String tooltipText, FXMLLoader loader) {
+        Button button = (Button) loader.getNamespace().get(buttonName);
+        Tooltip tooltip = new Tooltip(tooltipText);
+        tooltip.setAutoHide(false);
+        tooltip.setFont(new Font(13f));
+        tooltip.setShowDelay(new Duration(200f));
+
+        Tooltip.install(button, tooltip);
     }
 
     private void updateTableScale(ScrollEvent scrollEvent, TableView<BookDTO> bookTableView) {
@@ -266,7 +285,17 @@ public class MainViewController extends AbstractViewController {
     }
 
     @FXML
-    public void getBooksPrice() {
+    public void showSearchHelp() {
+        riseAlert(
+            AlertType.INFORMATION,
+            "Подсказки команд для поиска",
+            "Подсказки команд для поиска",
+            SEARCH_SERVICE_V2.getGeneratedTooltip()
+        );
+    }
+
+    @FXML
+    public void showBooksPrice() {
         double fullPrice = bookTableView.getItems()
             .stream()
             .map(BookDTO::getPrice)
@@ -283,6 +312,37 @@ public class MainViewController extends AbstractViewController {
                 new DecimalFormat("###,###").format(fullPrice)
             )
         );
+    }
+
+    @FXML
+    private void manageAudioBookSites() {
+        loadModalView(
+            "Audiobook sites",
+            "view/audio-book-sites-view.fxml",
+            mainStage,
+            this,
+            500,
+            50
+        );
+        updateTableColumns(bookTableView);
+    }
+
+    @FXML
+    public void chooseRandomBook() {
+        List<BookDTO> notReadBooks = bookTableView.getItems()
+            .stream()
+            .filter(bookDTO -> !bookDTO.getRead().isSelected())
+            .toList();
+
+        BookDTO randomBook = notReadBooks.get(RANDOM.nextInt(notReadBooks.size()));
+        String entityKey = BOOK_CONVERTER.buildEntityKeyByDTO(randomBook);
+
+        if (lastOpenedBookViewStage != null) {
+            lastOpenedBookViewStage.close();
+        }
+
+        loadBookView(mainStage, entityKey, this);
+        updateTableColumns(bookTableView);
     }
 
     @FXML
@@ -323,29 +383,6 @@ public class MainViewController extends AbstractViewController {
     private void search() {
         String searchQuery = searchQueryField.getText();
         bookTableView.setItems(observableArrayList(SEARCH_SERVICE_V2.search(searchQuery, getDtoBooks())));
-    }
-
-    @FXML
-    private void manageAudioBookSites() {
-        loadModalView(
-            "Audiobook sites",
-            "view/audio-book-sites-view.fxml",
-            mainStage,
-            this,
-            500,
-            50
-        );
-        updateTableColumns(bookTableView);
-    }
-
-    private void addSearchTooltip(FXMLLoader loader) {
-        ImageView signHelp = (ImageView) loader.getNamespace().get("signHelp");
-        Tooltip tooltip = new Tooltip(SEARCH_SERVICE_V2.getGeneratedTooltip());
-        tooltip.setAutoHide(false);
-        tooltip.setFont(new Font(16f));
-        tooltip.setShowDelay(new Duration(500f));
-
-        Tooltip.install(signHelp, tooltip);
     }
 
     private void updateTableColumns(TableView<BookDTO> bookTableView) {
