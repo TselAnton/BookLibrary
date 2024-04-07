@@ -398,6 +398,7 @@ public class MainViewController extends AbstractViewController {
     private void search() {
         String searchQuery = searchQueryField.getText();
         filteredList.setPredicate(SEARCH_SERVICE_V2.getSearchPredicate(searchQuery));
+        LOGGER.info("Search by '{}': founded {}", searchQuery, filteredList.size());
     }
 
     private void updateTableColumns() {
