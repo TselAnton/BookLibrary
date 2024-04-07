@@ -3,7 +3,6 @@ package com.tsel.home.project.booklibrary.data;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,12 +21,10 @@ import lombok.ToString;
 @EqualsAndHashCode(exclude = "coverImgAbsolutePath")
 public class Book implements BaseEntity {
 
-    //todo: в качестве ключей использовать реальные идентификаторы
-
     @Serial
     private static final long serialVersionUID = -88421120419730807L;
 
-    private UUID key;
+    private UUID id = UUID.randomUUID();
     private String name;
     private String author;
     private String publisher;
@@ -43,23 +40,6 @@ public class Book implements BaseEntity {
 
     @Override
     public String getKey() {
-        StringBuilder compositeKey = new StringBuilder();
-        compositeKey.append(name.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-        compositeKey.append("_");
-        compositeKey.append(author.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-        compositeKey.append("_");
-        compositeKey.append(publisher.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-
-        if (cycleName != null) {
-            compositeKey.append("_");
-            compositeKey.append(cycleName.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-        }
-
-        if (numberInSeries != null) {
-            compositeKey.append("_");
-            compositeKey.append(numberInSeries);
-        }
-
-        return compositeKey.toString();
+        return id.toString();
     }
 }

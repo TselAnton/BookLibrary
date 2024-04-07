@@ -3,8 +3,8 @@ package com.tsel.home.project.booklibrary.dto;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.search.SearchField;
 import com.tsel.home.project.booklibrary.utils.ImageProvider;
-import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import javafx.scene.control.CheckBox;
 import javafx.scene.image.ImageView;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(exclude = "cover")
 @EqualsAndHashCode(exclude = "cover")
-public class BookDTO implements Comparator<BookDTO> {
+public class BookDTO {
+
+    private UUID id;
 
     @SearchField(description = "Поиск по названию")
     private String name;
@@ -78,11 +80,6 @@ public class BookDTO implements Comparator<BookDTO> {
         this.hardCover = bookDTO.hardCover;
         this.hasAnyAudioBookSite = bookDTO.hasAnyAudioBookSite;
         this.audiobookSites = bookDTO.audiobookSites;
-    }
-
-    @Override
-    public int compare(BookDTO o1, BookDTO o2) {
-        return o1.name.compareTo(o2.getName());
     }
 
     public static class BookDTOBuilder {

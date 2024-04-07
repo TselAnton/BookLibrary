@@ -8,12 +8,13 @@ public class AudioBookSiteConverter implements Converter<AudioBookSite, AudioBoo
     @Override
     public AudioBookSiteDTO convert(AudioBookSite entity) {
         return AudioBookSiteDTO.builder()
+            .id(entity.getId())
             .name(entity.getName())
             .build();
     }
 
     @Override
     public String buildEntityKeyByDTO(AudioBookSiteDTO dto) {
-        return dto.getName();
+        return dto.getId().toString();
     }
 }

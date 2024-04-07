@@ -85,7 +85,7 @@ public class BookInfoViewController extends AbstractViewController {
     @Override
     public void initController(AbstractViewController parentController, Object... initParameters) {
         String bookKey = (String) initParameters[0];
-        book = BOOK_REPOSITORY.getByName(bookKey);
+        book = BOOK_REPOSITORY.getByKey(bookKey);
         if (book == null) {
             throw new IllegalStateException(format("Not found book by key = %s for book info controller", bookKey));
         }
@@ -95,7 +95,7 @@ public class BookInfoViewController extends AbstractViewController {
 
     @Override
     public void updateControllerState(String bookKey) {
-        book = BOOK_REPOSITORY.getByName(bookKey);
+        book = BOOK_REPOSITORY.getByKey(bookKey);
         if (book == null) {
             throw new IllegalStateException(format("Not found book by key = %s for book info controller", bookKey));
         }
@@ -132,7 +132,7 @@ public class BookInfoViewController extends AbstractViewController {
         if (isNotBlank(book.getCycleName())) {
             updateFontSizeForLongNames(book.getCycleName(), cycleLabel);
 
-            Cycle cycle = CYCLE_REPOSITORY.getByName(book.getCycleName());
+            Cycle cycle = CYCLE_REPOSITORY.getByKey(book.getCycleName());
 
             cycleLabel.setText(format("%s (%d / %d)", cycle.getName(), book.getNumberInSeries(), cycle.getBooksInCycle()));
             cycleEnded.setSelected(cycle.getEnded());

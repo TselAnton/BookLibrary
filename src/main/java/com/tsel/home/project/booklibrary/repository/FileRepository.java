@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface FileRepository<E extends BaseEntity> {
 
-    E getByName(String compositeKey);
+    E getByKey(String id);
 
     List<E> getAll();
 
-    E save(E entity);
+    void save(E entity);
 
     void delete(E entity);
 }

@@ -29,13 +29,13 @@ public class UserSettingsRepository extends AbstractFileRepository<UserSettings>
     }
 
     public void updateLastChosenCoverFile(File lastChosenCoverFile) {
-        UserSettings userSettings = ofNullable(getByName(USER_SETTINGS_KEY)).orElse(new UserSettings());
+        UserSettings userSettings = ofNullable(getByKey(USER_SETTINGS_KEY)).orElse(new UserSettings());
         userSettings.setLastChosenCoverFolder(lastChosenCoverFile.getAbsoluteFile().getParent());
         save(userSettings);
     }
 
     public Optional<File> getLastChosenCoverFile() {
-        return ofNullable(getByName(USER_SETTINGS_KEY))
+        return ofNullable(getByKey(USER_SETTINGS_KEY))
                 .map(UserSettings::getLastChosenCoverFolder)
                 .filter(path -> Files.isDirectory(Path.of(path)))
                 .map(File::new);

@@ -11,12 +11,12 @@ import com.tsel.home.project.booklibrary.dto.AudioBookSiteDTO;
 import com.tsel.home.project.booklibrary.repository.impl.AudioBookSiteRepository;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.UUID;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -118,7 +118,7 @@ public class AudioBookSiteController extends AbstractViewController {
 
             if (answer.isPresent() && OK.equals(answer.get().getText())) {
                 String deletedEntityKey = AUDIO_BOOK_SITE_CONVERTER.buildEntityKeyByDTO(clickedEntity);
-                AudioBookSite deletedEntity = AUDIO_BOOK_SITE_REPOSITORY.getByName(deletedEntityKey);
+                AudioBookSite deletedEntity = AUDIO_BOOK_SITE_REPOSITORY.getByKey(deletedEntityKey);
                 AUDIO_BOOK_SITE_REPOSITORY.delete(deletedEntity);
                 updateBookSiteTableItems();
             }
@@ -146,10 +146,14 @@ public class AudioBookSiteController extends AbstractViewController {
     public static class AudioBookSiteNameEditableColumn extends TableCell<AudioBookSiteDTO, String> {
 
         private TextField inputTextColumn;
+        private String previousName;
+        private UUID elementId;
 
         @Override
         public void startEdit() {
+            LOGGER.debug("START EDIT. Text: {}, Graphic: {}, Item: {}, PreviousName: {}", getText(), getGraphic(), getItem(), this.previousName);
             if (!this.isEmpty()) {
+                this.previousName = getText();
                 super.startEdit();
                 createTextField();
                 setText(null);
@@ -167,22 +171,60 @@ public class AudioBookSiteController extends AbstractViewController {
         }
 
         @Override
+        public void commitEdit(String newValue) {
+            super.commitEdit(newValue);
+            if (this.elementId != null) {
+                AudioBookSite audioBookSite = AUDIO_BOOK_SITE_REPOSITORY.getByKey(this.elementId.toString());
+                if (audioBookSite != null) {
+                    try {
+                        String newName = getString();
+                        audioBookSite.setName(newName);
+                        AUDIO_BOOK_SITE_REPOSITORY.save(audioBookSite);
+                        LOGGER.info("SAVE ITEM. Text: {}, Graphic: {}, Item: {}, PreviousName: {}", getText(), getGraphic(), getItem(), this.previousName);
+                    } catch (IllegalStateException e) {
+                        LOGGER.warn("Exception while saving audiobook site", e);
+                        setText(this.previousName);
+                        setGraphic(null);
+                    }
+                }
+            }
+            LOGGER.debug("COMMIT EDIT. Text: {}, Graphic: {}, Item: {}, PreviousName: {}", getText(), getGraphic(), getItem(), this.previousName);
+        }
+
+        @Override
         public void updateItem(String item, boolean empty) {
             super.updateItem(item, empty);
 
+            LOGGER.debug("UPDATE ITEM: Text: {}, Graphic: {}, Item: {}, PreviousName: {}", getText(), getGraphic(), getItem(), this.previousName);
             if (empty) {
                 setText(item);
                 setGraphic(null);
+                LOGGER.debug("IS EMPTY. Text: {}, Graphic: {}, Item: {}, PreviousName: {}", getText(), getGraphic(), getItem(), this.previousName);
             } else {
+                LOGGER.debug("IS EMPTY = FALSE. IsEditing: {}", isEditing());
                 if (isEditing()) {
+                    LOGGER.debug("START EDITING. InputTextColumn: {}, Text: {}, Graphic: {}, Item: {}", inputTextColumn.getText(), getText(), getGraphic(), getItem());
                     if (inputTextColumn != null) {
                         inputTextColumn.setText(getString());
                     }
                     setText(null);
                     setGraphic(inputTextColumn);
+                    LOGGER.debug("IS EDITING. Text: {}, Graphic: {}, Item: {}, PreviousName: {}", getText(), getGraphic(), getItem(), this.previousName);
+
                 } else {
+                    LOGGER.debug("BEFORE: Text: {}, Graphic: {}, Item: {}, PreviousName: {}", getText(), getGraphic(), getItem(), this.previousName);
+                    //todo: где-то здесь всё ломается
                     setText(getString());
                     setGraphic(null);
+                    LOGGER.debug("AFTER: Text: {}, Graphic: {}, Item: {}, PreviousName: {}", getText(), getGraphic(), getItem(), this.previousName);
+
+                    // Здесь инициализируются items в первый раз. Для них достаются id и сохраняются в переменную,
+                    // чтобы сохранение делать исключительно по id
+                    if (this.elementId == null) {
+                        this.elementId = AUDIO_BOOK_SITE_REPOSITORY.getByName(previousName)
+                            .map(AudioBookSite::getId)
+                            .orElse(null);
+                    }
                 }
             }
         }

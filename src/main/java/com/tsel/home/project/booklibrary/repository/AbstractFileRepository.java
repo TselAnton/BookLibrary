@@ -67,7 +67,7 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
         Iterator<Map.Entry<String, E>> iterator = repositoryMap.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, E> entry = iterator.next();
-            updatedRepository.put(entry.getValue().getKey().toLowerCase(Locale.ROOT), entry.getValue());
+            updatedRepository.put(entry.getValue().getKey(), entry.getValue());
             iterator.remove();
         }
 
@@ -87,8 +87,8 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
     protected void updateNewFields() {}
 
     @Override
-    public E getByName(String compositeKey) {
-        return repositoryMap.get(compositeKey.toLowerCase(Locale.ROOT));
+    public E getByKey(String id) {
+        return repositoryMap.get(id);
     }
 
     @Override
@@ -97,15 +97,28 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
     }
 
     @Override
-    public E save(E entity) {
-        repositoryMap.put(entity.getKey().toLowerCase(Locale.ROOT), entity);
+    public void save(E newEntity) {
+        Optional<E> notAllowedBy = repositoryMap.values()
+            .stream()
+            .filter(existedEntity -> (!existedEntity.getKey().equals(newEntity.getKey()))
+                && checkConstrains(existedEntity, newEntity))
+            .findAny();
+
+        if (notAllowedBy.isPresent()) {
+            throw new IllegalStateException("Can't save entity with same constraint fields " + newEntity + ", because of " + notAllowedBy.get());
+        }
+
+        repositoryMap.put(newEntity.getKey(), newEntity);
         updateStorageFile();
-        return entity;
+    }
+
+    protected boolean checkConstrains(E existedEntity, E newEntity) {
+        return false;
     }
 
     @Override
     public void delete(E entity) {
-        repositoryMap.remove(entity.getKey().toLowerCase(Locale.ROOT));
+        repositoryMap.remove(entity.getKey());
         updateStorageFile();
     }
 }

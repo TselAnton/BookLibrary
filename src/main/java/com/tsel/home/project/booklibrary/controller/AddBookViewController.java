@@ -134,7 +134,7 @@ public class AddBookViewController extends AbstractEditViewController {
 
     @Override
     protected boolean doUpdate(Book newBook, Author newAuthor, Publisher newPublisher, Cycle newCycle) {
-        if (BOOK_REPOSITORY.getByName(newBook.getKey()) != null) {
+        if (BOOK_REPOSITORY.getByKey(newBook.getKey()) != null) {
             riseAlert(WARNING, "Ошибка", "Такая книга уже существует",
                     "Книга с аналогичным названием, автором и номером цикла уже существует");
             return false;

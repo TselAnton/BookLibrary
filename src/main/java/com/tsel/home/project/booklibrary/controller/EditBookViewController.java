@@ -88,7 +88,7 @@ public class EditBookViewController extends AbstractEditViewController {
             throw new IllegalStateException("Entity key for edit controller is blank!");
         }
 
-        Book book = BOOK_REPOSITORY.getByName(bookKey);
+        Book book = BOOK_REPOSITORY.getByKey(bookKey);
         if (book == null) {
             throw new IllegalStateException(format("Book by key = \"%s\" not found for edit controller!", bookKey));
         }
@@ -111,7 +111,7 @@ public class EditBookViewController extends AbstractEditViewController {
         priceInput.setText(book.getPrice() != null ? String.valueOf(book.getPrice()) : "");
 
         if (isNotBlank(book.getCycleName())) {
-            Cycle cycle = CYCLE_REPOSITORY.getByName(book.getCycleName());
+            Cycle cycle = CYCLE_REPOSITORY.getByKey(book.getCycleName());
 
             isEndedCycleCheckBox.setSelected(TRUE.equals(cycle.getEnded()));
             numberInCycleInput.setText(String.valueOf(book.getNumberInSeries()));

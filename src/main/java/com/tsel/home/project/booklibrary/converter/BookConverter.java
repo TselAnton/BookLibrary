@@ -7,7 +7,6 @@ import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
-import java.util.Locale;
 import javafx.scene.control.CheckBox;
 
 public class BookConverter implements Converter<Book, BookDTO> {
@@ -21,13 +20,14 @@ public class BookConverter implements Converter<Book, BookDTO> {
         Boolean isCycleEnded = null;
 
         if (isNotBlank(book.getCycleName())) {
-            Cycle cycle = cycleRepository.getByName(book.getCycleName());
+            Cycle cycle = cycleRepository.getByKey(book.getCycleName());
             cycleName = cycle.getName();
             cycleNumber = format("%d/%d", book.getNumberInSeries(), cycle.getBooksInCycle());
             isCycleEnded = cycle.getEnded();
         }
 
         return BookDTO.builder()
+                .id(book.getId())
                 .name(book.getName())
                 .author(book.getAuthor())
                 .publisher(book.getPublisher())
@@ -68,26 +68,6 @@ public class BookConverter implements Converter<Book, BookDTO> {
         if (bookDTO == null) {
             return null;
         }
-
-         StringBuilder compositeKey = new StringBuilder();
-         compositeKey.append(bookDTO.getName().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-         compositeKey.append("_");
-         compositeKey.append(bookDTO.getAuthor().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-         compositeKey.append("_");
-         compositeKey.append(bookDTO.getPublisher().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-
-         if (isNotBlank(bookDTO.getCycleName())) {
-             compositeKey.append("_");
-             compositeKey.append(bookDTO.getCycleName().replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-         }
-
-         if (isNotBlank(bookDTO.getCycleNumber())) {
-             String bookNumberInBook = bookDTO.getCycleNumber().substring(0, bookDTO.getCycleNumber().indexOf("/"));
-
-             compositeKey.append("_");
-             compositeKey.append(bookNumberInBook);
-         }
-
-         return compositeKey.toString();
+        return bookDTO.getId().toString();
     }
 }

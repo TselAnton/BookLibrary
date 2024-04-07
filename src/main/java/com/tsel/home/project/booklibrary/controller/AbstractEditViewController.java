@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -79,7 +80,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
     private void updateCycleInfo(ComboBox<String> cycleInput, CheckBox isEndedCycleCheckBox, TextField totalCountInCycleInput) {
         String cycleName = getInputText(cycleInput);
         if (isNotBlank(cycleName)) {
-            Cycle cycle = CYCLE_REPOSITORY.getByName(cycleName);
+            Cycle cycle = CYCLE_REPOSITORY.getByKey(cycleName);
             if (cycle != null) {
                 isEndedCycleCheckBox.setSelected(TRUE.equals(cycle.getEnded()));
                 totalCountInCycleInput.setText(String.valueOf(cycle.getBooksInCycle()));
@@ -237,6 +238,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         }
 
         Book newBook = Book.builder()
+                .id(UUID.randomUUID())
                 .name(bookName.trim())
                 .author(author.trim())
                 .publisher(publisher.trim())

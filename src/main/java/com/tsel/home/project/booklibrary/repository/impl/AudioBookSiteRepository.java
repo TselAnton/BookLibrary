@@ -2,6 +2,9 @@ package com.tsel.home.project.booklibrary.repository.impl;
 
 import com.tsel.home.project.booklibrary.data.AudioBookSite;
 import com.tsel.home.project.booklibrary.repository.AbstractFileRepository;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public class AudioBookSiteRepository extends AbstractFileRepository<AudioBookSite> {
 
@@ -31,5 +34,23 @@ public class AudioBookSiteRepository extends AbstractFileRepository<AudioBookSit
                 BOOK_REPOSITORY.save(book);
             });
         super.delete(entity);
+    }
+
+    @Override
+    protected void updateNewFields() {
+        repositoryMap.values().forEach(book -> book.setId(book.getId() == null ? UUID.randomUUID() : book.getId()));
+        updateStorageFile();
+    }
+
+    @Override
+    protected boolean checkConstrains(AudioBookSite existedEntity, AudioBookSite newEntity) {
+        return Objects.equals(newEntity.getName(), existedEntity.getName());
+    }
+
+    public Optional<AudioBookSite> getByName(String name) {
+        return this.repositoryMap.values()
+            .stream()
+            .filter(audioBookSite -> audioBookSite.getName().equals(name))
+            .findFirst();
     }
 }

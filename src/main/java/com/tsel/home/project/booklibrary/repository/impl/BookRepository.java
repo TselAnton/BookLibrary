@@ -9,6 +9,9 @@ import com.tsel.home.project.booklibrary.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -23,10 +26,10 @@ public class BookRepository extends AbstractFileRepository<Book> {
     private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-books-storage.txt";
 
     private static final List<Consumer<Book>> PREPARE_FUNCTIONS = List.of(
-        book -> book.setPrice(book.getPrice() == null ? null : book.getPrice()),
         book -> book.setHardCover(book.getHardCover() == null || book.getHardCover()),
         book -> book.setAudiobookSites(book.getAudiobookSites() == null ? new ArrayList<>() : book.getAudiobookSites()),
-        book -> book.setAutograph(book.getAutograph() != null ? book.getAutograph() : false)
+        book -> book.setAutograph(book.getAutograph() != null ? book.getAutograph() : false),
+        book -> book.setId(book.getId() == null ? UUID.randomUUID() : book.getId())
     );
 
     private static BookRepository INSTANCE;
@@ -40,6 +43,26 @@ public class BookRepository extends AbstractFileRepository<Book> {
 
     protected BookRepository(String storageFileName) {
         super(storageFileName);
+    }
+
+    @Override
+    protected boolean checkConstrains(Book existedBook, Book newBook) {
+        return equals(existedBook.getName(), newBook.getName())
+            && equals(existedBook.getAuthor(), newBook.getAuthor())
+            && equals(existedBook.getPublisher(), newBook.getPublisher())
+            && equals(existedBook.getCycleName(), newBook.getCycleName())
+            && Objects.equals(existedBook.getNumberInSeries(), newBook.getNumberInSeries());
+    }
+
+    private boolean equals(String value1, String value2) {
+        if (value1 == null) {
+            return value2 == null;
+        }
+        return value2 != null && prepare(value1).equals(prepare(value2));
+    }
+
+    private String prepare(String value) {
+        return value.replace(" ", "_").toLowerCase(Locale.ROOT);
     }
 
     @Override
@@ -59,7 +82,7 @@ public class BookRepository extends AbstractFileRepository<Book> {
         }
 
         if (isNotBlank(cycle) && isNotLinkedValue(cycle, Book::getCycleName)) {
-            Cycle oldCycle = CYCLE_REPOSITORY.getByName(cycle);
+            Cycle oldCycle = CYCLE_REPOSITORY.getByKey(cycle);
             CYCLE_REPOSITORY.delete(oldCycle);
         }
     }

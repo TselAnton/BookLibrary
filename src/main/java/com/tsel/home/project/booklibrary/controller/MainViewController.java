@@ -6,9 +6,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
-import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsFirst;
-import static java.util.Comparator.nullsLast;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -45,7 +42,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -371,7 +367,7 @@ public class MainViewController extends AbstractViewController {
 
                 if (answer.isPresent() && OK.equals(answer.get().getText())) {
                     String deletedEntityKey = BOOK_CONVERTER.buildEntityKeyByDTO(clickedEntity);
-                    Book deletedEntity = BOOK_REPOSITORY.getByName(deletedEntityKey);
+                    Book deletedEntity = BOOK_REPOSITORY.getByKey(deletedEntityKey);
                     BOOK_REPOSITORY.delete(deletedEntity);
                     updateTableColumns();
                 }
