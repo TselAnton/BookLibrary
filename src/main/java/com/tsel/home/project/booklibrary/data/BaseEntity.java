@@ -2,7 +2,7 @@ package com.tsel.home.project.booklibrary.data;
 
 import java.io.Serializable;
 
-public interface BaseEntity extends Serializable {
+public interface BaseEntity<K extends Serializable> extends Serializable {
 
-    String getKey();
+    K getKey();
 }

@@ -17,7 +17,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cycle implements BaseEntity {
+public class Cycle implements BaseEntity<String> {
 
     @Serial
     private static final long serialVersionUID = 4292001364563617067L;

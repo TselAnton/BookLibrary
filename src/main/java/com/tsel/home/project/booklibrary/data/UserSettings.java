@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class UserSettings implements BaseEntity {
+public class UserSettings implements BaseEntity<String> {
 
     @Serial
     private static final long serialVersionUID = -6130628202822480336L;

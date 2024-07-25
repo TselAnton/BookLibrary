@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Publisher implements BaseEntity {
+public class Publisher implements BaseEntity<String> {
 
     @Serial
     private static final long serialVersionUID = -3488297266687933995L;

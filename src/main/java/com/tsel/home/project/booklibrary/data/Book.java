@@ -19,7 +19,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = {"coverImgAbsolutePath", "bookshelf"})
-public class Book implements BaseEntity {
+public class Book implements BaseEntity<String> {
 
     @Serial
     private static final long serialVersionUID = -88421120419730807L;
