@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 
-import com.tsel.home.project.booklibrary.BaseTest;
+import com.tsel.home.project.booklibrary.BaseJavaFXTest;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import java.util.List;
 import javafx.scene.control.CheckBox;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class SearchServiceV2Test extends BaseTest {
+class SearchServiceV2Test extends BaseJavaFXTest {
 
     private final SearchServiceV2 searchService = SearchServiceV2.INSTANCE;
 

@@ -10,7 +10,7 @@ import java.util.*;
 
 import static java.lang.String.format;
 
-public abstract class AbstractFileRepository<E extends BaseEntity> implements FileRepository<E> {
+public abstract class AbstractFileRepository<E extends BaseEntity<String>> implements FileRepository<String, E> {
 
     protected final String storageFileName;
     protected final LinkedHashMap<String, E> repositoryMap;
@@ -87,8 +87,8 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
     protected void updateNewFields() {}
 
     @Override
-    public E getByName(String compositeKey) {
-        return repositoryMap.get(compositeKey.toLowerCase(Locale.ROOT));
+    public E getByName(String key) {
+        return repositoryMap.get(key.toLowerCase(Locale.ROOT));
     }
 
     @Override
@@ -97,10 +97,9 @@ public abstract class AbstractFileRepository<E extends BaseEntity> implements Fi
     }
 
     @Override
-    public E save(E entity) {
+    public void save(E entity) {
         repositoryMap.put(entity.getKey().toLowerCase(Locale.ROOT), entity);
         updateStorageFile();
-        return entity;
     }
 
     @Override

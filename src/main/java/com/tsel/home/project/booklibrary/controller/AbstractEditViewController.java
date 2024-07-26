@@ -67,7 +67,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         new AutoCompleteComboBoxListener<>(cycleInput);
     }
 
-    private ObservableList<String> initComboBoxValues(FileRepository<?> repository) {
+    private ObservableList<String> initComboBoxValues(FileRepository<String, ?> repository) {
         return observableArrayList(
                 repository.getAll()
                         .stream()

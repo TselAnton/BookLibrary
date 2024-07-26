@@ -3,6 +3,7 @@ package com.tsel.home.project.booklibrary.repository.impl;
 import com.tsel.home.project.booklibrary.data.UserSettings;
 import com.tsel.home.project.booklibrary.repository.AbstractFileRepository;
 
+import com.tsel.home.project.booklibrary.repository.FileStorageName;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+@FileStorageName("userSettingsStorage.json")
 public class UserSettingsRepository extends AbstractFileRepository<UserSettings> {
 
     private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-user-settings-storage.txt";

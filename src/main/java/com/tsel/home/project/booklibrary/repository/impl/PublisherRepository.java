@@ -2,7 +2,9 @@ package com.tsel.home.project.booklibrary.repository.impl;
 
 import com.tsel.home.project.booklibrary.data.Publisher;
 import com.tsel.home.project.booklibrary.repository.AbstractFileRepository;
+import com.tsel.home.project.booklibrary.repository.FileStorageName;
 
+@FileStorageName("publisherStorage.json")
 public class PublisherRepository extends AbstractFileRepository<Publisher> {
 
     private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-publishers-storage.txt";
