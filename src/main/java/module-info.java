@@ -15,4 +15,5 @@ open module com.tsel.home.project.booklibrary {
 
     requires lombok;
     requires org.reflections;
+    requires com.google.gson;
 }

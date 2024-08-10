@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class ArchiveRepositoryStorageUtilsTest {
+class ArchiveStorageFilesUtilsTest {
 
     private static final String UNZIP_FILE_PREFIX = "unzip-";
 
@@ -36,7 +36,7 @@ class ArchiveRepositoryStorageUtilsTest {
         createTempFile(tempDirectory, TEST_FILE_2_NAME, "{\"test2\": \"value2\"}");
         createTempFile(tempDirectory, TEST_FILE_3_NAME, "invalid value");
 
-        ArchiveRepositoryStorageUtils.archiveStorages(tempDirectory, tempDirectory);
+        ArchiveStorageFilesUtils.archiveStorages(tempDirectory, tempDirectory);
 
         File archive = getArchive(tempDirectory);
         assertNotNull("Не найден архив", archive);

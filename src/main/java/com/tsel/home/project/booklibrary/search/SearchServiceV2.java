@@ -45,10 +45,6 @@ public class SearchServiceV2 {
         initialize();
     }
 
-    public String getGeneratedTooltip() {
-        return generatedTooltip;
-    }
-
     /**
      * Search method
      * @param searchQuery String query from search bar

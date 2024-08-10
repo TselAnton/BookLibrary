@@ -20,7 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
-public final class ArchiveRepositoryStorageUtils {
+public final class ArchiveStorageFilesUtils {
 
     private static final Logger log = LogManager.getLogger(BookInfoViewController.class);
 
@@ -38,23 +38,30 @@ public final class ArchiveRepositoryStorageUtils {
         Set<Class<?>> repositoryClasses = reflections.get(SubTypes.of(TypesAnnotated.with(FileStorageName.class)).asClass());
         log.info("Found repository classes: [{}]", repositoryClasses.stream().map(Class::getName).collect(Collectors.joining(", ")));
 
-        // Создание архива
-        Path archivePath = buildArchivePath(archiveDirectory);
+        Path archivePath;
+        try {
+            // Создание архива
+            archivePath = buildArchivePath(fileDirectory, archiveDirectory);
+        } catch (Exception e) {
+            log.error("Exception while trying to create archive directory", e);
+            throw new IllegalStateException("Can't create archive directory", e);
+        }
+
         log.info("Trying to create archive with name: {}", archivePath.getFileName());
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(archivePath.toFile()))) {
 
             // Попытка собрать в архив все найденные файлы
             for (Class<?> repositoryClass : repositoryClasses) {
                 log.info("Trying to read storage file for repository class {}", repositoryClass.getName());
-                FileStorageName fileStorageNameAnnotation = repositoryClass.getAnnotation(FileStorageName.class);
-                if (isFileStorageForRepositoryNotExist(fileDirectory, fileStorageNameAnnotation)) {
-                    log.warn("Not found storage file name for repository class {}. Skip it", repositoryClass.getName());
+                String fileStorageName = StorageFileUtils.resolveStorageFileName(repositoryClass);
+                if (fileStorageName == null || !Files.exists(fileDirectory.resolve(fileStorageName))) {
+                    log.warn("Not found storage file name for repository class {} by name '{}'. Skip it", repositoryClass.getName(), fileStorageName);
                     continue;
                 }
 
                 // Запись файла в архив
-                log.info("Founded storage file '{}' for repository class {}", fileStorageNameAnnotation.value(), repositoryClass.getName());
-                writeFileToZipStream(fileDirectory, repositoryClass, fileStorageNameAnnotation, zipOutputStream);
+                log.info("Founded storage file '{}' for repository class {}", fileStorageName, repositoryClass.getName());
+                writeFileToZipStream(fileDirectory, repositoryClass, fileStorageName, zipOutputStream);
             }
 
         } catch (Exception e) {
@@ -66,15 +73,13 @@ public final class ArchiveRepositoryStorageUtils {
     private static void writeFileToZipStream(
         Path fileDirectory,
         Class<?> repositoryClass,
-        FileStorageName fileStorageNameAnnotation,
+        String fileStorageName,
         ZipOutputStream zipOutputStream
     ) throws IOException {
 
-        try (FileInputStream fileInputStream = new FileInputStream(fileDirectory.resolve(fileStorageNameAnnotation.value()).toFile())) {
-            log.info("Trying to write storage file {} for repository class {} into archive",
-                fileStorageNameAnnotation.value(), repositoryClass.getName()
-            );
-            ZipEntry zipEntry = new ZipEntry(fileStorageNameAnnotation.value());
+        try (FileInputStream fileInputStream = new FileInputStream(fileDirectory.resolve(fileStorageName).toFile())) {
+            log.info("Trying to write storage file {} for repository class {} into archive", fileStorageName, repositoryClass.getName());
+            ZipEntry zipEntry = new ZipEntry(fileStorageName);
             zipOutputStream.putNextEntry(zipEntry);
 
             int length;
@@ -84,19 +89,15 @@ public final class ArchiveRepositoryStorageUtils {
             }
 
             zipOutputStream.closeEntry();
-            log.info("Storage file {} was successfully wrote to archive", fileStorageNameAnnotation.value());
+            log.info("Storage file {} was successfully wrote to archive", fileStorageName);
         }
     }
 
-    private static Path buildArchivePath(Path directory) {
-        return directory.resolve(("storage-archive-" + DATE_TIME_FORMATTER.format(LocalDateTime.now()) + ".zip"));
-    }
-
-    private static boolean isFileStorageForRepositoryNotExist(Path fileDirectory, FileStorageName fileStorageNameAnnotation) {
-        return fileStorageNameAnnotation == null
-            || fileStorageNameAnnotation.value() == null
-            || fileStorageNameAnnotation.value().isBlank()
-            || !Files.exists(fileDirectory.resolve(fileStorageNameAnnotation.value()));
-
+    private static Path buildArchivePath(Path directory, Path archiveDirectory) throws IOException {
+        archiveDirectory = Path.of(directory.toAbsolutePath().toString(), archiveDirectory.toString());
+        if (!Files.exists(archiveDirectory)) {
+            Files.createDirectory(archiveDirectory);
+        }
+        return archiveDirectory.resolve(("storage-archive-" + DATE_TIME_FORMATTER.format(LocalDateTime.now()) + ".zip"));
     }
 }

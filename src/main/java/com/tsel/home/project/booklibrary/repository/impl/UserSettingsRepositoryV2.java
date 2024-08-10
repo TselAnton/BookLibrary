@@ -3,29 +3,29 @@ package com.tsel.home.project.booklibrary.repository.impl;
 import static java.util.Optional.ofNullable;
 
 import com.tsel.home.project.booklibrary.data.UserSettings;
-import com.tsel.home.project.booklibrary.repository.AbstractFileRepository;
+import com.tsel.home.project.booklibrary.repository.AbstractFileRepositoryV2;
+import com.tsel.home.project.booklibrary.repository.FileStorageName;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-@Deprecated
-public class UserSettingsRepository extends AbstractFileRepository<UserSettings> {
+@FileStorageName("userSettingsStorage.json")
+public class UserSettingsRepositoryV2 extends AbstractFileRepositoryV2<String, UserSettings> {
 
-    private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-user-settings-storage.txt";
     private static final String USER_SETTINGS_KEY = "userSettings";
 
-    private static UserSettingsRepository INSTANCE;
+    private static UserSettingsRepositoryV2 INSTANCE;
 
-    public static UserSettingsRepository getInstance() {
+    public static UserSettingsRepositoryV2 getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new UserSettingsRepository(DEFAULT_STORAGE_FILE_NAME);
+            INSTANCE = new UserSettingsRepositoryV2();
         }
         return INSTANCE;
     }
 
-    protected UserSettingsRepository(String storageFileName) {
-        super(storageFileName);
+    protected UserSettingsRepositoryV2() {
+        super(UserSettings.class);
     }
 
     public void updateLastChosenCoverFile(File lastChosenCoverFile) {

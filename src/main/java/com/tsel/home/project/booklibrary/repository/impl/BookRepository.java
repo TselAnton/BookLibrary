@@ -1,21 +1,19 @@
 package com.tsel.home.project.booklibrary.repository.impl;
 
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+
 import com.tsel.home.project.booklibrary.data.Author;
 import com.tsel.home.project.booklibrary.data.Book;
 import com.tsel.home.project.booklibrary.data.Cycle;
 import com.tsel.home.project.booklibrary.data.Publisher;
 import com.tsel.home.project.booklibrary.repository.AbstractFileRepository;
-import com.tsel.home.project.booklibrary.repository.FileStorageName;
 import com.tsel.home.project.booklibrary.utils.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
-
-@FileStorageName("bookStorage.json")
+@Deprecated
 public class BookRepository extends AbstractFileRepository<Book> {
 
     private static final AuthorRepository AUTHOR_REPOSITORY = AuthorRepository.getInstance();

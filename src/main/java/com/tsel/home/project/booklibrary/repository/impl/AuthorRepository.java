@@ -4,7 +4,7 @@ import com.tsel.home.project.booklibrary.data.Author;
 import com.tsel.home.project.booklibrary.repository.AbstractFileRepository;
 import com.tsel.home.project.booklibrary.repository.FileStorageName;
 
-@FileStorageName("authorStorage.json")
+@Deprecated
 public class AuthorRepository extends AbstractFileRepository<Author> {
 
     private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-authors-storage.txt";

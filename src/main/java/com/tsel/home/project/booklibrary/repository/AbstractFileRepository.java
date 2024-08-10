@@ -10,6 +10,7 @@ import java.util.*;
 
 import static java.lang.String.format;
 
+@Deprecated
 public abstract class AbstractFileRepository<E extends BaseEntity<String>> implements FileRepository<String, E> {
 
     protected final String storageFileName;

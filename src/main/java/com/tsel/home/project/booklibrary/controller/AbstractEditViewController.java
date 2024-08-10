@@ -131,6 +131,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         return false;
     }
 
+    // TODO: Нужно собирать в общую модель, возможно сделать билдер по полям
     protected void addBook(TextField nameInput,
                            ComboBox<String> authorInput,
                            ComboBox<String> publisherInput,
