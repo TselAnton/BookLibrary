@@ -1,11 +1,11 @@
 package com.tsel.home.project.booklibrary.controller;
 
 import com.tsel.home.project.booklibrary.converter.BookConverter;
-import com.tsel.home.project.booklibrary.repository.impl.AuthorRepository;
-import com.tsel.home.project.booklibrary.repository.impl.BookRepository;
-import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
-import com.tsel.home.project.booklibrary.repository.impl.PublisherRepository;
-import com.tsel.home.project.booklibrary.repository.impl.UserSettingsRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.utils.ImageProvider;
 import java.util.Optional;
 import javafx.fxml.FXMLLoader;

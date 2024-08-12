@@ -6,7 +6,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import com.tsel.home.project.booklibrary.controller.BookInfoViewController;
-import com.tsel.home.project.booklibrary.data.Book;
+import com.tsel.home.project.booklibrary.dao.data.Book;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;

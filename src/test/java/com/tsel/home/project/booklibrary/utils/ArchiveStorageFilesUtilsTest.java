@@ -5,9 +5,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
-import com.tsel.home.project.booklibrary.data.BaseEntity;
-import com.tsel.home.project.booklibrary.repository.FileRepository;
-import com.tsel.home.project.booklibrary.repository.FileStorageName;
+import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
+import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
+import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
+import com.tsel.home.project.booklibrary.dao.repository.utils.ArchiveStorageFilesUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -121,7 +122,7 @@ class ArchiveStorageFilesUtilsTest {
     protected abstract class TestFileRepository implements FileRepository<String, BaseEntity<String>> {
 
         @Override
-        public BaseEntity<String> getByName(String key) {
+        public BaseEntity<String> getById(String id) {
             return null;
         }
 
@@ -137,6 +138,11 @@ class ArchiveStorageFilesUtilsTest {
 
         @Override
         public void delete(BaseEntity<String> entity) {
+
+        }
+
+        @Override
+        public void deleteById(String id) {
 
         }
     }

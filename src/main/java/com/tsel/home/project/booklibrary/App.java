@@ -1,7 +1,7 @@
 package com.tsel.home.project.booklibrary;
 
 import com.tsel.home.project.booklibrary.controller.MainViewController;
-import com.tsel.home.project.booklibrary.utils.ArchiveStorageFilesUtils;
+import com.tsel.home.project.booklibrary.dao.repository.utils.ArchiveStorageFilesUtils;
 import java.nio.file.Paths;
 import javafx.application.Application;
 import javafx.stage.Stage;

@@ -3,9 +3,9 @@ package com.tsel.home.project.booklibrary.controller;
 import static javafx.collections.FXCollections.observableList;
 
 import com.tsel.home.project.booklibrary.converter.AudioBookSiteConverter;
-import com.tsel.home.project.booklibrary.data.AudioBookSite;
+import com.tsel.home.project.booklibrary.dao.data.AudioBookSite;
 import com.tsel.home.project.booklibrary.dto.AudioBookSiteDTO;
-import com.tsel.home.project.booklibrary.repository.impl.AudioBookSiteRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteRepository;
 import com.tsel.home.project.booklibrary.utils.CustomCheckBoxTableCell;
 import java.util.Comparator;
 import java.util.HashMap;

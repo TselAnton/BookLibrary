@@ -8,12 +8,12 @@ import static java.util.stream.Collectors.toList;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 
-import com.tsel.home.project.booklibrary.data.Author;
-import com.tsel.home.project.booklibrary.data.BaseEntity;
-import com.tsel.home.project.booklibrary.data.Book;
-import com.tsel.home.project.booklibrary.data.Cycle;
-import com.tsel.home.project.booklibrary.data.Publisher;
-import com.tsel.home.project.booklibrary.repository.FileRepository;
+import com.tsel.home.project.booklibrary.dao.data.Author;
+import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
+import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Publisher;
+import com.tsel.home.project.booklibrary.dao.repository.FileRepositoryOld;
 import com.tsel.home.project.booklibrary.utils.AutoCompleteComboBoxListener;
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +67,7 @@ public abstract class AbstractEditViewController extends AbstractViewController 
         new AutoCompleteComboBoxListener<>(cycleInput);
     }
 
-    private ObservableList<String> initComboBoxValues(FileRepository<String, ?> repository) {
+    private ObservableList<String> initComboBoxValues(FileRepositoryOld<?> repository) {
         return observableArrayList(
                 repository.getAll()
                         .stream()

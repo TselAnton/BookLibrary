@@ -4,8 +4,8 @@ import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
-import com.tsel.home.project.booklibrary.data.Book;
-import com.tsel.home.project.booklibrary.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.dao.data.Cycle;
 import java.text.DecimalFormat;
 import java.util.Optional;
 import javafx.fxml.FXML;

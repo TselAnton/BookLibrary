@@ -3,10 +3,10 @@ package com.tsel.home.project.booklibrary.controller;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 
-import com.tsel.home.project.booklibrary.data.Author;
-import com.tsel.home.project.booklibrary.data.Book;
-import com.tsel.home.project.booklibrary.data.Cycle;
-import com.tsel.home.project.booklibrary.data.Publisher;
+import com.tsel.home.project.booklibrary.dao.data.Author;
+import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Publisher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

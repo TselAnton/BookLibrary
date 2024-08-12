@@ -6,10 +6,10 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
-import com.tsel.home.project.booklibrary.data.Author;
-import com.tsel.home.project.booklibrary.data.Book;
-import com.tsel.home.project.booklibrary.data.Cycle;
-import com.tsel.home.project.booklibrary.data.Publisher;
+import com.tsel.home.project.booklibrary.dao.data.Author;
+import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Publisher;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javafx.fxml.FXML;

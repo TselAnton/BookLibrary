@@ -3,10 +3,10 @@ package com.tsel.home.project.booklibrary.converter;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
 
-import com.tsel.home.project.booklibrary.data.Book;
-import com.tsel.home.project.booklibrary.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.dao.data.Cycle;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
-import com.tsel.home.project.booklibrary.repository.impl.CycleRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
 import java.util.Locale;
 import javafx.scene.control.CheckBox;
 

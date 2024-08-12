@@ -1,6 +1,6 @@
 package com.tsel.home.project.booklibrary.dto;
 
-import com.tsel.home.project.booklibrary.data.Book;
+import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.search.SearchField;
 import com.tsel.home.project.booklibrary.utils.ImageProvider;
 import java.util.List;
