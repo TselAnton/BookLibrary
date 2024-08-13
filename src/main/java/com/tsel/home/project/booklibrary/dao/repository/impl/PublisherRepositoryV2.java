@@ -1,6 +1,7 @@
 package com.tsel.home.project.booklibrary.dao.repository.impl;
 
 import com.tsel.home.project.booklibrary.dao.data.Publisher;
+import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import java.util.UUID;
@@ -18,6 +19,6 @@ public class PublisherRepositoryV2 extends AbstractFileRepositoryV2<UUID, Publis
     }
 
     protected PublisherRepositoryV2() {
-        super(Publisher.class);
+        super(Publisher.class, UUIDIdentifierGenerator.INSTANCE);
     }
 }

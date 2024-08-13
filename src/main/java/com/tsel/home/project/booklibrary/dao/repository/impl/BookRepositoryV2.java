@@ -1,11 +1,13 @@
 package com.tsel.home.project.booklibrary.dao.repository.impl;
 
-import com.tsel.home.project.booklibrary.dao.exception.RepositoryConstraintException;
-import com.tsel.home.project.booklibrary.dao.data.Book;
-import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
+import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
+import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
+import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 @FileStorageName("bookStorage.json")
 public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
@@ -24,45 +26,44 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
     }
 
     protected BookRepositoryV2() {
-        super(Book.class);
+        super(Book.class, UUIDIdentifierGenerator.INSTANCE);
     }
 
     @Override
     public void delete(Book entity) {
         super.delete(entity);
 
-        if (isNotLinkedValue(book -> book.getAuthorId().equals(entity.getAuthorId()))) {
+        if (isLatestValue(book -> Objects.equals(book.getAuthorId(), entity.getAuthorId()))) {
             AUTHOR_REPOSITORY.deleteById(entity.getAuthorId());
         }
-        if (isNotLinkedValue(book -> book.getPublisherId().equals(entity.getPublisherId()))) {
+        if (isLatestValue(book -> Objects.equals(book.getPublisherId(), entity.getPublisherId()))) {
             PUBLISHER_REPOSITORY.deleteById(entity.getPublisherId());
         }
-        if (isNotLinkedValue(book -> book.getCycleId().equals(entity.getCycleId()))) {
+        if (isLatestValue(book -> Objects.equals(book.getCycleId(), entity.getCycleId()))) {
             CYCLE_REPOSITORY.deleteById(entity.getCycleId());
         }
     }
 
-    // TODO: переделать
+    private boolean isLatestValue(Predicate<Book> checkPredicate) {
+        return this.repositoryMap.values()
+            .stream()
+            .noneMatch(checkPredicate);
+    }
+
     @Override
-    protected void checkEntityConstrains(Book existedEntity, Book entityForSave) throws RepositoryConstraintException {
-        if (existedEntity.getName() == null) {
-            throw new RepositoryConstraintException(entityForSave, "книга должна иметь название");
-        }
-        if (existedEntity.getAuthorId() == null) {
-            throw new RepositoryConstraintException(entityForSave, "книга должна иметь автора");
-        }
-        if (existedEntity.getPublisherId() == null) {
-            throw new RepositoryConstraintException(entityForSave, "книга должна иметь публициста");
-        }
-        if (isSameBook(existedEntity, entityForSave)) {
-            throw new RepositoryConstraintException(entityForSave, "книги не могут иметь одинаковое имя, автора, публициста, цикл и номер серии");
+    protected void compareEntities(Book newEntity, Book oldEntity) throws ConstraintException {
+        if (isSameBook(oldEntity, newEntity)) {
+            throw new ConstraintException(
+                this.entityName,
+                "книга с таким же именем, автором, публицистом, циклом и номером серии уже существует"
+            );
         }
     }
 
     private boolean isSameBook(Book existedBook, Book newBook) {
-        return existedBook.getName().equalsIgnoreCase(newBook.getName())
-            && existedBook.getAuthorId().equals(newBook.getAuthorId())
-            && existedBook.getPublisherId().equals(newBook.getPublisherId())
+        return Objects.equals(existedBook.getName(), newBook.getName())
+            && Objects.equals(existedBook.getAuthorId(), newBook.getAuthorId())
+            && Objects.equals(existedBook.getPublisherId(), newBook.getPublisherId())
             && Objects.equals(existedBook.getCycleId(), newBook.getCycleId())
             && Objects.equals(existedBook.getNumberInSeries(), newBook.getNumberInSeries());
     }

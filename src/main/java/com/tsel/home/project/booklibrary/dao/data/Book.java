@@ -1,5 +1,7 @@
 package com.tsel.home.project.booklibrary.dao.data;
 
+import com.tsel.home.project.booklibrary.dao.annotation.EntityDisplayName;
+import com.tsel.home.project.booklibrary.dao.annotation.Property;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,24 +20,51 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = {"coverImgAbsolutePath", "bookshelf"})
+@EntityDisplayName("Книга")
+//@UniqueConstraint(name = "unique_book_constraint", properties = {"name", "authorId", "publisherId", "cycleName", "numberInSeries"})
 public class Book implements BaseEntity<UUID> {
 
     @Serial
     private static final long serialVersionUID = -88421120419730807L;
 
+    @Property(value = "идентификатор")
     private UUID id;
+
+    @Property(value = "название", nullable = false)
     private String name;
+
+    @Property(value = "автор", nullable = false)
     private UUID authorId;
+
+    @Property(value = "публицист", nullable = false)
     private UUID publisherId;
+
+    @Property(value = "страницы")
     private Integer pages;
+
+    @Property(value = "прочитано")
     private Boolean read;
+
+    @Property(value = "автограф")
     private Boolean autograph;
+
+    @Property(value = "цикл")
     private UUID cycleId;
+
+    @Property(value = "номер в цикле")
     private Integer numberInSeries;
+
+    @Property(value = "картинка обложки")
     private String coverImgAbsolutePath;
+
+    @Property(value = "твёрдая обложка")
     private Boolean hardCover;
+
+    @Property(value = "цена")
     private Double price;
-    private List<String> audiobookSites = new ArrayList<>();
+
+    @Property(value = "аудиокниги")
+    private List<String> audiobookSites = new ArrayList<>();    // TODO: на UUID
 
     @Deprecated
     private String author;
@@ -66,10 +95,5 @@ public class Book implements BaseEntity<UUID> {
         }
 
         return compositeKey.toString();
-    }
-
-    @Override
-    public String getEntityPrintName() {
-        return "Книга";
     }
 }

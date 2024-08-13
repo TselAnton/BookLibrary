@@ -25,7 +25,7 @@ public class UserSettingsRepositoryV2 extends AbstractFileRepositoryV2<String, U
     }
 
     protected UserSettingsRepositoryV2() {
-        super(UserSettings.class);
+        super(UserSettings.class, () -> USER_SETTINGS_KEY);
     }
 
     public void updateLastChosenCoverFile(File lastChosenCoverFile) {

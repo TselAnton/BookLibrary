@@ -8,8 +8,6 @@ public interface BaseEntity<K extends Serializable> extends Serializable {
 
     void setId(K id);
 
-    String getEntityPrintName();
-
-    @Deprecated
+    @Deprecated(since = "4.0")
     String getKey();
 }

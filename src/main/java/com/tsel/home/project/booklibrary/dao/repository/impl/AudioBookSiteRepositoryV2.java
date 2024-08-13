@@ -1,6 +1,7 @@
 package com.tsel.home.project.booklibrary.dao.repository.impl;
 
 import com.tsel.home.project.booklibrary.dao.data.AudioBookSite;
+import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import java.util.UUID;
@@ -18,6 +19,6 @@ public class AudioBookSiteRepositoryV2 extends AbstractFileRepositoryV2<UUID, Au
     }
 
     protected AudioBookSiteRepositoryV2() {
-        super(AudioBookSite.class);
+        super(AudioBookSite.class, UUIDIdentifierGenerator.INSTANCE);
     }
 }

@@ -1,5 +1,7 @@
 package com.tsel.home.project.booklibrary.dao.data;
 
+import com.tsel.home.project.booklibrary.dao.annotation.EntityDisplayName;
+import com.tsel.home.project.booklibrary.dao.annotation.Property;
 import java.io.Serial;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +14,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityDisplayName("Настройки пользователя")
 public class UserSettings implements BaseEntity<String> {
 
     private static final String UNIQUE_KEY = "userSettings";
@@ -19,6 +22,7 @@ public class UserSettings implements BaseEntity<String> {
     @Serial
     private static final long serialVersionUID = -6130628202822480336L;
 
+    @Property(value = "последняя выбранная папка с обложками")
     private String lastChosenCoverFolder;
 
     public String getId() {
@@ -27,11 +31,6 @@ public class UserSettings implements BaseEntity<String> {
 
     public void setId(String id) {
         // NOT NEEDED
-    }
-
-    @Override
-    public String getEntityPrintName() {
-        return "Настройки пользователя";
     }
 
     @Override
