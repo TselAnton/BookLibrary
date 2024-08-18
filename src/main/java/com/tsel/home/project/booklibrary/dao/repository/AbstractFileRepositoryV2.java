@@ -32,6 +32,8 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
 
     private final IdentifierGenerator<K> keyGenerator;
 
+    // TODO: нужно принимать Path в котором будет создаваться файл
+    // TODO: тесты на все репозитории
     public AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator) {
         this.keyGenerator = keyGenerator;
         this.entityName = resolveEntityName(entityClass);
