@@ -28,21 +28,22 @@ public class BookConverter implements Converter<Book, BookDTO> {
         }
 
         return BookDTO.builder()
-                .name(book.getName())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .cycleName(cycleName)
-                .cycleNumber(cycleNumber)
-                .cycleEnded(getCheckBox(isCycleEnded))
-                .read(getCheckBox(book.getRead()))
-                .autograph(getCheckBox(book.getAutograph()))
-                .pages(book.getPages())
-                .cover(book)
-                .price(book.getPrice())
-                .hardCover(getCheckBox(book.getHardCover()))
-                .audiobookSites(book.getAudiobookSites())
-                .hasAnyAudioBookSite(getCheckBox(hasAnyAudiBookSites(book)))
-                .build();
+            .id(book.getId())
+            .name(book.getName())
+            .author(book.getAuthor())
+            .publisher(book.getPublisher())
+            .cycleName(cycleName)
+            .cycleNumber(cycleNumber)
+            .cycleEnded(getCheckBox(isCycleEnded))
+            .read(getCheckBox(book.getRead()))
+            .autograph(getCheckBox(book.getAutograph()))
+            .pages(book.getPages())
+            .cover(book)
+            .price(book.getPrice())
+            .hardCover(getCheckBox(book.getHardCover()))
+            .audiobookSites(book.getAudiobookSites())
+            .hasAnyAudioBookSite(getCheckBox(hasAnyAudiBookSites(book)))
+            .build();
     }
 
     private boolean hasAnyAudiBookSites(Book book) {

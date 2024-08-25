@@ -489,7 +489,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     }
 
     @Test
-    public void testSearchByAndFilters() {
+    void testSearchByAndFilters() {
         assertThat(
             searchService.search(
                 "%s > 100 AND %s <= 300".formatted(PAGES_EN_ALIAS, PAGES_EN_ALIAS),
@@ -505,7 +505,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     }
 
     @Test
-    public void testSearchByOrFilters() {
+    void testSearchByOrFilters() {
         assertThat(
             searchService.search("%s = 0 OR %s > 400".formatted(PRICE_EN_ALIAS, PRICE_RU_ALIAS), bookDtoList),
             contains(book_3, book_4, book_5)
@@ -517,7 +517,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     }
 
     @Test
-    public void testSearchByOrFiltersWithNumberAndCheckbox() {
+    void testSearchByOrFiltersWithNumberAndCheckbox() {
         assertThat(
             searchService.search("%s OR %s = 0 ".formatted(READ_EN_ALIAS, PRICE_EN_ALIAS), bookDtoList),
             contains(book_1, book_3, book_4, book_5)

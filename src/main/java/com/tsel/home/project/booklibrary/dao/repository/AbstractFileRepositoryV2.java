@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,7 +26,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
 
     private static final Logger log = LogManager.getLogger(AbstractFileRepositoryV2.class);
 
-    protected final String entityName;
+    protected final String entityDisplayName;
     protected final String storageFileName;
     protected final Map<K, E> repositoryMap;
     protected final Map<Field, Property> notNullFields;
@@ -34,9 +35,9 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
 
     // TODO: нужно принимать Path в котором будет создаваться файл
     // TODO: тесты на все репозитории
-    public AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator) {
+    protected AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator) {
         this.keyGenerator = keyGenerator;
-        this.entityName = resolveEntityName(entityClass);
+        this.entityDisplayName = resolveEntityName(entityClass);
         this.repositoryMap = initEntities(entityClass);
         this.storageFileName = resolveStorageFileName();
         this.notNullFields = resolveNotNullFields(entityClass);
@@ -45,7 +46,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     private String resolveStorageFileName() {
         return ofNullable(FileRepositoryUtils.resolveStorageFileName(this.getClass()))
             .orElseThrow(() -> new IllegalStateException(
-                format("Невозможно определить название файла хранилища для репозитория сущности '%s'", this.entityName))
+                format("Невозможно определить название файла хранилища для репозитория сущности '%s'", this.entityDisplayName))
             );
     }
 
@@ -59,17 +60,17 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     }
 
     private Map<Field, Property> resolveNotNullFields(Class<E> entityClass) {
-        Map<Field, Property> notNullFields = new HashMap<>();
+        Map<Field, Property> notNullFieldsMap = new HashMap<>();
         for (Field entityProperty : entityClass.getDeclaredFields()) {
             if (entityProperty.isAnnotationPresent(Property.class)) {
                 Property propertyAnnotation = entityProperty.getAnnotation(Property.class);
                 if (!propertyAnnotation.nullable()) {
                     entityProperty.setAccessible(true);
-                    notNullFields.put(entityProperty, propertyAnnotation);
+                    notNullFieldsMap.put(entityProperty, propertyAnnotation);
                 }
             }
         }
-        return notNullFields;
+        return notNullFieldsMap;
     }
 
     private Map<K, E> initEntities(Class<E> entityClass) {
@@ -128,13 +129,16 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     }
 
     private void checkNotNullFields(E entity) {
-        for (Field notNullField : this.notNullFields.keySet()) {
+        for (Entry<Field, Property> notNullFieldEntry : this.notNullFields.entrySet()) {
+            Field field = notNullFieldEntry.getKey();
+            Property fieldAnnotation = notNullFieldEntry.getValue();
+
             try {
-                if (notNullField.get(entity) == null) {
-                    throw new NotNullConstraintException(this.entityName, this.notNullFields.get(notNullField).value());
+                if (field.get(entity) == null) {
+                    throw new NotNullConstraintException(this.entityDisplayName, fieldAnnotation.value());
                 }
             } catch (IllegalAccessException e) {
-                throw new NotNullConstraintException(this.entityName, this.notNullFields.get(notNullField).value());
+                throw new NotNullConstraintException(this.entityDisplayName, fieldAnnotation.value());
             }
         }
     }

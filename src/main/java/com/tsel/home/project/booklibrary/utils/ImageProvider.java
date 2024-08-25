@@ -5,7 +5,6 @@ import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
-import com.tsel.home.project.booklibrary.controller.BookInfoViewController;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,45 +12,36 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ImageProvider {
 
-    private static final Logger LOGGER = LogManager.getLogger(BookInfoViewController.class);
+    public static final ImageProvider INSTANCE = new ImageProvider();
 
-    private static ImageProvider INSTANCE;
+    private static final Logger LOGGER = LogManager.getLogger(ImageProvider.class);
 
-    private final Map<String, Image> cashedImages = new HashMap<>();
-    private final Map<String, Image> cashedSmallImages = new HashMap<>();
-    private Image defaultImg;
-
-    public static ImageProvider getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ImageProvider();
-        }
-        return INSTANCE;
-    }
+    private final Map<String, Image> cashedImages = new ConcurrentHashMap<>();
+    private final Map<String, Image> cashedSmallImages = new ConcurrentHashMap<>();
+    private final Image cachedIcon;
+    private final Image defaultImg;
 
     private ImageProvider() {
         try {
+            this.cachedIcon = loadImage("img/icon.png");
             this.defaultImg = loadImage("img/default.png");
-        } catch (Exception e) {
-            LOGGER.error("Exception while init abstract constructor", e);
+        } catch (Exception ex) {
+            LOGGER.error("Exception while init abstract constructor", ex);
+            throw ex;
         }
     }
 
-    public Image loadIcon() {
-        try {
-            return loadImage("img/icon.png");
-        } catch (Exception e) {
-            LOGGER.error("Exception while load icon", e);
-            return null;
-        }
+    public Image getWindowIcon() {
+        return cachedIcon;
     }
 
     public Image resolveCover(Book book) {
@@ -110,7 +100,10 @@ public class ImageProvider {
     }
 
     private Image loadImage(String path) {
-        InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + path);
-        return new Image(requireNonNull(imageInputStream));
+        try (InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + path)) {
+            return new Image(requireNonNull(imageInputStream));
+        } catch (IOException e) {
+            throw new IllegalStateException(format("Exception while loading image by path '%s'", path), e);
+        }
     }
 }

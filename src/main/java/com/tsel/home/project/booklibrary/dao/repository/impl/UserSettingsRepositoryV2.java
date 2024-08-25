@@ -2,9 +2,9 @@ package com.tsel.home.project.booklibrary.dao.repository.impl;
 
 import static java.util.Optional.ofNullable;
 
+import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.UserSettings;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,16 +13,9 @@ import java.util.Optional;
 @FileStorageName("userSettingsStorage.json")
 public class UserSettingsRepositoryV2 extends AbstractFileRepositoryV2<String, UserSettings> {
 
+    public static final UserSettingsRepositoryV2 INSTANCE = new UserSettingsRepositoryV2();
+
     private static final String USER_SETTINGS_KEY = "userSettings";
-
-    private static UserSettingsRepositoryV2 INSTANCE;
-
-    public static UserSettingsRepositoryV2 getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new UserSettingsRepositoryV2();
-        }
-        return INSTANCE;
-    }
 
     protected UserSettingsRepositoryV2() {
         super(UserSettings.class, () -> USER_SETTINGS_KEY);

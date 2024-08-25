@@ -1,4 +1,4 @@
-package com.tsel.home.project.booklibrary.utils;
+package com.tsel.home.project.booklibrary.utils.table;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -25,7 +25,7 @@ public abstract class CustomCheckBoxTableCell<S> extends TableCell<S, CheckBox> 
 
     private ObservableValue<Boolean> booleanProperty;
 
-    public CustomCheckBoxTableCell() {
+    protected CustomCheckBoxTableCell() {
         this.getStyleClass().add("check-box");
         this.setStyle("-fx-alignment: CENTER");
 

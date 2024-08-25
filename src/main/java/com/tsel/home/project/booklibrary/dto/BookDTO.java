@@ -4,6 +4,7 @@ import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.search.SearchField;
 import com.tsel.home.project.booklibrary.utils.ImageProvider;
 import java.util.List;
+import java.util.UUID;
 import javafx.scene.control.CheckBox;
 import javafx.scene.image.ImageView;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,8 @@ import lombok.ToString;
 @ToString(exclude = "cover")
 @EqualsAndHashCode(exclude = "cover")
 public class BookDTO {
+
+    private UUID id;
 
     @SearchField(description = "Поиск по названию")
     private String name;
@@ -64,7 +67,7 @@ public class BookDTO {
 
     public static class BookDTOBuilder {
 
-        private static final ImageProvider IMAGE_PROVIDER = ImageProvider.getInstance();
+        private static final ImageProvider IMAGE_PROVIDER = ImageProvider.INSTANCE;
 
         private ImageView cover;
 

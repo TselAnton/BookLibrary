@@ -3,7 +3,6 @@ package com.tsel.home.project.booklibrary.dao.repository.utils;
 import static org.reflections.scanners.Scanners.SubTypes;
 import static org.reflections.scanners.Scanners.TypesAnnotated;
 
-import com.tsel.home.project.booklibrary.controller.BookInfoViewController;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,10 +21,12 @@ import org.reflections.Reflections;
 
 public final class ArchiveStorageFilesUtils {
 
-    private static final Logger log = LogManager.getLogger(BookInfoViewController.class);
+    private static final Logger log = LogManager.getLogger(ArchiveStorageFilesUtils.class);
 
     private static final int BUFFER_SIZE = 1024;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
+
+    private ArchiveStorageFilesUtils() {}
 
     /**
      * Архивирование всех файлов репозиториев
@@ -36,7 +37,9 @@ public final class ArchiveStorageFilesUtils {
         // Поиск всех репозиториев для получения названия файлов
         Reflections reflections = new Reflections("com.tsel.home.project.booklibrary");
         Set<Class<?>> repositoryClasses = reflections.get(SubTypes.of(TypesAnnotated.with(FileStorageName.class)).asClass());
-        log.info("Found repository classes: [{}]", repositoryClasses.stream().map(Class::getName).collect(Collectors.joining(", ")));
+
+        String repositoryClassesStringArray = repositoryClasses.stream().map(Class::getName).collect(Collectors.joining(", "));
+        log.info("Found repository classes: [{}]", repositoryClassesStringArray);
 
         Path archivePath;
         try {

@@ -1,5 +1,6 @@
 package com.tsel.home.project.booklibrary.dto;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,6 +17,8 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class AudioBookSiteDTO {
+
+    private UUID id;
 
     private String name;
 }

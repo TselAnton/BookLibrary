@@ -12,21 +12,14 @@ import java.util.function.Predicate;
 @FileStorageName("bookStorage.json")
 public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
 
-    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY = AuthorRepositoryV2.getInstance();
-    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY = PublisherRepositoryV2.getInstance();
-    private static final CycleRepositoryV2 CYCLE_REPOSITORY = CycleRepositoryV2.getInstance();
+    public static final BookRepositoryV2 INSTANCE = new BookRepositoryV2();
 
-    private static BookRepositoryV2 INSTANCE;
-
-    public static BookRepositoryV2 getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new BookRepositoryV2();
-        }
-        return INSTANCE;
-    }
+    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY = AuthorRepositoryV2.INSTANCE;
+    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY = PublisherRepositoryV2.INSTANCE;
+    private static final CycleRepositoryV2 CYCLE_REPOSITORY = CycleRepositoryV2.INSTANCE;
 
     protected BookRepositoryV2() {
-        super(Book.class, UUIDIdentifierGenerator.INSTANCE);
+        super(Book.class, new UUIDIdentifierGenerator());
     }
 
     @Override
@@ -54,7 +47,7 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
     protected void compareEntities(Book newEntity, Book oldEntity) throws ConstraintException {
         if (isSameBook(oldEntity, newEntity)) {
             throw new ConstraintException(
-                this.entityName,
+                this.entityDisplayName,
                 "книга с таким же именем, автором, публицистом, циклом и номером серии уже существует"
             );
         }

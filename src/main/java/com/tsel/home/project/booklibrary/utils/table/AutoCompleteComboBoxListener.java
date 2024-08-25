@@ -1,4 +1,4 @@
-package com.tsel.home.project.booklibrary.utils;
+package com.tsel.home.project.booklibrary.utils.table;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,27 +29,25 @@ public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
 
     @Override
     public void handle(KeyEvent event) {
-
-        if (event.getCode() == KeyCode.UP) {
-            caretPos = -1;
-            moveCaret(comboBox.getEditor().getText().length());
-            return;
-
-        } else if (event.getCode() == KeyCode.DOWN) {
-            if (!comboBox.isShowing()) {
-                comboBox.show();
+        switch (event.getCode()) {
+            case UP -> {
+                caretPos = -1;
+                moveCaret(comboBox.getEditor().getText().length());
             }
-            caretPos = -1;
-            moveCaret(comboBox.getEditor().getText().length());
-            return;
-
-        } else if (event.getCode() == KeyCode.BACK_SPACE) {
-            moveCaretToPos = true;
-            caretPos = comboBox.getEditor().getCaretPosition();
-
-        } else if (event.getCode() == KeyCode.DELETE) {
-            moveCaretToPos = true;
-            caretPos = comboBox.getEditor().getCaretPosition();
+            case DOWN -> {
+                if (!comboBox.isShowing()) {
+                    comboBox.show();
+                }
+                caretPos = -1;
+                moveCaret(comboBox.getEditor().getText().length());
+            }
+            case BACK_SPACE, DELETE -> {
+                moveCaretToPos = true;
+                caretPos = comboBox.getEditor().getCaretPosition();
+            }
+            default -> {
+                // NOT NEEDED
+            }
         }
 
         if (event.getCode() == KeyCode.RIGHT
