@@ -38,7 +38,7 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
     }
 
     private boolean isLatestValue(Predicate<Book> checkPredicate) {
-        return this.repositoryMap.values()
+        return this.getRepositoryMap().values()
             .stream()
             .noneMatch(checkPredicate);
     }
@@ -47,7 +47,7 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
     protected void compareEntities(Book newEntity, Book oldEntity) throws ConstraintException {
         if (isSameBook(oldEntity, newEntity)) {
             throw new ConstraintException(
-                this.entityDisplayName,
+                this.getEntityDisplayName(),
                 "книга с таким же именем, автором, публицистом, циклом и номером серии уже существует"
             );
         }

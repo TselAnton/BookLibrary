@@ -26,21 +26,29 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
 
     private static final Logger log = LogManager.getLogger(AbstractFileRepositoryV2.class);
 
-    protected final String entityDisplayName;
-    protected final String storageFileName;
-    protected final Map<K, E> repositoryMap;
-    protected final Map<Field, Property> notNullFields;
+    private final String entityDisplayName;
+    private final String storageFileName;
+    private final Map<Field, Property> notNullFields;
 
     private final IdentifierGenerator<K> keyGenerator;
+
+    private Map<K, E> repositoryMap;
+
+    private boolean isTransactionOpen;
+    private Map<K, E> repositoryMapSnapshot;
 
     // TODO: нужно принимать Path в котором будет создаваться файл
     // TODO: тесты на все репозитории
     protected AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator) {
         this.keyGenerator = keyGenerator;
         this.entityDisplayName = resolveEntityName(entityClass);
-        this.repositoryMap = initEntities(entityClass);
         this.storageFileName = resolveStorageFileName();
+
+        this.repositoryMap = initEntities(entityClass);
         this.notNullFields = resolveNotNullFields(entityClass);
+
+        this.repositoryMapSnapshot = null;
+        this.isTransactionOpen = false;
     }
 
     private String resolveStorageFileName() {
@@ -93,16 +101,22 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     }
 
     @Override
-    public void save(E entity) {
+    public K save(E entity) {
         if (entity.getId() == null) {
             entity.setId(keyGenerator.generate());
         }
 
         checkConstrains(entity);
-
         repositoryMap.put(entity.getId(), entity);
-        FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
-        log.info("Successfully saved entity '{}'", entity);
+
+        if (isTransactionOpen) {
+            log.info("Successfully saved entity '{}' in transaction", entity);
+        } else {
+            FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
+            log.info("Successfully saved entity '{}'", entity);
+        }
+
+        return entity.getId();
     }
 
     @Override
@@ -114,9 +128,53 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     public void deleteById(K id) {
         E removedEntity = repositoryMap.remove(id);
         if (removedEntity != null) {
-            FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
-            log.info("Successfully deleted entity '{}'", removedEntity);
+            if (isTransactionOpen) {
+                log.info("Deleted entity '{}' in transaction", removedEntity);
+            } else {
+                FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
+                log.info("Successfully deleted entity '{}'", removedEntity);
+            }
         }
+    }
+
+    @Override
+    public void beginTransaction() {
+        if (!this.isTransactionOpen) {
+            this.isTransactionOpen = true;
+            this.repositoryMapSnapshot = new HashMap<>(this.repositoryMap);
+            log.info("Starting transaction");
+        }
+    }
+
+    @Override
+    public void commitTransaction() {
+        if (this.isTransactionOpen) {
+            FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
+
+            this.isTransactionOpen = false;
+            this.repositoryMapSnapshot = null;
+            log.info("Transaction commited");
+        }
+    }
+
+    @Override
+    public void abortTransaction() {
+        if (this.isTransactionOpen) {
+            this.repositoryMap = new HashMap<>(this.repositoryMapSnapshot);
+            FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
+
+            this.isTransactionOpen = false;
+            this.repositoryMapSnapshot = null;
+            log.info("Transaction aborted");
+        }
+    }
+
+    protected Map<K, E> getRepositoryMap() {
+        return this.repositoryMap;
+    }
+
+    protected String getEntityDisplayName() {
+        return this.entityDisplayName;
     }
 
     protected void compareEntities(E newEntity, E oldEntity) throws ConstraintException {

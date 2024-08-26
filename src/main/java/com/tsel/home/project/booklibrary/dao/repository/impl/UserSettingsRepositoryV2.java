@@ -8,7 +8,6 @@ import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 @FileStorageName("userSettingsStorage.json")
 public class UserSettingsRepositoryV2 extends AbstractFileRepositoryV2<String, UserSettings> {
@@ -27,10 +26,11 @@ public class UserSettingsRepositoryV2 extends AbstractFileRepositoryV2<String, U
         save(userSettings);
     }
 
-    public Optional<File> getLastChosenCoverFile() {
+    public File getLastChosenCoverFile() {
         return ofNullable(getById(USER_SETTINGS_KEY))
-                .map(UserSettings::getLastChosenCoverFolder)
-                .filter(path -> Files.isDirectory(Path.of(path)))
-                .map(File::new);
+            .map(UserSettings::getLastChosenCoverFolder)
+            .filter(path -> Files.isDirectory(Path.of(path)))
+            .map(File::new)
+            .orElse(null);
     }
 }

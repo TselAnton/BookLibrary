@@ -21,7 +21,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = {"coverImgAbsolutePath", "bookshelf"})
 @EntityDisplayName("Книга")
-//@UniqueConstraint(name = "unique_book_constraint", properties = {"name", "authorId", "publisherId", "cycleName", "numberInSeries"})
 public class Book implements BaseEntity<UUID> {
 
     @Serial
@@ -75,6 +74,7 @@ public class Book implements BaseEntity<UUID> {
     @Deprecated
     private String publisher;
 
+    @Deprecated
     @Override
     public String getKey() {
         StringBuilder compositeKey = new StringBuilder();
