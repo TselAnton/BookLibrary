@@ -96,6 +96,11 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     }
 
     @Override
+    public boolean existById(K id) {
+        return repositoryMap.containsKey(id);
+    }
+
+    @Override
     public List<E> getAll() {
         return new ArrayList<>(repositoryMap.values());
     }

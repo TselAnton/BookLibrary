@@ -90,7 +90,7 @@ public class EditBookController extends AbstractBookController {
     @FXML
     private Button selectCoverFileButton;
 
-    private Book book;
+    private Book bookForEdit;
     private AbstractViewController mainController;
 
 
@@ -102,12 +102,11 @@ public class EditBookController extends AbstractBookController {
         if (bookId == null) {
             throw new IllegalStateException("Entity key for edit controller is blank!");
         }
-        Book bookForEdit = BOOK_REPOSITORY_V2.getById(bookId);
-        if (bookForEdit == null) {
+        this.bookForEdit = BOOK_REPOSITORY_V2.getById(bookId);
+        if (this.bookForEdit == null) {
             throw new IllegalStateException(format("Book by ID \"%s\" not found for edit controller!", bookId));
         }
 
-        this.book = bookForEdit;
         this.mainController = parentController;
 
         nameTextFieldInput.setText(bookForEdit.getName());
@@ -168,7 +167,7 @@ public class EditBookController extends AbstractBookController {
 
     @FXML
     public void editBook() {
-        saveNewBook(book.getAudiobookSites());
+        saveNewBook(bookForEdit.getAudiobookSites());
     }
 
     @Override
@@ -184,7 +183,7 @@ public class EditBookController extends AbstractBookController {
             "view/audio-book-sites-connections-edit-view.fxml",
             500,
             0,
-            book.getAudiobookSites()
+            bookForEdit.getAudiobookSites()
         );
     }
 

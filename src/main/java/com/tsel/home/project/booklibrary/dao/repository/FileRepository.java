@@ -10,6 +10,8 @@ public interface FileRepository<K extends Serializable, E extends BaseEntity<K>>
     @Nullable
     E getById(K id);
 
+    boolean existById(K id);
+
     List<E> getAll();
 
     K save(E entity);
