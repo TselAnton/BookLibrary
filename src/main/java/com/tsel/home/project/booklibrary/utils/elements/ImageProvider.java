@@ -1,4 +1,4 @@
-package com.tsel.home.project.booklibrary.utils;
+package com.tsel.home.project.booklibrary.utils.elements;
 
 import static com.tsel.home.project.booklibrary.controller.AbstractViewController.RESOURCE_PATH;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
@@ -12,21 +12,21 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class ImageProvider {
+public final class ImageProvider {
 
     public static final ImageProvider INSTANCE = new ImageProvider();
 
     private static final Logger LOGGER = LogManager.getLogger(ImageProvider.class);
 
-    private final Map<String, Image> cashedImages = new ConcurrentHashMap<>();
-    private final Map<String, Image> cashedSmallImages = new ConcurrentHashMap<>();
+    private final Map<UUID, Image> cashedImages = new ConcurrentHashMap<>();
+    private final Map<UUID, Image> cashedSmallImages = new ConcurrentHashMap<>();
     private final Image cachedIcon;
     private final Image defaultImg;
 
@@ -46,7 +46,7 @@ public class ImageProvider {
 
     public Image resolveCover(Book book) {
         if (isNotBlank(book.getCoverImgAbsolutePath())) {
-            Image cashedImage = cashedImages.get(book.getKey());
+            Image cashedImage = cashedImages.get(book.getId());
             if (cashedImage != null) {
                 return cashedImage;
             }
@@ -56,7 +56,7 @@ public class ImageProvider {
                 try (InputStream inputStream = Files.newInputStream(imgPath)) {
                     Image bookImage = new Image(inputStream);
                     if (!bookImage.isError()) {
-                        cashedImages.put(book.getKey().toLowerCase(Locale.ROOT), bookImage);
+                        cashedImages.put(book.getId(), bookImage);
                         return bookImage;
                     }
                     return defaultImg;
@@ -82,7 +82,7 @@ public class ImageProvider {
                 try {
                     Image bookImage = new Image(imgPath.toUri().toURL().toExternalForm(), 12, 0, true, true, true);
                     if (!bookImage.isError()) {
-                        cashedSmallImages.put(book.getKey().toLowerCase(Locale.ROOT), bookImage);
+                        cashedSmallImages.put(book.getId(), bookImage);
                         return bookImage;
                     }
                 } catch (MalformedURLException e) {
@@ -95,8 +95,8 @@ public class ImageProvider {
     }
 
     public void deleteImagesFromCache(Book book) {
-        cashedImages.remove(book.getKey().toLowerCase(Locale.ROOT));
-        cashedSmallImages.remove(book.getKey().toLowerCase(Locale.ROOT));
+        cashedImages.remove(book.getId());
+        cashedSmallImages.remove(book.getId());
     }
 
     private Image loadImage(String path) {

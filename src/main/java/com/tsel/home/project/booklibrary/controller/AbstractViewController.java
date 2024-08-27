@@ -11,13 +11,12 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
-import com.tsel.home.project.booklibrary.utils.ImageProvider;
-import java.util.Optional;
+import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
+import com.tsel.home.project.booklibrary.utils.elements.ImageProvider;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -29,8 +28,6 @@ public abstract class AbstractViewController {
     public static final String RESOURCE_PATH = "/com/tsel/home/project/booklibrary/";
 
     protected static final Logger LOGGER = LogManager.getLogger(AbstractViewController.class);
-
-    protected static final String OK = "OK";
 
     @Deprecated
     protected static final BookRepository BOOK_REPOSITORY = BookRepository.getInstance();
@@ -65,12 +62,12 @@ public abstract class AbstractViewController {
      * @param explanationMsg Сообщение в основной части ошибки
      * @return Результат вызова
      */
-    protected Optional<ButtonType> riseAlert(Alert.AlertType alertType, String title, String warnMsg, String explanationMsg) {
+    protected ButtonAnswer riseAlert(Alert.AlertType alertType, String title, String warnMsg, String explanationMsg) {
         Alert warnAlert = new Alert(alertType);
         warnAlert.setTitle(title);
         warnAlert.setHeaderText(warnMsg);
         warnAlert.setContentText(explanationMsg);
-        return warnAlert.showAndWait();
+        return new ButtonAnswer(warnAlert.showAndWait().orElse(null));
     }
 
     /**
@@ -117,7 +114,7 @@ public abstract class AbstractViewController {
     }
 
     /**
-     * Инициализация контроллера. Вызывается из {@link #initController(FXMLLoader, AbstractViewController, Object...)}
+     * Инициализация контроллера. Вызывается из {@link AbstractViewController#loadModalView(String, String, int, int, Object...)}
      * @param parentController Родительский контроллер
      * @param initParameters Параметры инициализации
      */

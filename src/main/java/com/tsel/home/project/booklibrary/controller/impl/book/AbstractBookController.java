@@ -22,7 +22,7 @@ import com.tsel.home.project.booklibrary.dto.AuthorDTO;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
 import com.tsel.home.project.booklibrary.dto.CycleDTO;
 import com.tsel.home.project.booklibrary.dto.PublisherDTO;
-import com.tsel.home.project.booklibrary.utils.CustomFileChooser;
+import com.tsel.home.project.booklibrary.utils.elements.CustomFileChooser;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import com.tsel.home.project.booklibrary.utils.table.AutoCompleteComboBoxListener;
 import java.io.File;

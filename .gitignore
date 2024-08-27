@@ -3,6 +3,7 @@
 /logs/
 /target/
 /setup/
+/backup/
 /Обложки для книг/
 /library-dump/
 /*Features
@@ -16,4 +17,8 @@
 /publisherStorage.json
 /userSettingsStorage.json
 /my-library-audio-book-site-storage.txt
-/backup/storage-archive-25-08-2024-15-04-02.zip
+/my-library-authors-storage.txt
+/my-library-books-storage.txt
+/my-library-cycles-storage.txt
+/my-library-publishers-storage.txt
+/my-library-user-settings-storage.txt

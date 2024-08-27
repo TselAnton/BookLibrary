@@ -4,13 +4,12 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 import com.google.gson.Gson;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
+import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -111,14 +110,14 @@ public class NewBookController extends AbstractBookController {
     @FXML
     public void stageKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            Optional<ButtonType> answer = riseAlert(
+            ButtonAnswer answer = riseAlert(
                 CONFIRMATION,
                 "Внимание!",
                 "Закрыть окно?",
                 "Все несохранённые данные будут потеряны"
             );
 
-            if (answer.isPresent() && OK.equals(answer.get().getText())) {
+            if (answer.isOkAnswer()) {
                 closeStage();
             }
 
