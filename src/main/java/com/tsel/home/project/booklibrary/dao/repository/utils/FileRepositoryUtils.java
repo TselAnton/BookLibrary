@@ -11,13 +11,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,41 +35,41 @@ public final class FileRepositoryUtils {
 
     /**
      * Чтение сущностей из фала-хранилища
-     * @param filename Название фала-хранилища
+     * @param storagePath Путь файла-хранилища
      * @param entityClass Тип класса сущности
      * @return Список сущностей
      * @param <T> Тип сущности
      */
-    public static <T> List<T> readStorageFile(String filename, Class<T> entityClass) {
-        if (isStorageFileNotExist(filename)) {
-            log.warn("Not found file '{}'. Can't read anything, so returning empty list", filename);
+    public static <T> List<T> readStorageFile(Path storagePath, Class<T> entityClass) {
+        if (isStorageFileNotExist(storagePath)) {
+            log.warn("Not found file '{}'. Can't read anything, so returning empty list", storagePath);
             return new ArrayList<>();
         }
 
-        try (Stream<String> fileLines = Files.lines(Paths.get(filename), StandardCharsets.UTF_8)) {
+        try (Stream<String> fileLines = Files.lines(storagePath, StandardCharsets.UTF_8)) {
             return fileLines
                 .map(jsonEntity -> GSON.fromJson(jsonEntity, entityClass))
-                .collect(Collectors.toList());
+                .toList();
 
         } catch (IOException e) {
-            log.error("Exception while trying to read storage file '{}' line by line", filename);
-            throw new IllegalStateException(format("Проблема при чтении файла хранилища '%s'", filename), e);
+            log.error("Exception while trying to read storage file '{}' line by line", storagePath);
+            throw new IllegalStateException(format("Проблема при чтении файла хранилища '%s'", storagePath), e);
         }
     }
 
     /**
      * Перезапись контента фала-хранилища
-     * @param filename Название фала-хранилища
+     * @param storagePath Название фала-хранилища
      * @param entities Список сущностей
      * @param <T> Тип сущности
      */
-    public static <T> void overwriteStorageFile(String filename, Collection<T> entities) {
-        if (isStorageFileNotExist(filename)) {
-            log.info("File '{}' not exist, trying to create new one", filename);
-            createStorageFile(filename);
+    public static <T> void overwriteStorageFile(Path storagePath, Collection<T> entities) {
+        if (isStorageFileNotExist(storagePath)) {
+            log.info("File '{}' not exist, trying to create new one", storagePath);
+            createStorageFile(storagePath);
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, false))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(storagePath.toFile(), false))) {
             Iterator<T> entitiesIterator = entities.iterator();
             while (entitiesIterator.hasNext()) {
                 writer.write(GSON.toJson(entitiesIterator.next()));
@@ -78,13 +79,30 @@ public final class FileRepositoryUtils {
             }
 
         } catch (IOException e) {
-            log.error("Exception while trying to write storage file '{}' line by line", filename);
-            throw new IllegalStateException(format("Проблема при записи данных в файл хранилища '%s'", filename), e);
+            log.error("Exception while trying to write storage file '{}' line by line", storagePath);
+            throw new IllegalStateException(format("Проблема при записи данных в файл хранилища '%s'", storagePath), e);
         }
     }
 
     /**
      * Определить тип класса
+     * @param repositoryClass Класс репозитория
+     * @param rootPath Расположение рутовой директории
+     * @return {@link Path} до файла хранилища репозитория
+     */
+    public static Path resolveStoragePath(Class<?> repositoryClass, @Nullable Path rootPath) {
+        String repositoryFileName = resolveStorageFileName(repositoryClass);
+        if (repositoryFileName == null) {
+            return null;
+        }
+        Path storagePath = Paths.get(repositoryFileName);
+        return rootPath != null
+            ? Path.of(rootPath.toAbsolutePath().toString(), storagePath.toString())
+            : storagePath;
+    }
+
+    /**
+     * Определить название файла хранилища
      * @param repositoryClass Класс репозитория
      * @return Названия файла хранилища из {@link FileStorageName} аннотации
      */
@@ -97,18 +115,18 @@ public final class FileRepositoryUtils {
         return fileStorageName.value();
     }
 
-    private static void createStorageFile(String filename) {
+    private static void createStorageFile(Path storagePath) {
         try {
-            log.info("Trying to create storage file '{}'", filename);
-            Files.createFile(Paths.get(filename));
+            log.info("Trying to create storage file '{}'", storagePath);
+            Files.createFile(storagePath);
 
         } catch (IOException e) {
-            log.error("Exception while trying to create storage file '{}'", filename);
-            throw new IllegalStateException(format("Проблема при создании файла хранилища '%s'", filename), e);
+            log.error("Exception while trying to create storage file '{}'", storagePath);
+            throw new IllegalStateException(format("Проблема при создании файла хранилища '%s'", storagePath), e);
         }
     }
 
-    private static boolean isStorageFileNotExist(String filename) {
-        return !Files.exists(Paths.get(filename));
+    private static boolean isStorageFileNotExist(Path storagePath) {
+        return !Files.exists(storagePath);
     }
 }

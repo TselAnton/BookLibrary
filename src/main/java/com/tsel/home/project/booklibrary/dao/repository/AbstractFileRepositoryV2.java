@@ -13,12 +13,14 @@ import com.tsel.home.project.booklibrary.dao.repository.utils.FileRepositoryUtil
 import com.tsel.home.project.booklibrary.utils.StringUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,71 +29,25 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     private static final Logger log = LogManager.getLogger(AbstractFileRepositoryV2.class);
 
     private final String entityDisplayName;
-    private final String storageFileName;
-    private final Map<Field, Property> notNullFields;
+    private final Path storagePath;
 
+    private final Map<Field, Property> notNullFields;
     private final IdentifierGenerator<K> keyGenerator;
 
-    private Map<K, E> repositoryMap;
-
     private boolean isTransactionOpen;
+    private Map<K, E> repositoryMap;
     private Map<K, E> repositoryMapSnapshot;
 
-    // TODO: нужно принимать Path в котором будет создаваться файл
-    // TODO: тесты на все репозитории
-    protected AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator) {
+    protected AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator, @Nullable Path rootPath) {
         this.keyGenerator = keyGenerator;
         this.entityDisplayName = resolveEntityName(entityClass);
-        this.storageFileName = resolveStorageFileName();
+        this.storagePath = resolveStoragePath(rootPath);
 
         this.repositoryMap = initEntities(entityClass);
         this.notNullFields = resolveNotNullFields(entityClass);
 
         this.repositoryMapSnapshot = null;
         this.isTransactionOpen = false;
-    }
-
-    private String resolveStorageFileName() {
-        return ofNullable(FileRepositoryUtils.resolveStorageFileName(this.getClass()))
-            .orElseThrow(() -> new IllegalStateException(
-                format("Невозможно определить название файла хранилища для репозитория сущности '%s'", this.entityDisplayName))
-            );
-    }
-
-    private String resolveEntityName(Class<E> entityClass) {
-        return ofNullable(entityClass.getAnnotation(EntityDisplayName.class))
-            .map(EntityDisplayName::value)
-            .filter(StringUtils::isNotBlank)
-            .orElseThrow(() -> new IllegalStateException(
-                format("Не определена аннотация @EntityDisplayName для сущности %s", entityClass.getName()))
-            );
-    }
-
-    private Map<Field, Property> resolveNotNullFields(Class<E> entityClass) {
-        Map<Field, Property> notNullFieldsMap = new HashMap<>();
-        for (Field entityProperty : entityClass.getDeclaredFields()) {
-            if (entityProperty.isAnnotationPresent(Property.class)) {
-                Property propertyAnnotation = entityProperty.getAnnotation(Property.class);
-                if (!propertyAnnotation.nullable()) {
-                    entityProperty.setAccessible(true);
-                    notNullFieldsMap.put(entityProperty, propertyAnnotation);
-                }
-            }
-        }
-        return notNullFieldsMap;
-    }
-
-    private Map<K, E> initEntities(Class<E> entityClass) {
-        Map<K, E> entitiesMap = new LinkedHashMap<>();
-        List<E> entitiesList = FileRepositoryUtils.readStorageFile(this.storageFileName, entityClass);
-        for (E entity : entitiesList) {
-            entitiesMap.put(entity.getId(), entity);
-        }
-        return entitiesMap;
-    }
-
-    protected Map<K, E> getRepositoryMap() {
-        return this.repositoryMap;
     }
 
     @Override
@@ -121,7 +77,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
         if (isTransactionOpen) {
             log.info("Successfully saved entity '{}' in transaction", entity);
         } else {
-            FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
+            FileRepositoryUtils.overwriteStorageFile(this.storagePath, repositoryMap.values());
             log.info("Successfully saved entity '{}'", entity);
         }
 
@@ -140,7 +96,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
             if (isTransactionOpen) {
                 log.info("Deleted entity '{}' in transaction", removedEntity);
             } else {
-                FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
+                FileRepositoryUtils.overwriteStorageFile(this.storagePath, repositoryMap.values());
                 log.info("Successfully deleted entity '{}'", removedEntity);
             }
         }
@@ -158,7 +114,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     @Override
     public void commitTransaction() {
         if (this.isTransactionOpen) {
-            FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
+            FileRepositoryUtils.overwriteStorageFile(this.storagePath, repositoryMap.values());
 
             this.isTransactionOpen = false;
             this.repositoryMapSnapshot = null;
@@ -170,7 +126,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     public void abortTransaction() {
         if (this.isTransactionOpen) {
             this.repositoryMap = new HashMap<>(this.repositoryMapSnapshot);
-            FileRepositoryUtils.overwriteStorageFile(this.storageFileName, repositoryMap.values());
+            FileRepositoryUtils.overwriteStorageFile(this.storagePath, repositoryMap.values());
 
             this.isTransactionOpen = false;
             this.repositoryMapSnapshot = null;
@@ -178,12 +134,16 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
         }
     }
 
-    protected void compareEntities(E newEntity, E oldEntity) throws ConstraintException {
-        // FOR OVERWRITE
+    protected Map<K, E> getRepositoryMap() {
+        return this.repositoryMap;
     }
 
     protected ConstraintException buildConstraintException(String message) {
         return new ConstraintException(this.entityDisplayName, message);
+    }
+
+    protected void compareEntities(E newEntity, E oldEntity) throws ConstraintException {
+        // FOR OVERWRITE
     }
 
     private void checkConstrains(E entity) {
@@ -204,5 +164,44 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
                 throw new NotNullConstraintException(this.entityDisplayName, fieldAnnotation.value());
             }
         }
+    }
+
+    private Path resolveStoragePath(@Nullable Path rootPath) {
+        return ofNullable(FileRepositoryUtils.resolveStoragePath(this.getClass(), rootPath))
+            .orElseThrow(() -> new IllegalStateException(
+                format("Невозможно определить путь файла хранилища для репозитория сущности '%s'", this.entityDisplayName))
+            );
+    }
+
+    private String resolveEntityName(Class<E> entityClass) {
+        return ofNullable(entityClass.getAnnotation(EntityDisplayName.class))
+            .map(EntityDisplayName::value)
+            .filter(StringUtils::isNotBlank)
+            .orElseThrow(() -> new IllegalStateException(
+                format("Не определена аннотация @EntityDisplayName для сущности %s", entityClass.getName()))
+            );
+    }
+
+    private Map<Field, Property> resolveNotNullFields(Class<E> entityClass) {
+        Map<Field, Property> notNullFieldsMap = new HashMap<>();
+        for (Field entityProperty : entityClass.getDeclaredFields()) {
+            if (entityProperty.isAnnotationPresent(Property.class)) {
+                Property propertyAnnotation = entityProperty.getAnnotation(Property.class);
+                if (!propertyAnnotation.nullable()) {
+                    entityProperty.setAccessible(true);
+                    notNullFieldsMap.put(entityProperty, propertyAnnotation);
+                }
+            }
+        }
+        return notNullFieldsMap;
+    }
+
+    private Map<K, E> initEntities(Class<E> entityClass) {
+        Map<K, E> entitiesMap = new LinkedHashMap<>();
+        List<E> entitiesList = FileRepositoryUtils.readStorageFile(this.storagePath, entityClass);
+        for (E entity : entitiesList) {
+            entitiesMap.put(entity.getId(), entity);
+        }
+        return entitiesMap;
     }
 }

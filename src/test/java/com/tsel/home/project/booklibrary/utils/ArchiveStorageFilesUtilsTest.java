@@ -5,9 +5,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
+import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
-import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.repository.utils.ArchiveStorageFilesUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +32,7 @@ class ArchiveStorageFilesUtilsTest {
     private static final String TEST_FILE_4_NAME = "test4.json";
 
     @Test
-    public void testArchiveStorages(@TempDir Path tempDirectory) {
+    void testArchiveStorages(@TempDir Path tempDirectory) {
         createTempFile(tempDirectory, TEST_FILE_1_NAME, "{\"test1\": \"value1\"}");
         createTempFile(tempDirectory, TEST_FILE_2_NAME, "{\"test2\": \"value2\"}");
         createTempFile(tempDirectory, TEST_FILE_3_NAME, "invalid value");
@@ -108,18 +108,18 @@ class ArchiveStorageFilesUtilsTest {
     }
 
     @FileStorageName(TEST_FILE_1_NAME)
-    protected class TestRepository1 extends TestFileRepository {}
+    protected static class TestRepository1 extends TestFileRepository {}
 
     @FileStorageName(TEST_FILE_2_NAME)
-    protected class TestRepository2 extends TestFileRepository {}
+    protected static class TestRepository2 extends TestFileRepository {}
 
     @FileStorageName(TEST_FILE_3_NAME)
-    protected class TestRepository3 extends TestFileRepository {}
+    protected static class TestRepository3 extends TestFileRepository {}
 
     @FileStorageName(TEST_FILE_4_NAME)
-    protected class TestRepository4 extends TestFileRepository {}
+    protected static class TestRepository4 extends TestFileRepository {}
 
-    protected abstract class TestFileRepository implements FileRepository<String, BaseEntity<String>> {
+    protected abstract static class TestFileRepository implements FileRepository<String, BaseEntity<String>> {
 
         @Override
         public BaseEntity<String> getById(String id) {
@@ -132,18 +132,38 @@ class ArchiveStorageFilesUtilsTest {
         }
 
         @Override
-        public void save(BaseEntity<String> entity) {
-
+        public String save(BaseEntity<String> entity) {
+            return null;
         }
 
         @Override
         public void delete(BaseEntity<String> entity) {
-
+            // ONLY FOR TESTS
         }
 
         @Override
         public void deleteById(String id) {
+            // ONLY FOR TESTS
+        }
 
+        @Override
+        public boolean existById(String id) {
+            return false;
+        }
+
+        @Override
+        public void beginTransaction() {
+            // ONLY FOR TESTS
+        }
+
+        @Override
+        public void commitTransaction() {
+            // ONLY FOR TESTS
+        }
+
+        @Override
+        public void abortTransaction() {
+            // ONLY FOR TESTS
         }
     }
 }

@@ -45,6 +45,8 @@ public final class ArchiveStorageFilesUtils {
         try {
             // Создание архива
             archivePath = buildArchivePath(fileDirectory, archiveDirectory);
+            log.info("Resolved archive path: {}", archivePath.toAbsolutePath());
+
         } catch (Exception e) {
             log.error("Exception while trying to create archive directory", e);
             throw new IllegalStateException("Can't create archive directory", e);
@@ -57,14 +59,16 @@ public final class ArchiveStorageFilesUtils {
             for (Class<?> repositoryClass : repositoryClasses) {
                 log.info("Trying to read storage file for repository class {}", repositoryClass.getName());
                 String fileStorageName = FileRepositoryUtils.resolveStorageFileName(repositoryClass);
-                if (fileStorageName == null || !Files.exists(fileDirectory.resolve(fileStorageName))) {
+                Path resolvedStoragePath = FileRepositoryUtils.resolveStoragePath(repositoryClass, fileDirectory);
+
+                if (fileStorageName == null || resolvedStoragePath == null || !Files.exists(resolvedStoragePath)) {
                     log.warn("Not found storage file name for repository class {} by name '{}'. Skip it", repositoryClass.getName(), fileStorageName);
                     continue;
                 }
 
                 // Запись файла в архив
                 log.info("Founded storage file '{}' for repository class {}", fileStorageName, repositoryClass.getName());
-                writeFileToZipStream(fileDirectory, repositoryClass, fileStorageName, zipOutputStream);
+                writeFileToZipStream(resolvedStoragePath, repositoryClass, fileStorageName, zipOutputStream);
             }
 
         } catch (Exception e) {
@@ -74,13 +78,13 @@ public final class ArchiveStorageFilesUtils {
     }
 
     private static void writeFileToZipStream(
-        Path fileDirectory,
+        Path resolvedStoragePath,
         Class<?> repositoryClass,
         String fileStorageName,
         ZipOutputStream zipOutputStream
     ) throws IOException {
 
-        try (FileInputStream fileInputStream = new FileInputStream(fileDirectory.resolve(fileStorageName).toFile())) {
+        try (FileInputStream fileInputStream = new FileInputStream(resolvedStoragePath.toFile())) {
             log.info("Trying to write storage file {} for repository class {} into archive", fileStorageName, repositoryClass.getName());
             ZipEntry zipEntry = new ZipEntry(fileStorageName);
             zipOutputStream.putNextEntry(zipEntry);
@@ -97,7 +101,7 @@ public final class ArchiveStorageFilesUtils {
     }
 
     private static Path buildArchivePath(Path directory, Path archiveDirectory) throws IOException {
-        archiveDirectory = Path.of(directory.toAbsolutePath().toString(), archiveDirectory.toString());
+        archiveDirectory = directory.resolve(archiveDirectory);
         if (!Files.exists(archiveDirectory)) {
             Files.createDirectory(archiveDirectory);
         }
