@@ -1,5 +1,6 @@
 package com.tsel.home.project.booklibrary.utils.table;
 
+import java.util.UUID;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -19,7 +20,7 @@ import javafx.util.StringConverter;
 public abstract class CustomCheckBoxTableCell<S> extends TableCell<S, CheckBox> {
 
     private final CheckBox checkBox;
-    private String id;
+    private UUID id;
 
     private boolean showLabel;
 
@@ -38,11 +39,11 @@ public abstract class CustomCheckBoxTableCell<S> extends TableCell<S, CheckBox> 
 
     protected void handleActionEvent(ActionEvent event) {}
 
-    public void setCheckBoxId(String id) {
+    public void setCheckBoxId(UUID id) {
         this.id = id;
     }
 
-    public String getCheckBoxId() {
+    public UUID getCheckBoxId() {
         return this.id;
     }
 
@@ -81,8 +82,9 @@ public abstract class CustomCheckBoxTableCell<S> extends TableCell<S, CheckBox> 
         super.updateItem(item, empty);
 
         if (item != null) {
-            this.setCheckBoxId(item.getId());
-            this.setCheckBoxSelected(setSelectedOnInit(item.getId()));
+            UUID checkBoxId = UUID.fromString(item.getId());
+            this.setCheckBoxId(checkBoxId);
+            this.setCheckBoxSelected(setSelectedOnInit(checkBoxId));
         }
 
         if (empty) {
@@ -113,7 +115,7 @@ public abstract class CustomCheckBoxTableCell<S> extends TableCell<S, CheckBox> 
         }
     }
 
-    protected abstract boolean setSelectedOnInit(String checkBoxId);
+    protected abstract boolean setSelectedOnInit(UUID checkBoxId);
 
     private void updateShowLabel() {
         this.showLabel = converter != null;

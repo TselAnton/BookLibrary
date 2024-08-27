@@ -72,7 +72,7 @@ public final class ImageProvider {
 
     public Image resolveSmallCover(Book book) {
         if (isNotBlank(book.getCoverImgAbsolutePath())) {
-            Image cashedImage = cashedSmallImages.get(book.getKey());
+            Image cashedImage = cashedSmallImages.get(book.getId());
             if (cashedImage != null) {
                 return cashedImage;
             }

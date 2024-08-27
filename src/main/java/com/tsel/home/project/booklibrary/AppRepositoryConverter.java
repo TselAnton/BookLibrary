@@ -1,5 +1,6 @@
 package com.tsel.home.project.booklibrary;
 
+import com.tsel.home.project.booklibrary.dao.data.AudioBookSite;
 import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.data.Book;
@@ -17,6 +18,7 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class AppRepositoryConverter {
@@ -91,6 +93,17 @@ public class AppRepositoryConverter {
         if (book.getCycleName() != null) {
             Cycle cycle = CYCLE_REPOSITORY_V1.getByName(book.getCycleName());
             book.setCycleId(cycle.getId());
+        }
+        if (book.getAudiobookSites() != null && !book.getAudiobookSites().isEmpty()) {
+            if (book.getAudioBookSiteIds() == null) {
+                book.setAudioBookSiteIds(new ArrayList<>());
+            }
+            book.getAudiobookSites()
+                .stream()
+                .forEach(audioBook -> {
+                    AudioBookSite audioBookSite = AUDIO_BOOK_SITE_REPOSITORY_V1.getByName(audioBook);
+                    book.getAudioBookSiteIds().add(audioBookSite.getId());
+                });
         }
         return book;
     }

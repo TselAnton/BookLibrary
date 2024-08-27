@@ -8,6 +8,7 @@ import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -88,8 +89,7 @@ public class NewBookController extends AbstractBookController {
     @FXML
     private Button selectCoverFileButton;
 
-
-    private final List<String> audioBookSites = new ArrayList<>();
+    private final List<UUID> audioBookSiteIds = new ArrayList<>();
 
 
     @FXML
@@ -99,7 +99,7 @@ public class NewBookController extends AbstractBookController {
 
     @FXML
     public void cancelAdding() {
-        closeStage();
+        closeStage(getExitButton());
     }
 
     @FXML
@@ -118,7 +118,7 @@ public class NewBookController extends AbstractBookController {
             );
 
             if (answer.isOkAnswer()) {
-                closeStage();
+                closeStage(getExitButton());
             }
 
         } else if (keyEvent.getCode() == KeyCode.ENTER) {
@@ -128,7 +128,7 @@ public class NewBookController extends AbstractBookController {
 
     @FXML
     public void addBook() {
-        saveNewBook(null, audioBookSites);
+        saveNewBook(null, audioBookSiteIds);
     }
 
     @FXML
@@ -138,7 +138,7 @@ public class NewBookController extends AbstractBookController {
             "view/audio-book-sites-connections-edit-view.fxml",
             500,
             0,
-            audioBookSites
+            audioBookSiteIds
         );
     }
 }

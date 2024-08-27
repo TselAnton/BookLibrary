@@ -146,7 +146,7 @@ public class EditBookController extends AbstractBookController {
             );
 
             if (answer.isOkAnswer()) {
-                closeStage();
+                closeStage(getExitButton());
             }
 
         } else if (keyEvent.getCode() == KeyCode.ENTER) {
@@ -157,7 +157,7 @@ public class EditBookController extends AbstractBookController {
 
     @FXML
     public void cancelEditing() {
-        closeStage();
+        closeStage(getExitButton());
     }
 
     @FXML
@@ -167,7 +167,7 @@ public class EditBookController extends AbstractBookController {
 
     @FXML
     public void editBook() {
-        saveNewBook(bookForEdit.getId(), bookForEdit.getAudiobookSites());
+        saveNewBook(bookForEdit.getId(), bookForEdit.getAudioBookSiteIds());
     }
 
     @Override

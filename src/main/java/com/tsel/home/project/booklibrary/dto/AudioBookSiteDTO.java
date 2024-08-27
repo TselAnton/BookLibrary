@@ -7,18 +7,21 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @EqualsAndHashCode
 public class AudioBookSiteDTO {
 
     private UUID id;
 
     private String name;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

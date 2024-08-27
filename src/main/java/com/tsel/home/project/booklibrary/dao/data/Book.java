@@ -63,7 +63,10 @@ public class Book implements BaseEntity<UUID> {
     private Double price;
 
     @Property(value = "аудиокниги")
-    private List<String> audiobookSites = new ArrayList<>();    // TODO: на UUID
+    private List<UUID> audioBookSiteIds = new ArrayList<>();
+
+    @Deprecated
+    private List<String> audiobookSites = new ArrayList<>();
 
     @Deprecated
     private String author;

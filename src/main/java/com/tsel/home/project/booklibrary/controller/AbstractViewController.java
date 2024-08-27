@@ -2,7 +2,6 @@ package com.tsel.home.project.booklibrary.controller;
 
 import com.tsel.home.project.booklibrary.converter.BookConverter;
 import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
@@ -11,6 +10,7 @@ import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.elements.ImageProvider;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
@@ -24,9 +24,6 @@ public abstract class AbstractViewController {
     public static final String RESOURCE_PATH = "/com/tsel/home/project/booklibrary/";
 
     private static final Logger log = LogManager.getLogger(AbstractViewController.class);
-
-    @Deprecated
-    protected static final BookRepository BOOK_REPOSITORY = BookRepository.getInstance();
 
     protected static final BookRepositoryV2 BOOK_REPOSITORY_V2 = BookRepositoryV2.INSTANCE;
     protected static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.INSTANCE;
@@ -56,6 +53,15 @@ public abstract class AbstractViewController {
         warnAlert.setHeaderText(warnMsg);
         warnAlert.setContentText(explanationMsg);
         return new ButtonAnswer(warnAlert.showAndWait().orElse(null));
+    }
+
+    /**
+     * Закрыть текущее окно
+     * @param node Любой элемент текущего окна
+     */
+    protected void closeStage(Node node) {
+        Stage stage = (Stage) node.getScene().getWindow();
+        stage.close();
     }
 
     /**

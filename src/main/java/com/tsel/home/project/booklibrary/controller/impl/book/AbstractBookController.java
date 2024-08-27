@@ -187,14 +187,6 @@ public abstract class AbstractBookController extends AbstractViewController {
     }
 
     /**
-     * Закрыть текущее окно
-     */
-    protected void closeStage() {
-        Stage stage = (Stage) getExitButton().getScene().getWindow();
-        stage.close();
-    }
-
-    /**
      * Выбор файл в качестве обложки книги
      */
     protected void selectBookCover() {
@@ -244,9 +236,9 @@ public abstract class AbstractBookController extends AbstractViewController {
 
     /**
      * Сохранение новой книги
-     * @param audioBookSites Аудио книги (TODO: удалить)
+     * @param audioBookSiteIds Идентификаторы сайтов аудиокниг
      */
-    protected void saveNewBook(@Nullable UUID bookId, List<String> audioBookSites) {
+    protected void saveNewBook(@Nullable UUID bookId, List<UUID> audioBookSiteIds) {
         String bookTitle = getInputText(getNameTextFieldInput());
         String bookPagesCount = getInputText(getPagesCountFieldInput());
         String bookPrice = getInputText(getPriceFieldInput());
@@ -308,7 +300,7 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .coverImgAbsolutePath(imagePath)
                 .price(stringToDouble(bookPrice))
                 .hardCover(hardCoverFlag)
-                .audiobookSites(audioBookSites)
+                .audioBookSiteIds(audioBookSiteIds)
                 .build();
 
             BOOK_REPOSITORY_V2.save(newBook);
