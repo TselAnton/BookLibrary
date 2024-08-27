@@ -17,4 +17,5 @@ open module com.tsel.home.project.booklibrary {
     requires org.reflections;
     requires com.google.gson;
     requires jsr305;
+    requires backport.util.concurrent;
 }
