@@ -167,7 +167,7 @@ public class EditBookController extends AbstractBookController {
 
     @FXML
     public void editBook() {
-        saveNewBook(bookForEdit.getAudiobookSites());
+        saveNewBook(bookForEdit.getId(), bookForEdit.getAudiobookSites());
     }
 
     @Override

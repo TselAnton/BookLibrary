@@ -128,7 +128,7 @@ public class NewBookController extends AbstractBookController {
 
     @FXML
     public void addBook() {
-        saveNewBook(audioBookSites);
+        saveNewBook(null, audioBookSites);
     }
 
     @FXML

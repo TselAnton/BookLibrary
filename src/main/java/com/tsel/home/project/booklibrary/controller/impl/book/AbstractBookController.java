@@ -41,6 +41,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -245,7 +246,7 @@ public abstract class AbstractBookController extends AbstractViewController {
      * Сохранение новой книги
      * @param audioBookSites Аудио книги (TODO: удалить)
      */
-    protected void saveNewBook(List<String> audioBookSites) {
+    protected void saveNewBook(@Nullable UUID bookId, List<String> audioBookSites) {
         String bookTitle = getInputText(getNameTextFieldInput());
         String bookPagesCount = getInputText(getPagesCountFieldInput());
         String bookPrice = getInputText(getPriceFieldInput());
@@ -295,6 +296,7 @@ public abstract class AbstractBookController extends AbstractViewController {
             }
 
             newBook = Book.builder()
+                .id(bookId)
                 .name(bookTitle)
                 .authorId(newAuthor.getId())
                 .publisherId(newPublisher.getId())
