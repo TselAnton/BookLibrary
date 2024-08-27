@@ -18,7 +18,11 @@ public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
     private boolean moveCaretToPos = false;
     private int caretPos;
 
-    public AutoCompleteComboBoxListener(final ComboBox<T> comboBox) {
+    public static <T> void wrapComboBox(final ComboBox<T> comboBox) {
+        new AutoCompleteComboBoxListener<>(comboBox);
+    }
+
+    private AutoCompleteComboBoxListener(final ComboBox<T> comboBox) {
         this.comboBox = comboBox;
         data = comboBox.getItems();
 
