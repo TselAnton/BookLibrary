@@ -24,22 +24,22 @@ import java.util.UUID;
 public class AppRepositoryConverter {
 
     private static final AudioBookSiteRepository AUDIO_BOOK_SITE_REPOSITORY_V1 = AudioBookSiteRepository.getInstance();
-    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = AudioBookSiteRepositoryV2.INSTANCE;
+    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = AudioBookSiteRepositoryV2.getInstance();
 
     private static final AuthorRepository AUTHOR_REPOSITORY_V1 = AuthorRepository.getInstance();
-    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.INSTANCE;
+    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.getInstance();
 
     private static final CycleRepository CYCLE_REPOSITORY_V1 = CycleRepository.getInstance();
-    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.INSTANCE;
+    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.getInstance();
 
     private static final PublisherRepository PUBLISHER_REPOSITORY_V1 = PublisherRepository.getInstance();
-    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.INSTANCE;
+    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.getInstance();
 
     private static final BookRepository BOOK_REPOSITORY_V1 = BookRepository.getInstance();
-    private static final BookRepositoryV2 BOOK_REPOSITORY_V2 = BookRepositoryV2.INSTANCE;
+    private static final BookRepositoryV2 BOOK_REPOSITORY_V2 = BookRepositoryV2.getInstance();
 
     private static final UserSettingsRepository USER_SETTINGS_REPOSITORY_V1 = UserSettingsRepository.getInstance();
-    private static final UserSettingsRepositoryV2 USER_SETTINGS_REPOSITORY_V2 = UserSettingsRepositoryV2.INSTANCE;
+    private static final UserSettingsRepositoryV2 USER_SETTINGS_REPOSITORY_V2 = UserSettingsRepositoryV2.getInstance();
 
     public static void main(String[] args) {
         AUDIO_BOOK_SITE_REPOSITORY_V1.getAll()

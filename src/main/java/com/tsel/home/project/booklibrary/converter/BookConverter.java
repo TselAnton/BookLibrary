@@ -19,10 +19,10 @@ import javafx.scene.control.CheckBox;
 
 public class BookConverter implements Converter<Book, BookDTO> {
 
-    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.INSTANCE;
-    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.INSTANCE;
-    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.INSTANCE;
-    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = AudioBookSiteRepositoryV2.INSTANCE;
+    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.getInstance();
+    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.getInstance();
+    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.getInstance();
+    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = AudioBookSiteRepositoryV2.getInstance();
 
     @Override
     public BookDTO convert(Book book) {

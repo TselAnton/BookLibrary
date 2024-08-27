@@ -8,6 +8,7 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
 import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.elements.ImageProvider;
+import java.net.URI;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -21,15 +22,15 @@ import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractViewController {
 
-    public static final String RESOURCE_PATH = "/com/tsel/home/project/booklibrary/";
+    public static final URI RESOURCE_PATH = URI.create("/com/tsel/home/project/booklibrary/");
 
     private static final Logger log = LogManager.getLogger(AbstractViewController.class);
 
-    protected static final BookRepositoryV2 BOOK_REPOSITORY_V2 = BookRepositoryV2.INSTANCE;
-    protected static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.INSTANCE;
-    protected static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.INSTANCE;
-    protected static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.INSTANCE;
-    protected static final UserSettingsRepositoryV2 USER_SETTINGS_REPOSITORY_V2 = UserSettingsRepositoryV2.INSTANCE;
+    protected static final BookRepositoryV2 BOOK_REPOSITORY_V2 = BookRepositoryV2.getInstance();
+    protected static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.getInstance();
+    protected static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.getInstance();
+    protected static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.getInstance();
+    protected static final UserSettingsRepositoryV2 USER_SETTINGS_REPOSITORY_V2 = UserSettingsRepositoryV2.getInstance();
 
     protected static final ImageProvider IMAGE_PROVIDER = ImageProvider.INSTANCE;
     protected static final BookConverter BOOK_CONVERTER = new BookConverter();

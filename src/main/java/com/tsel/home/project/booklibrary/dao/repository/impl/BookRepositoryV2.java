@@ -3,10 +3,10 @@ package com.tsel.home.project.booklibrary.dao.repository.impl;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
-import com.tsel.home.project.booklibrary.dao.identifier.IdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -15,14 +15,21 @@ import javax.annotation.Nullable;
 @FileStorageName("bookStorage.json")
 public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
 
-    public static final BookRepositoryV2 INSTANCE = new BookRepositoryV2(Book.class, new UUIDIdentifierGenerator(), null);
+    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY = AuthorRepositoryV2.getInstance();
+    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY = PublisherRepositoryV2.getInstance();
+    private static final CycleRepositoryV2 CYCLE_REPOSITORY = CycleRepositoryV2.getInstance();
 
-    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY = AuthorRepositoryV2.INSTANCE;
-    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY = PublisherRepositoryV2.INSTANCE;
-    private static final CycleRepositoryV2 CYCLE_REPOSITORY = CycleRepositoryV2.INSTANCE;
+    private static BookRepositoryV2 instance;
 
-    public BookRepositoryV2(Class<Book> entityClass, IdentifierGenerator<UUID> keyGenerator, @Nullable Path rootPath) {
-        super(entityClass, keyGenerator, rootPath);
+    public static BookRepositoryV2 getInstance(Path... paths) {
+        if (instance == null) {
+            instance = new BookRepositoryV2(Arrays.stream(paths).findFirst().orElse(null));
+        }
+        return instance;
+    }
+
+    public BookRepositoryV2(@Nullable Path rootPath) {
+        super(Book.class, new UUIDIdentifierGenerator(), rootPath);
     }
 
     @Override

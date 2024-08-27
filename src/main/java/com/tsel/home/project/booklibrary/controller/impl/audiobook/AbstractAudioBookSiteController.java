@@ -14,7 +14,7 @@ import javafx.scene.layout.AnchorPane;
 public abstract class AbstractAudioBookSiteController extends AbstractViewController {
 
     protected static final AudioBookSiteConverter AUDIO_BOOK_SITE_CONVERTER = new AudioBookSiteConverter();
-    protected static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = AudioBookSiteRepositoryV2.INSTANCE;
+    protected static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = AudioBookSiteRepositoryV2.getInstance();
 
     @Override
     protected AnchorPane getMainAnchorPane() {

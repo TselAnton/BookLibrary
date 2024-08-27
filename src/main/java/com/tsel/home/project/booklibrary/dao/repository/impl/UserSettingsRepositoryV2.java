@@ -4,11 +4,11 @@ import static java.util.Optional.ofNullable;
 
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.UserSettings;
-import com.tsel.home.project.booklibrary.dao.identifier.IdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import javax.annotation.Nullable;
 
 @FileStorageName("userSettingsStorage.json")
@@ -16,10 +16,17 @@ public class UserSettingsRepositoryV2 extends AbstractFileRepositoryV2<String, U
 
     private static final String USER_SETTINGS_KEY = "userSettings";
 
-    public static final UserSettingsRepositoryV2 INSTANCE = new UserSettingsRepositoryV2(UserSettings.class, () -> USER_SETTINGS_KEY, null);
+    private static UserSettingsRepositoryV2 instance;
 
-    public UserSettingsRepositoryV2(Class<UserSettings> entityClass, IdentifierGenerator<String> keyGenerator, @Nullable Path rootPath) {
-        super(entityClass, keyGenerator, rootPath);
+    public static UserSettingsRepositoryV2 getInstance(Path... paths) {
+        if (instance == null) {
+            instance = new UserSettingsRepositoryV2(Arrays.stream(paths).findFirst().orElse(null));
+        }
+        return instance;
+    }
+
+    public UserSettingsRepositoryV2(@Nullable Path rootPath) {
+        super(UserSettings.class, () -> USER_SETTINGS_KEY, rootPath);
     }
 
     public void updateLastChosenCoverFile(File lastChosenCoverFile) {
