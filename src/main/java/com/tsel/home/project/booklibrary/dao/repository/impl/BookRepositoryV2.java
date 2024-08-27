@@ -46,10 +46,7 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
     @Override
     protected void compareEntities(Book newEntity, Book oldEntity) throws ConstraintException {
         if (isSameBook(oldEntity, newEntity)) {
-            throw new ConstraintException(
-                this.getEntityDisplayName(),
-                "книга с таким же именем, автором, публицистом, циклом и номером серии уже существует"
-            );
+            throw buildConstraintException("книга с таким же именем, автором, публицистом, циклом и номером серии уже существует");
         }
     }
 

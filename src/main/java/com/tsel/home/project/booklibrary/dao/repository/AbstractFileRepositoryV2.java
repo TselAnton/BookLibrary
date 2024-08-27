@@ -90,6 +90,10 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
         return entitiesMap;
     }
 
+    protected Map<K, E> getRepositoryMap() {
+        return this.repositoryMap;
+    }
+
     @Override
     public E getById(K id) {
         return repositoryMap.get(id);
@@ -174,16 +178,12 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
         }
     }
 
-    protected Map<K, E> getRepositoryMap() {
-        return this.repositoryMap;
-    }
-
-    protected String getEntityDisplayName() {
-        return this.entityDisplayName;
-    }
-
     protected void compareEntities(E newEntity, E oldEntity) throws ConstraintException {
         // FOR OVERWRITE
+    }
+
+    protected ConstraintException buildConstraintException(String message) {
+        return new ConstraintException(this.entityDisplayName, message);
     }
 
     private void checkConstrains(E entity) {
