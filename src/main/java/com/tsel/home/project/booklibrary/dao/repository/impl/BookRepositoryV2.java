@@ -6,11 +6,9 @@ import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 
 @FileStorageName("bookStorage.json")
 public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
@@ -21,15 +19,15 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
 
     private static BookRepositoryV2 instance;
 
-    public static BookRepositoryV2 getInstance(Path... paths) {
+    public static BookRepositoryV2 getInstance(Path... rootPaths) {
         if (instance == null) {
-            instance = new BookRepositoryV2(Arrays.stream(paths).findFirst().orElse(null));
+            instance = new BookRepositoryV2(rootPaths);
         }
         return instance;
     }
 
-    public BookRepositoryV2(@Nullable Path rootPath) {
-        super(Book.class, new UUIDIdentifierGenerator(), rootPath);
+    public BookRepositoryV2(Path... rootPaths) {
+        super(Book.class, new UUIDIdentifierGenerator(), rootPaths);
     }
 
     @Override

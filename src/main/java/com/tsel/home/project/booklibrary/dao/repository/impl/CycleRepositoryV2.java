@@ -6,25 +6,23 @@ import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 @FileStorageName("bookCycleStorage.json")
 public class CycleRepositoryV2 extends AbstractFileRepositoryV2<UUID, Cycle> {
 
     private static CycleRepositoryV2 instance;
 
-    public static CycleRepositoryV2 getInstance(Path... paths) {
+    public static CycleRepositoryV2 getInstance(Path... rootPaths) {
         if (instance == null) {
-            instance = new CycleRepositoryV2(Arrays.stream(paths).findFirst().orElse(null));
+            instance = new CycleRepositoryV2(rootPaths);
         }
         return instance;
     }
 
-    public CycleRepositoryV2(@Nullable Path rootPath) {
-        super(Cycle.class, new UUIDIdentifierGenerator(), rootPath);
+    public CycleRepositoryV2(Path... rootPaths) {
+        super(Cycle.class, new UUIDIdentifierGenerator(), rootPaths);
     }
 
     @Override

@@ -4,18 +4,9 @@
 /target/
 /setup/
 /backup/
-/Обложки для книг/
-/library-dump/
-/*Features
+/repository/
 /dependency-reduced-pom.xml
-/test_cover.png
 /TODO.txt
-/audioBookSiteStorage.json
-/authorStorage.json
-/bookCycleStorage.json
-/bookStorage.json
-/publisherStorage.json
-/userSettingsStorage.json
 /my-library-audio-book-site-storage.txt
 /my-library-authors-storage.txt
 /my-library-books-storage.txt

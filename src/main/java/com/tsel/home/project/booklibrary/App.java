@@ -1,7 +1,9 @@
 package com.tsel.home.project.booklibrary;
 
+import static com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2.DEFAULT_REPOSITORY_PATH;
+
 import com.tsel.home.project.booklibrary.controller.impl.MainViewController;
-import com.tsel.home.project.booklibrary.dao.repository.utils.ArchiveStorageFilesUtils;
+import com.tsel.home.project.booklibrary.utils.file.ArchiveStorageFilesUtils;
 import java.nio.file.Paths;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -19,7 +21,7 @@ public class App {
         private static final Logger LOGGER = LogManager.getLogger(JavaFXRunner.class);
 
         public static void main(String[] args) {
-            ArchiveStorageFilesUtils.archiveStorages(Paths.get(""), Paths.get("", "/backup"));
+            ArchiveStorageFilesUtils.archiveStorages(DEFAULT_REPOSITORY_PATH, Paths.get("", "/backup"));
             launch(args);
         }
 

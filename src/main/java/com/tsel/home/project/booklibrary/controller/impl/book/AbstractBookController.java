@@ -22,7 +22,7 @@ import com.tsel.home.project.booklibrary.dto.AuthorDTO;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
 import com.tsel.home.project.booklibrary.dto.CycleDTO;
 import com.tsel.home.project.booklibrary.dto.PublisherDTO;
-import com.tsel.home.project.booklibrary.utils.elements.CustomFileChooser;
+import com.tsel.home.project.booklibrary.utils.file.CustomFileChooser;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import com.tsel.home.project.booklibrary.utils.table.AutoCompleteComboBoxListener;
 import java.io.File;
@@ -42,12 +42,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javax.annotation.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@Slf4j
 public abstract class AbstractBookController extends AbstractViewController {
-
-    private static final Logger log = LogManager.getLogger(AbstractBookController.class);
 
     private static final Gson GSON = MyGson.buildGson();
 
@@ -333,7 +333,7 @@ public abstract class AbstractBookController extends AbstractViewController {
             CYCLE_REPOSITORY_V2.abortTransaction();
             BOOK_REPOSITORY_V2.abortTransaction();
 
-            riseAlert(WARNING, "Ошибка", "Ошибка при создании новой книги", "Произошда непредвиденная ошибка: " + e.getMessage());
+            riseAlert(WARNING, "Ошибка", "Ошибка при создании новой книги", "Произошла непредвиденная ошибка: " + e.getMessage());
         }
     }
 

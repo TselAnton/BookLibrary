@@ -6,12 +6,10 @@ import com.tsel.home.project.booklibrary.dto.AudioBookSiteDTO;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AudioBookSiteNameEditableColumn extends TableCell<AudioBookSiteDTO, String> {
-
-    private static final Logger log = LogManager.getLogger(AudioBookSiteNameEditableColumn.class);
 
     private TextField inputTextColumn;
 

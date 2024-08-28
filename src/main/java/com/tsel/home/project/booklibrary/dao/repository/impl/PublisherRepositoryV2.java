@@ -6,25 +6,23 @@ import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 @FileStorageName("publisherStorage.json")
 public class PublisherRepositoryV2 extends AbstractFileRepositoryV2<UUID, Publisher> {
 
     private static PublisherRepositoryV2 instance;
 
-    public static PublisherRepositoryV2 getInstance(Path... paths) {
+    public static PublisherRepositoryV2 getInstance(Path... rootPaths) {
         if (instance == null) {
-            instance = new PublisherRepositoryV2(Arrays.stream(paths).findFirst().orElse(null));
+            instance = new PublisherRepositoryV2(rootPaths);
         }
         return instance;
     }
 
-    public PublisherRepositoryV2(@Nullable Path rootPath) {
-        super(Publisher.class, new UUIDIdentifierGenerator(), rootPath);
+    public PublisherRepositoryV2(Path... rootPaths) {
+        super(Publisher.class, new UUIDIdentifierGenerator(), rootPaths);
     }
 
     @Override

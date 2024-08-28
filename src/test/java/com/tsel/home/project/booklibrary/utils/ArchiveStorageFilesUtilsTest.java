@@ -8,7 +8,7 @@ import static junit.framework.Assert.assertNotNull;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
-import com.tsel.home.project.booklibrary.dao.repository.utils.ArchiveStorageFilesUtils;
+import com.tsel.home.project.booklibrary.utils.file.ArchiveStorageFilesUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

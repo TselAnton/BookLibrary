@@ -1,5 +1,6 @@
 package com.tsel.home.project.booklibrary.controller.impl.book;
 
+import static com.tsel.home.project.booklibrary.utils.CollectionUtils.isNotEmpty;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -10,7 +11,7 @@ import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
 import com.tsel.home.project.booklibrary.dao.data.Publisher;
-import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
+import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import java.text.DecimalFormat;
 import java.util.UUID;
 import javafx.fxml.FXML;
@@ -144,7 +145,7 @@ public class BookInfoViewController extends AbstractViewController {
             "Audio Book Sites", "view/audio-book-sites-connections-view.fxml",
             165,
             0,
-            bookForView.getAudiobookSites()
+            bookForView.getAudioBookSiteIds()
         );
         updateBookViewInfo();
     }
@@ -206,7 +207,7 @@ public class BookInfoViewController extends AbstractViewController {
         }
 
         coverImage.setImage(IMAGE_PROVIDER.resolveCover(bookForView));
-        viewAudioBookSitesButton.setVisible(bookForView.getAudiobookSites() != null && !bookForView.getAudiobookSites().isEmpty());
+        viewAudioBookSitesButton.setVisible(isNotEmpty(bookForView.getAudioBookSiteIds()));
     }
 
     private String resolvePrice(Double price) {

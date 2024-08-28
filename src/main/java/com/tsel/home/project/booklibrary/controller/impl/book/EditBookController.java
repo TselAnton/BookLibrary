@@ -8,7 +8,7 @@ import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
-import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
+import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import java.util.Objects;
 import java.util.UUID;
 import javafx.fxml.FXML;
@@ -21,13 +21,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 public class EditBookController extends AbstractBookController {
-
-    private static final Logger log = LogManager.getLogger(EditBookController.class);
 
     // Основные элементы
 
@@ -183,7 +181,7 @@ public class EditBookController extends AbstractBookController {
             "view/audio-book-sites-connections-edit-view.fxml",
             500,
             0,
-            bookForEdit.getAudiobookSites()
+            bookForEdit.getAudioBookSiteIds()
         );
     }
 

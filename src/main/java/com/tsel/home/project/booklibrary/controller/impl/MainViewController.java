@@ -14,10 +14,9 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
-import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchServiceV2;
-import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
+import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.text.DecimalFormat;
 import java.util.Comparator;
@@ -49,12 +48,12 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@Slf4j
 public class MainViewController extends AbstractViewController {
-
-    private static final Logger log = LogManager.getLogger(MainViewController.class);
 
     private static final Random RANDOM = new Random(1412423095L);
     private static final SearchServiceV2 SEARCH_SERVICE_V2 = SearchServiceV2.INSTANCE;

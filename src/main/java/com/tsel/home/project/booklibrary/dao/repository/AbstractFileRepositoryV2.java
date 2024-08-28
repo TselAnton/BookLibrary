@@ -9,24 +9,32 @@ import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.exception.NotNullConstraintException;
 import com.tsel.home.project.booklibrary.dao.identifier.IdentifierGenerator;
-import com.tsel.home.project.booklibrary.dao.repository.utils.FileRepositoryUtils;
 import com.tsel.home.project.booklibrary.utils.StringUtils;
+import com.tsel.home.project.booklibrary.utils.file.FileRepositoryUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends BaseEntity<K>> implements FileRepository<K, E> {
 
-    private static final Logger log = LogManager.getLogger(AbstractFileRepositoryV2.class);
+    public static final Path DEFAULT_REPOSITORY_PATH = Paths.get(
+        FileSystems.getDefault()
+            .getPath("")
+            .toAbsolutePath()
+            .toString(),
+        "repository"
+    );
 
     private final String entityDisplayName;
     private final Path storagePath;
@@ -38,7 +46,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     private Map<K, E> repositoryMap;
     private Map<K, E> repositoryMapSnapshot;
 
-    protected AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator, @Nullable Path rootPath) {
+    protected AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator, Path... rootPath) {
         this.keyGenerator = keyGenerator;
         this.entityDisplayName = resolveEntityName(entityClass);
         this.storagePath = resolveStoragePath(rootPath);
@@ -166,11 +174,17 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
         }
     }
 
-    private Path resolveStoragePath(@Nullable Path rootPath) {
-        return ofNullable(FileRepositoryUtils.resolveStoragePath(this.getClass(), rootPath))
+    private Path resolveStoragePath(Path... rootPaths) {
+        return ofNullable(FileRepositoryUtils.resolveStoragePath(this.getClass(), resolvePaths(rootPaths)))
             .orElseThrow(() -> new IllegalStateException(
                 format("Невозможно определить путь файла хранилища для репозитория сущности '%s'", this.entityDisplayName))
             );
+    }
+
+    private Path resolvePaths(Path... paths) {
+        return Arrays.stream(paths)
+            .findFirst()
+            .orElse(DEFAULT_REPOSITORY_PATH);
     }
 
     private String resolveEntityName(Class<E> entityClass) {

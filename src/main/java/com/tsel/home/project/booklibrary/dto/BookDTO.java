@@ -2,7 +2,7 @@ package com.tsel.home.project.booklibrary.dto;
 
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.search.SearchField;
-import com.tsel.home.project.booklibrary.utils.elements.ImageProvider;
+import com.tsel.home.project.booklibrary.utils.file.ImageProvider;
 import java.util.List;
 import java.util.UUID;
 import javafx.scene.control.CheckBox;

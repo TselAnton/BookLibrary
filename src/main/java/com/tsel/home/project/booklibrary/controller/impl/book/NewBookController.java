@@ -4,7 +4,7 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 import com.google.gson.Gson;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
-import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
+import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +18,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@Slf4j
 @Getter
 public class NewBookController extends AbstractBookController {
-
-    private static final Logger log = LogManager.getLogger(NewBookController.class);
 
     private static final Gson GSON = MyGson.buildGson();
 

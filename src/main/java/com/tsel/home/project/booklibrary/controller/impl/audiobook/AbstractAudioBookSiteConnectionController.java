@@ -17,12 +17,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class AbstractAudioBookSiteConnectionController extends AbstractAudioBookSiteController {
-
-    private static final Logger log = LogManager.getLogger(AbstractAudioBookSiteConnectionController.class);
 
     protected List<UUID> audioBookSiteIds;
     protected final Map<UUID, Boolean> checkedAudioBookSiteItemsMap = new HashMap<>();

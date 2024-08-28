@@ -6,8 +6,8 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
-import com.tsel.home.project.booklibrary.utils.elements.ButtonAnswer;
-import com.tsel.home.project.booklibrary.utils.elements.ImageProvider;
+import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
+import com.tsel.home.project.booklibrary.utils.file.ImageProvider;
 import java.net.URI;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;
@@ -17,14 +17,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@Slf4j
 public abstract class AbstractViewController {
 
     public static final URI RESOURCE_PATH = URI.create("/com/tsel/home/project/booklibrary/");
-
-    private static final Logger log = LogManager.getLogger(AbstractViewController.class);
 
     protected static final BookRepositoryV2 BOOK_REPOSITORY_V2 = BookRepositoryV2.getInstance();
     protected static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.getInstance();
@@ -53,6 +53,8 @@ public abstract class AbstractViewController {
         warnAlert.setTitle(title);
         warnAlert.setHeaderText(warnMsg);
         warnAlert.setContentText(explanationMsg);
+
+        log.info("Raised alert {} with message '{}'", alertType, explanationMsg);
         return new ButtonAnswer(warnAlert.showAndWait().orElse(null));
     }
 
@@ -61,6 +63,7 @@ public abstract class AbstractViewController {
      * @param node Любой элемент текущего окна
      */
     protected void closeStage(Node node) {
+        log.info("Close scene");
         Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
     }
@@ -101,6 +104,7 @@ public abstract class AbstractViewController {
             AbstractViewController controller = loader.getController();
             controller.initController(loader, this, initParameters);
 
+            log.info("Opening modal window {}", modalViewResourceFile);
             stage.showAndWait();
 
         } catch (Exception e) {

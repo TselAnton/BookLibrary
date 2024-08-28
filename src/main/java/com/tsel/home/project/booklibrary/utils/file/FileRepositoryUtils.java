@@ -1,4 +1,4 @@
-package com.tsel.home.project.booklibrary.dao.repository.utils;
+package com.tsel.home.project.booklibrary.utils.file;
 
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static java.lang.String.format;
@@ -19,15 +19,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Утилиты для работы с файлами хранилища
  */
+@Slf4j
 public final class FileRepositoryUtils {
-
-    private static final Logger log = LogManager.getLogger(FileRepositoryUtils.class);
 
     private static final Gson GSON = MyGson.buildGson();
 
@@ -118,6 +116,8 @@ public final class FileRepositoryUtils {
     private static void createStorageFile(Path storagePath) {
         try {
             log.info("Trying to create storage file '{}'", storagePath);
+            // TODO: вынести в отдельную файл-утилиту
+            Files.createDirectories(storagePath.getParent());
             Files.createFile(storagePath);
 
         } catch (IOException e) {

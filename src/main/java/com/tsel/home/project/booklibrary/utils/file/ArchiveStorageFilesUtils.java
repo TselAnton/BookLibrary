@@ -1,4 +1,4 @@
-package com.tsel.home.project.booklibrary.dao.repository.utils;
+package com.tsel.home.project.booklibrary.utils.file;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 import static org.reflections.scanners.Scanners.TypesAnnotated;
@@ -15,13 +15,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 
+@Slf4j
 public final class ArchiveStorageFilesUtils {
-
-    private static final Logger log = LogManager.getLogger(ArchiveStorageFilesUtils.class);
 
     private static final int BUFFER_SIZE = 1024;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
