@@ -12,17 +12,12 @@ import java.util.UUID;
 @FileStorageName("audioBookSiteStorage.json")
 public class AudioBookSiteRepositoryV2 extends AbstractFileRepositoryV2<UUID, AudioBookSite> {
 
-    private static AudioBookSiteRepositoryV2 instance;
-
-    public static AudioBookSiteRepositoryV2 getInstance(Path... rootPaths) {
-        if (instance == null) {
-            instance = new AudioBookSiteRepositoryV2(rootPaths);
-        }
-        return instance;
+    public AudioBookSiteRepositoryV2(Path rootPath) {
+        super(AudioBookSite.class, new UUIDIdentifierGenerator(), rootPath);
     }
 
-    public AudioBookSiteRepositoryV2(Path... rootPaths) {
-        super(AudioBookSite.class, new UUIDIdentifierGenerator(), rootPaths);
+    public AudioBookSiteRepositoryV2() {
+        super(AudioBookSite.class, new UUIDIdentifierGenerator(), null);
     }
 
     @Override

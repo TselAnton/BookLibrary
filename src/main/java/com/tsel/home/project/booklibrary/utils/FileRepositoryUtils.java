@@ -1,11 +1,11 @@
-package com.tsel.home.project.booklibrary.utils.file;
+package com.tsel.home.project.booklibrary.utils;
 
+import static com.tsel.home.project.booklibrary.utils.FileUtils.isNotExists;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static java.lang.String.format;
 
 import com.google.gson.Gson;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
-import com.tsel.home.project.booklibrary.utils.MyGson;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -39,7 +39,7 @@ public final class FileRepositoryUtils {
      * @param <T> Тип сущности
      */
     public static <T> List<T> readStorageFile(Path storagePath, Class<T> entityClass) {
-        if (isStorageFileNotExist(storagePath)) {
+        if (isNotExists(storagePath)) {
             log.warn("Not found file '{}'. Can't read anything, so returning empty list", storagePath);
             return new ArrayList<>();
         }
@@ -62,9 +62,9 @@ public final class FileRepositoryUtils {
      * @param <T> Тип сущности
      */
     public static <T> void overwriteStorageFile(Path storagePath, Collection<T> entities) {
-        if (isStorageFileNotExist(storagePath)) {
+        if (isNotExists(storagePath)) {
             log.info("File '{}' not exist, trying to create new one", storagePath);
-            createStorageFile(storagePath);
+            FileUtils.createFile(storagePath);
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(storagePath.toFile(), false))) {
@@ -111,22 +111,5 @@ public final class FileRepositoryUtils {
             return null;
         }
         return fileStorageName.value();
-    }
-
-    private static void createStorageFile(Path storagePath) {
-        try {
-            log.info("Trying to create storage file '{}'", storagePath);
-            // TODO: вынести в отдельную файл-утилиту
-            Files.createDirectories(storagePath.getParent());
-            Files.createFile(storagePath);
-
-        } catch (IOException e) {
-            log.error("Exception while trying to create storage file '{}'", storagePath);
-            throw new IllegalStateException(format("Проблема при создании файла хранилища '%s'", storagePath), e);
-        }
-    }
-
-    private static boolean isStorageFileNotExist(Path storagePath) {
-        return !Files.exists(storagePath);
     }
 }

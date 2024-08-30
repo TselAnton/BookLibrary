@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 
-import com.tsel.home.project.booklibrary.BaseJavaFXTest;
+import com.tsel.home.project.booklibrary.UnitJavaFXTest;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import java.util.List;
 import javafx.scene.control.CheckBox;
@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class SearchServiceV2Test extends BaseJavaFXTest {
+class SearchServiceTest extends UnitJavaFXTest {
 
-    private final SearchServiceV2 searchService = SearchServiceV2.INSTANCE;
+    private final SearchService searchService = new SearchService();
 
     private static final String CYCLE_EN_ALIAS = "cycle";
     private static final String CYCLE_RU_ALIAS = "цикл";
@@ -35,17 +35,17 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     private static final String PRICE_EN_ALIAS = "price";
     private static final String PRICE_RU_ALIAS = "цена";
 
-    private BookDTO book_1;
-    private BookDTO book_2;
-    private BookDTO book_3;
-    private BookDTO book_4;
-    private BookDTO book_5;
+    private BookDTO book1;
+    private BookDTO book2;
+    private BookDTO book3;
+    private BookDTO book4;
+    private BookDTO book5;
 
     private List<BookDTO> bookDtoList;
 
     @BeforeEach
     public void init() {
-        book_1 = BookDTO.builder()
+        book1 = BookDTO.builder()
             .name("Book 1 name")
             .author("Author 1")
             .publisher("Publisher 1")
@@ -59,7 +59,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
             .pages(100)
             .build();
 
-        book_2 = BookDTO.builder()
+        book2 = BookDTO.builder()
             .name("Book 2 name")
             .author("Author 2")
             .publisher("Publisher 1")
@@ -73,7 +73,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
             .pages(200)
             .build();
 
-        book_3 = BookDTO.builder()
+        book3 = BookDTO.builder()
             .name("Book 3 name")
             .author("Author 3")
             .publisher("Publisher 2")
@@ -87,7 +87,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
             .pages(300)
             .build();
 
-        book_4 = BookDTO.builder()
+        book4 = BookDTO.builder()
             .name("Book 4 name")
             .author("Author 1")
             .publisher("Publisher 3")
@@ -101,7 +101,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
             .pages(400)
             .build();
 
-        book_5 = BookDTO.builder()
+        book5 = BookDTO.builder()
             .name("Book 5 name")
             .author("Author 4")
             .publisher("Publisher 3")
@@ -115,7 +115,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
             .pages(500)
             .build();
 
-        bookDtoList = List.of(book_1, book_2, book_3, book_4, book_5);
+        bookDtoList = List.of(book1, book2, book3, book4, book5);
     }
 
     @ParameterizedTest(name = "Поиск по '{0}' запросу")
@@ -123,7 +123,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByBookSearchQueryInDifferentRegistry(String searchQuery) {
         assertThat(
             searchService.search(searchQuery, bookDtoList),
-            contains(book_1, book_2, book_3, book_4, book_5)
+            contains(book1, book2, book3, book4, book5)
         );
 
     }
@@ -132,7 +132,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByNameQuery() {
         assertThat(
             searchService.search("name", bookDtoList),
-            contains(book_1, book_2, book_3, book_4, book_5)
+            contains(book1, book2, book3, book4, book5)
         );
     }
 
@@ -140,7 +140,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByBook1Query() {
         assertThat(
             searchService.search("Book 1", bookDtoList),
-            contains(book_1)
+            contains(book1)
         );
     }
 
@@ -148,7 +148,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByAuthorQuery() {
         assertThat(
             searchService.search("Author", bookDtoList),
-            contains(book_1, book_2, book_3, book_4, book_5)
+            contains(book1, book2, book3, book4, book5)
         );
     }
 
@@ -156,7 +156,7 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByNumber1Query() {
         assertThat(
             searchService.search("1", bookDtoList),
-            contains(book_1, book_2, book_3, book_4)
+            contains(book1, book2, book3, book4)
         );
     }
 
@@ -164,19 +164,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByCycleCheckBox() {
         assertThat(
             searchService.search(CYCLE_EN_ALIAS, bookDtoList),
-            contains(book_1, book_2, book_3, book_4, book_5)
+            contains(book1, book2, book3, book4, book5)
         );
         assertThat(
             searchService.search(CYCLE_RU_ALIAS, bookDtoList),
-            contains(book_1, book_3, book_5)
+            contains(book1, book3, book5)
         );
         assertThat(
             searchService.search("!" + CYCLE_EN_ALIAS, bookDtoList),
-            contains(book_2, book_4)
+            contains(book2, book4)
         );
         assertThat(
             searchService.search("!" + CYCLE_RU_ALIAS, bookDtoList),
-            contains(book_2, book_4)
+            contains(book2, book4)
         );
     }
 
@@ -184,19 +184,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByReadCheckBox() {
         assertThat(
             searchService.search(READ_EN_ALIAS, bookDtoList),
-            contains(book_1, book_3, book_5)
+            contains(book1, book3, book5)
         );
         assertThat(
             searchService.search(READ_RU_ALIAS, bookDtoList),
-            contains(book_1, book_3, book_5)
+            contains(book1, book3, book5)
         );
         assertThat(
             searchService.search("!" + READ_EN_ALIAS, bookDtoList),
-            contains(book_2, book_4)
+            contains(book2, book4)
         );
         assertThat(
             searchService.search("!" + READ_RU_ALIAS, bookDtoList),
-            contains(book_2, book_4)
+            contains(book2, book4)
         );
     }
 
@@ -204,19 +204,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchBySignCheckBox() {
         assertThat(
             searchService.search(SIGN_EN_ALIAS, bookDtoList),
-            contains(book_1, book_3, book_5)
+            contains(book1, book3, book5)
         );
         assertThat(
             searchService.search(SIGN_RU_ALIAS, bookDtoList),
-            contains(book_1, book_3, book_5)
+            contains(book1, book3, book5)
         );
         assertThat(
             searchService.search("!" + SIGN_EN_ALIAS, bookDtoList),
-            contains(book_2, book_4)
+            contains(book2, book4)
         );
         assertThat(
             searchService.search("!" + SIGN_RU_ALIAS, bookDtoList),
-            contains(book_2, book_4)
+            contains(book2, book4)
         );
     }
 
@@ -224,19 +224,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByHardcoverCheckBox() {
         assertThat(
             searchService.search(HARDCOVER_EN_ALIAS, bookDtoList),
-            contains(book_1, book_3, book_4, book_5)
+            contains(book1, book3, book4, book5)
         );
         assertThat(
             searchService.search(HARDCOVER_RU_ALIAS, bookDtoList),
-            contains(book_1, book_3, book_4, book_5)
+            contains(book1, book3, book4, book5)
         );
         assertThat(
             searchService.search("!" + HARDCOVER_EN_ALIAS, bookDtoList),
-            contains(book_2)
+            contains(book2)
         );
         assertThat(
             searchService.search("!" + HARDCOVER_RU_ALIAS, bookDtoList),
-            contains(book_2)
+            contains(book2)
         );
     }
 
@@ -244,19 +244,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByEqualsPages() {
         assertThat(
             searchService.search("%s = 300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
         assertThat(
             searchService.search("%s = 300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
         assertThat(
             searchService.search("%s=300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
         assertThat(
             searchService.search("%s=300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
     }
 
@@ -264,19 +264,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByMorePages() {
         assertThat(
             searchService.search("%s > 300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_4, book_5)
+            contains(book4, book5)
         );
         assertThat(
             searchService.search("%s > 300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_4, book_5)
+            contains(book4, book5)
         );
         assertThat(
             searchService.search("%s>300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_4, book_5)
+            contains(book4, book5)
         );
         assertThat(
             searchService.search("%s>300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_4, book_5)
+            contains(book4, book5)
         );
     }
 
@@ -284,19 +284,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByMoreOrEqualsPages() {
         assertThat(
             searchService.search("%s >= 300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_3, book_4, book_5)
+            contains(book3, book4, book5)
         );
         assertThat(
             searchService.search("%s >= 300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_3, book_4, book_5)
+            contains(book3, book4, book5)
         );
         assertThat(
             searchService.search("%s>=300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_3, book_4, book_5)
+            contains(book3, book4, book5)
         );
         assertThat(
             searchService.search("%s>=300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_3, book_4, book_5)
+            contains(book3, book4, book5)
         );
     }
 
@@ -304,19 +304,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByLessOrEqualsPages() {
         assertThat(
             searchService.search("%s <= 300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_3)
+            contains(book1, book2, book3)
         );
         assertThat(
             searchService.search("%s <= 300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_3)
+            contains(book1, book2, book3)
         );
         assertThat(
             searchService.search("%s<=300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_3)
+            contains(book1, book2, book3)
         );
         assertThat(
             searchService.search("%s<=300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_3)
+            contains(book1, book2, book3)
         );
     }
 
@@ -324,19 +324,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByLessPages() {
         assertThat(
             searchService.search("%s < 300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2)
+            contains(book1, book2)
         );
         assertThat(
             searchService.search("%s < 300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2)
+            contains(book1, book2)
         );
         assertThat(
             searchService.search("%s<300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2)
+            contains(book1, book2)
         );
         assertThat(
             searchService.search("%s<300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2)
+            contains(book1, book2)
         );
     }
 
@@ -344,19 +344,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByNotEqualsPages() {
         assertThat(
             searchService.search("%s != 300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_4, book_5)
+            contains(book1, book2, book4, book5)
         );
         assertThat(
             searchService.search("%s != 300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_4, book_5)
+            contains(book1, book2, book4, book5)
         );
         assertThat(
             searchService.search("%s!=300".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_4, book_5)
+            contains(book1, book2, book4, book5)
         );
         assertThat(
             searchService.search("%s!=300".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_4, book_5)
+            contains(book1, book2, book4, book5)
         );
     }
 
@@ -364,19 +364,19 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByCloseEqualsPages() {
         assertThat(
             searchService.search("%s ~= 3".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
         assertThat(
             searchService.search("%s ~= 3".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
         assertThat(
             searchService.search("%s~=3".formatted(PAGES_EN_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
         assertThat(
             searchService.search("%s~=3".formatted(PAGES_RU_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
     }
 
@@ -384,11 +384,11 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByEqualToZeroPrice() {
         assertThat(
             searchService.search("%s = 0".formatted(PRICE_EN_ALIAS), bookDtoList),
-            contains(book_3, book_4)
+            contains(book3, book4)
         );
         assertThat(
             searchService.search("%s = 0".formatted(PRICE_RU_ALIAS), bookDtoList),
-            contains(book_3, book_4)
+            contains(book3, book4)
         );
     }
 
@@ -396,11 +396,11 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByNotEqualToZeroPrice() {
         assertThat(
             searchService.search("%s != 0".formatted(PRICE_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_5)
+            contains(book1, book2, book5)
         );
         assertThat(
             searchService.search("%s != 0".formatted(PRICE_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_5)
+            contains(book1, book2, book5)
         );
     }
 
@@ -408,11 +408,11 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByMorePrice() {
         assertThat(
             searchService.search("%s > 0".formatted(PRICE_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_5)
+            contains(book1, book2, book5)
         );
         assertThat(
             searchService.search("%s > 0".formatted(PRICE_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_5)
+            contains(book1, book2, book5)
         );
     }
 
@@ -420,11 +420,11 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByMoreOrEqualPrice() {
         assertThat(
             searchService.search("%s >= 0".formatted(PRICE_EN_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_3, book_4, book_5)
+            contains(book1, book2, book3, book4, book5)
         );
         assertThat(
             searchService.search("%s >= 0".formatted(PRICE_RU_ALIAS), bookDtoList),
-            contains(book_1, book_2, book_3, book_4, book_5)
+            contains(book1, book2, book3, book4, book5)
         );
     }
 
@@ -432,11 +432,11 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByLessOrEqualPrice() {
         assertThat(
             searchService.search("%s <= 0".formatted(PRICE_EN_ALIAS), bookDtoList),
-            contains(book_3, book_4)
+            contains(book3, book4)
         );
         assertThat(
             searchService.search("%s <= 0".formatted(PRICE_RU_ALIAS), bookDtoList),
-            contains(book_3, book_4)
+            contains(book3, book4)
         );
     }
 
@@ -456,11 +456,11 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByEqualPrice() {
         assertThat(
             searchService.search("%s = 555.555".formatted(PRICE_EN_ALIAS), bookDtoList),
-            contains(book_5)
+            contains(book5)
         );
         assertThat(
             searchService.search("%s = 555.555".formatted(PRICE_RU_ALIAS), bookDtoList),
-            contains(book_5)
+            contains(book5)
         );
     }
 
@@ -480,11 +480,11 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByCloseEqualPrice() {
         assertThat(
             searchService.search("%s ~= 555".formatted(PRICE_EN_ALIAS), bookDtoList),
-            contains(book_5)
+            contains(book5)
         );
         assertThat(
             searchService.search("%s ~= 555".formatted(PRICE_RU_ALIAS), bookDtoList),
-            contains(book_5)
+            contains(book5)
         );
     }
 
@@ -494,13 +494,13 @@ class SearchServiceV2Test extends BaseJavaFXTest {
             searchService.search(
                 "%s > 100 AND %s <= 300".formatted(PAGES_EN_ALIAS, PAGES_EN_ALIAS),
                 bookDtoList),
-            contains(book_2, book_3)
+            contains(book2, book3)
         );
         assertThat(
             searchService.search(
                 "%s > 100 И %s <= 300".formatted(PAGES_EN_ALIAS, PAGES_EN_ALIAS),
                 bookDtoList),
-            contains(book_2, book_3)
+            contains(book2, book3)
         );
     }
 
@@ -508,11 +508,11 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByOrFilters() {
         assertThat(
             searchService.search("%s = 0 OR %s > 400".formatted(PRICE_EN_ALIAS, PRICE_RU_ALIAS), bookDtoList),
-            contains(book_3, book_4, book_5)
+            contains(book3, book4, book5)
         );
         assertThat(
             searchService.search("%s = 0 ИЛИ %s > 400".formatted(PRICE_EN_ALIAS, PRICE_RU_ALIAS), bookDtoList),
-            contains(book_3, book_4, book_5)
+            contains(book3, book4, book5)
         );
     }
 
@@ -520,35 +520,35 @@ class SearchServiceV2Test extends BaseJavaFXTest {
     void testSearchByOrFiltersWithNumberAndCheckbox() {
         assertThat(
             searchService.search("%s OR %s = 0 ".formatted(READ_EN_ALIAS, PRICE_EN_ALIAS), bookDtoList),
-            contains(book_1, book_3, book_4, book_5)
+            contains(book1, book3, book4, book5)
         );
         assertThat(
             searchService.search("%s ИЛИ %s = 0 ".formatted(READ_EN_ALIAS, PRICE_EN_ALIAS), bookDtoList),
-            contains(book_1, book_3, book_4, book_5)
+            contains(book1, book3, book4, book5)
         );
     }
 
     @Test
-    public void testSearchByAndFiltersWithNumberAndCheckbox() {
+    void testSearchByAndFiltersWithNumberAndCheckbox() {
         assertThat(
             searchService.search("%s AND %s = 0 ".formatted(READ_EN_ALIAS, PRICE_EN_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
         assertThat(
             searchService.search("%s И %s = 0 ".formatted(READ_EN_ALIAS, PRICE_EN_ALIAS), bookDtoList),
-            contains(book_3)
+            contains(book3)
         );
     }
 
     @Test
-    public void testSearchByManyLogicalOperands() {
+    void testSearchByManyLogicalOperands() {
         assertThat(
             searchService.search("%s > 200 AND %s OR %s = 0 ".formatted(PAGES_EN_ALIAS, SIGN_EN_ALIAS, PRICE_EN_ALIAS), bookDtoList),
-            contains(book_3, book_4, book_5)
+            contains(book3, book4, book5)
         );
         assertThat(
             searchService.search("%s > 200 И %s ИЛИ %s = 0 ".formatted(PAGES_RU_ALIAS, SIGN_RU_ALIAS, PRICE_RU_ALIAS), bookDtoList),
-            contains(book_3, book_4, book_5)
+            contains(book3, book4, book5)
         );
     }
 

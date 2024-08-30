@@ -12,17 +12,12 @@ import java.util.UUID;
 @FileStorageName("publisherStorage.json")
 public class PublisherRepositoryV2 extends AbstractFileRepositoryV2<UUID, Publisher> {
 
-    private static PublisherRepositoryV2 instance;
-
-    public static PublisherRepositoryV2 getInstance(Path... rootPaths) {
-        if (instance == null) {
-            instance = new PublisherRepositoryV2(rootPaths);
-        }
-        return instance;
+    public PublisherRepositoryV2(Path rootPath) {
+        super(Publisher.class, new UUIDIdentifierGenerator(), rootPath);
     }
 
-    public PublisherRepositoryV2(Path... rootPaths) {
-        super(Publisher.class, new UUIDIdentifierGenerator(), rootPaths);
+    public PublisherRepositoryV2() {
+        super(Publisher.class, new UUIDIdentifierGenerator(), null);
     }
 
     @Override

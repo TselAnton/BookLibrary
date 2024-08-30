@@ -1,12 +1,15 @@
 package com.tsel.home.project.booklibrary.converter;
 
+import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
 import static com.tsel.home.project.booklibrary.utils.CollectionUtils.isNotEmpty;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
 import com.tsel.home.project.booklibrary.dao.data.AudioBookSite;
+import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Publisher;
 import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
@@ -19,10 +22,10 @@ import javafx.scene.control.CheckBox;
 
 public class BookConverter implements Converter<Book, BookDTO> {
 
-    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.getInstance();
-    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.getInstance();
-    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.getInstance();
-    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = AudioBookSiteRepositoryV2.getInstance();
+    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = getBean(CycleRepositoryV2.class);
+    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = getBean(AuthorRepositoryV2.class);
+    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = getBean(PublisherRepositoryV2.class);
+    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = getBean(AudioBookSiteRepositoryV2.class);
 
     @Override
     public BookDTO convert(Book book) {
@@ -30,7 +33,7 @@ public class BookConverter implements Converter<Book, BookDTO> {
         String cycleNumber = null;
         Boolean isCycleEnded = null;
 
-        if (book.getCycleId() != null) {
+        if (book.getCycleId() != null && CYCLE_REPOSITORY_V2.existById(book.getCycleId())) {
             Cycle cycle = CYCLE_REPOSITORY_V2.getById(book.getCycleId());
             cycleName = cycle.getName();
             cycleNumber = format("%d/%d", book.getNumberInSeries(), cycle.getBooksInCycle());
@@ -57,11 +60,15 @@ public class BookConverter implements Converter<Book, BookDTO> {
     }
 
     private String getAuthorName(Book book) {
-        return AUTHOR_REPOSITORY_V2.getById(book.getAuthorId()).getName();
+        return ofNullable(AUTHOR_REPOSITORY_V2.getById(book.getAuthorId()))
+            .map(Author::getName)
+            .orElse(null);
     }
 
     private String getPublisherName(Book book) {
-        return PUBLISHER_REPOSITORY_V2.getById(book.getPublisherId()).getName();
+        return ofNullable(PUBLISHER_REPOSITORY_V2.getById(book.getPublisherId()))
+            .map(Publisher::getName)
+            .orElse(null);
     }
 
     private List<String> getAudioBookSiteNames(Book book) {

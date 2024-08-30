@@ -55,7 +55,7 @@ public class AudioBookSiteController extends AbstractAudioBookSiteController {
         }
 
         AudioBookSite audioBookSite = new AudioBookSite(null, audioBookSiteName);
-        AUDIO_BOOK_SITE_REPOSITORY_V2.save(audioBookSite);
+        audioBookSiteRepository.save(audioBookSite);
 
         updateBookSiteTableItems(audioBookSiteTable);
         addAudioBookSiteTextField.setText(null);
@@ -72,15 +72,15 @@ public class AudioBookSiteController extends AbstractAudioBookSiteController {
             );
 
             if (answer.isOkAnswer()) {
-                BOOK_REPOSITORY_V2.getAll()
+                bookRepository.getAll()
                     .stream()
                     .filter(book -> isNotEmpty(book.getAudioBookSiteIds()))
                     .forEach(book -> {
                         book.getAudioBookSiteIds().remove(clickedEntity.getId());
-                        BOOK_REPOSITORY_V2.save(book);
+                        bookRepository.save(book);
                     });
 
-                AUDIO_BOOK_SITE_REPOSITORY_V2.deleteById(clickedEntity.getId());
+                audioBookSiteRepository.deleteById(clickedEntity.getId());
                 updateBookSiteTableItems(audioBookSiteTable);
             }
         }

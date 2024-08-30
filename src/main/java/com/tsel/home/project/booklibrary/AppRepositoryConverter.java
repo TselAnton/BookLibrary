@@ -18,28 +18,32 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
+import com.tsel.home.project.booklibrary.utils.FileUtils;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.UUID;
 
 public class AppRepositoryConverter {
 
+    private static final Path CONVERTED_REPOSITORIES_PATH = FileUtils.buildPathFromCurrentDir("/converted");
+
     private static final AudioBookSiteRepository AUDIO_BOOK_SITE_REPOSITORY_V1 = AudioBookSiteRepository.getInstance();
-    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = AudioBookSiteRepositoryV2.getInstance();
+    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = new AudioBookSiteRepositoryV2(CONVERTED_REPOSITORIES_PATH);
 
     private static final AuthorRepository AUTHOR_REPOSITORY_V1 = AuthorRepository.getInstance();
-    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.getInstance();
+    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = new AuthorRepositoryV2(CONVERTED_REPOSITORIES_PATH);
 
     private static final CycleRepository CYCLE_REPOSITORY_V1 = CycleRepository.getInstance();
-    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.getInstance();
+    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = new CycleRepositoryV2(CONVERTED_REPOSITORIES_PATH);
 
     private static final PublisherRepository PUBLISHER_REPOSITORY_V1 = PublisherRepository.getInstance();
-    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.getInstance();
+    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = new PublisherRepositoryV2(CONVERTED_REPOSITORIES_PATH);
 
     private static final BookRepository BOOK_REPOSITORY_V1 = BookRepository.getInstance();
-    private static final BookRepositoryV2 BOOK_REPOSITORY_V2 = BookRepositoryV2.getInstance();
+    private static final BookRepositoryV2 BOOK_REPOSITORY_V2 = new BookRepositoryV2(CONVERTED_REPOSITORIES_PATH);
 
     private static final UserSettingsRepository USER_SETTINGS_REPOSITORY_V1 = UserSettingsRepository.getInstance();
-    private static final UserSettingsRepositoryV2 USER_SETTINGS_REPOSITORY_V2 = UserSettingsRepositoryV2.getInstance();
+    private static final UserSettingsRepositoryV2 USER_SETTINGS_REPOSITORY_V2 = new UserSettingsRepositoryV2(CONVERTED_REPOSITORIES_PATH);
 
     public static void main(String[] args) {
         AUDIO_BOOK_SITE_REPOSITORY_V1.getAll()

@@ -12,17 +12,12 @@ import java.util.UUID;
 @FileStorageName("bookCycleStorage.json")
 public class CycleRepositoryV2 extends AbstractFileRepositoryV2<UUID, Cycle> {
 
-    private static CycleRepositoryV2 instance;
-
-    public static CycleRepositoryV2 getInstance(Path... rootPaths) {
-        if (instance == null) {
-            instance = new CycleRepositoryV2(rootPaths);
-        }
-        return instance;
+    public CycleRepositoryV2(Path rootPath) {
+        super(Cycle.class, new UUIDIdentifierGenerator(), rootPath);
     }
 
-    public CycleRepositoryV2(Path... rootPaths) {
-        super(Cycle.class, new UUIDIdentifierGenerator(), rootPaths);
+    public CycleRepositoryV2() {
+        super(Cycle.class, new UUIDIdentifierGenerator(), null);
     }
 
     @Override

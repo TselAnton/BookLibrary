@@ -99,7 +99,7 @@ public class BookInfoViewController extends AbstractViewController {
         if (bookId == null) {
             throw new IllegalStateException("Entity ID for view controller is not passed!");
         }
-        this.bookForView = BOOK_REPOSITORY_V2.getById(bookId);
+        this.bookForView = bookRepository.getById(bookId);
         if (this.bookForView == null) {
             throw new IllegalStateException(format("Not found book by ID '%s' for book info controller", bookId));
         }
@@ -109,7 +109,7 @@ public class BookInfoViewController extends AbstractViewController {
 
     @Override
     public void updateControllerState(UUID bookId) {
-        this.bookForView = BOOK_REPOSITORY_V2.getById(bookId);
+        this.bookForView = bookRepository.getById(bookId);
         if (this.bookForView == null) {
             throw new IllegalStateException(format("Not found book by ID '%s' for book info controller", bookId));
         }
@@ -160,7 +160,7 @@ public class BookInfoViewController extends AbstractViewController {
         );
 
         if (answer.isOkAnswer()) {
-            BOOK_REPOSITORY_V2.delete(bookForView);
+            bookRepository.delete(bookForView);
 
             Stage stage = (Stage) deleteBookButton.getScene().getWindow();
             stage.close();
@@ -170,12 +170,12 @@ public class BookInfoViewController extends AbstractViewController {
     private void updateBookViewInfo() {
         setTextWithSizeControl(nameLabel, bookForView.getName());
         setTextWithSizeControl(authorLabel,
-            ofNullable(AUTHOR_REPOSITORY_V2.getById(bookForView.getAuthorId()))
+            ofNullable(authorRepository.getById(bookForView.getAuthorId()))
                 .map(Author::getName)
                 .orElse(null)
         );
         setTextWithSizeControl(publisherLabel,
-            ofNullable(PUBLISHER_REPOSITORY_V2.getById(bookForView.getPublisherId()))
+            ofNullable(publisherRepository.getById(bookForView.getPublisherId()))
                 .map(Publisher::getName)
                 .orElse(null)
         );
@@ -187,8 +187,8 @@ public class BookInfoViewController extends AbstractViewController {
         autographCheckBox.setSelected(Boolean.TRUE.equals(bookForView.getAutograph()));
         isHardCoverCheckBox.setSelected(Boolean.TRUE.equals(bookForView.getHardCover()));
 
-        if (bookForView.getCycleId() != null && CYCLE_REPOSITORY_V2.existById(bookForView.getCycleId())) {
-            Cycle cycle = CYCLE_REPOSITORY_V2.getById(bookForView.getCycleId());
+        if (bookForView.getCycleId() != null && cycleRepository.existById(bookForView.getCycleId())) {
+            Cycle cycle = cycleRepository.getById(bookForView.getCycleId());
 
             setTextWithSizeControl(cycleLabel, cycle.getName());
             cycleLabel.setText(format("%s (%d / %d)", cycle.getName(), bookForView.getNumberInSeries(), cycle.getBooksInCycle()));
@@ -206,7 +206,7 @@ public class BookInfoViewController extends AbstractViewController {
             cycleEndedCheckBox.setVisible(false);
         }
 
-        coverImage.setImage(IMAGE_PROVIDER.resolveCover(bookForView));
+        coverImage.setImage(imageProvider.resolveCover(bookForView));
         viewAudioBookSitesButton.setVisible(isNotEmpty(bookForView.getAudioBookSiteIds()));
     }
 

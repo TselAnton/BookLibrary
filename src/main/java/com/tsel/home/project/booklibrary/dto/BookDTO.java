@@ -1,8 +1,10 @@
 package com.tsel.home.project.booklibrary.dto;
 
+import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+
 import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.provider.ImageProvider;
 import com.tsel.home.project.booklibrary.search.SearchField;
-import com.tsel.home.project.booklibrary.utils.file.ImageProvider;
 import java.util.List;
 import java.util.UUID;
 import javafx.scene.control.CheckBox;
@@ -67,12 +69,10 @@ public class BookDTO {
 
     public static class BookDTOBuilder {
 
-        private static final ImageProvider IMAGE_PROVIDER = ImageProvider.INSTANCE;
-
         private ImageView cover;
 
         public BookDTOBuilder cover(Book book) {
-            this.cover = new ImageView(IMAGE_PROVIDER.resolveSmallCover(book));
+            this.cover = new ImageView(getBean(ImageProvider.class).resolveSmallCover(book));
             return this;
         }
     }

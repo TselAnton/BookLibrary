@@ -100,7 +100,7 @@ public class EditBookController extends AbstractBookController {
         if (bookId == null) {
             throw new IllegalStateException("Entity key for edit controller is blank!");
         }
-        this.bookForEdit = BOOK_REPOSITORY_V2.getById(bookId);
+        this.bookForEdit = bookRepository.getById(bookId);
         if (this.bookForEdit == null) {
             throw new IllegalStateException(format("Book by ID \"%s\" not found for edit controller!", bookId));
         }
@@ -122,7 +122,7 @@ public class EditBookController extends AbstractBookController {
         priceFieldInput.setText(bookForEdit.getPrice() != null ? String.valueOf(bookForEdit.getPrice()) : "");
 
         if (bookForEdit.getCycleId() != null) {
-            Cycle cycle = CYCLE_REPOSITORY_V2.getById(bookForEdit.getCycleId());
+            Cycle cycle = cycleRepository.getById(bookForEdit.getCycleId());
             if (cycle == null) {
                 throw new IllegalStateException(format("Not found cycle by id '%s' for book id '%s'", bookForEdit.getCycleId(), bookId));
             }

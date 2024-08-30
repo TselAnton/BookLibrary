@@ -28,21 +28,25 @@ import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class SearchServiceV2 {
+public class SearchService {
 
-    public static final SearchServiceV2 INSTANCE = new SearchServiceV2();
-
-    private static final Logger LOGGER = LogManager.getLogger(SearchServiceV2.class);
+    private static final Logger LOGGER = LogManager.getLogger(SearchService.class);
     private static final Comparator<BookDTO> BOOK_NAME_COMPARATOR = Comparator.comparing(BookDTO::getName);
-    private static final Pattern OPERATOR_PATTERN = Pattern.compile("(.*?) (AND|И|OR|ИЛИ) (.*?)");
+    private static final Pattern OPERATOR_PATTERN = Pattern.compile("(.*?) (AND|И|OR|ИЛИ) (.*)");
 
     private final Map<Field, SearchFieldDefinition> fieldDefinitionMap = new ConcurrentHashMap<>();
 
     @Getter
     private String generatedTooltip;
 
-    private SearchServiceV2() {
-        initialize();
+    public SearchService() {
+        List<Field> searchFields = Arrays.stream(BookDTO.class.getDeclaredFields())
+            .filter(dtoField -> dtoField.isAnnotationPresent(SearchField.class))
+            .peek(searchField -> searchField.setAccessible(true))
+            .toList();
+
+        initializeFieldsDefinitionMap(searchFields);
+        initializeFieldsSearchTooltip(searchFields);
     }
 
     /**
@@ -119,19 +123,6 @@ public class SearchServiceV2 {
         return false;
     }
 
-    /**
-     * Init search fields definitions
-     */
-    private void initialize() {
-        List<Field> searchFields = Arrays.stream(BookDTO.class.getDeclaredFields())
-            .filter(dtoField -> dtoField.isAnnotationPresent(SearchField.class))
-            .peek(searchField -> searchField.setAccessible(true))
-            .toList();
-
-        initializeFieldsDefinitionMap(searchFields);
-        initializeFieldsSearchTooltip(searchFields);
-    }
-
     private void initializeFieldsDefinitionMap(List<Field> searchFields) {
         for (Field searchField : searchFields) {
             SearchField searchFieldAnnotation = searchField.getAnnotation(SearchField.class);
@@ -146,7 +137,7 @@ public class SearchServiceV2 {
     private void initializeFieldsSearchTooltip(List<Field> searchFields) {
         StringBuilder stringFieldsTooltipBuilder = new StringBuilder();
         StringBuilder tooltipBuilder = new StringBuilder(
-            format("Поиск через условие: [%s] и [%s]\n",
+            format("Поиск через условие: [%s] и [%s]%n",
                 arrayToString(AND.getNames()),
                 arrayToString(OR.getNames())
             ));
@@ -161,7 +152,7 @@ public class SearchServiceV2 {
 
             } else {
                 SearchFilter searchFilter = SearchFilterFactory.getSearchFilter(searchField.getType());
-                tooltipBuilder.append(format("- %s: %s, %s\n",
+                tooltipBuilder.append(format("- %s: %s, %s%n",
                     searchFieldAnnotation.description(),
                     arrayToString(searchFieldAnnotation.aliases()),
                     searchFilter.getTooltipInfo()

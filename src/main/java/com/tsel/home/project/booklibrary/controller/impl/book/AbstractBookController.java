@@ -22,7 +22,7 @@ import com.tsel.home.project.booklibrary.dto.AuthorDTO;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
 import com.tsel.home.project.booklibrary.dto.CycleDTO;
 import com.tsel.home.project.booklibrary.dto.PublisherDTO;
-import com.tsel.home.project.booklibrary.utils.file.CustomFileChooser;
+import com.tsel.home.project.booklibrary.utils.table.CustomFileChooser;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import com.tsel.home.project.booklibrary.utils.table.AutoCompleteComboBoxListener;
 import java.io.File;
@@ -43,8 +43,6 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Slf4j
 public abstract class AbstractBookController extends AbstractViewController {
@@ -141,17 +139,17 @@ public abstract class AbstractBookController extends AbstractViewController {
     protected void initController() {
         // Инициализация пикера обложек
         defaultFolder = new File(System.getProperty("user.dir"));
-        fileChooser = new CustomFileChooser("Выбрать обложку книги", USER_SETTINGS_REPOSITORY_V2.getLastChosenCoverFile());
+        fileChooser = new CustomFileChooser("Выбрать обложку книги", userSettingsRepository.getLastChosenCoverFile());
 
         // Инициализация выпадаек
         getAuthorComboBox().setItems(
-            getComboBoxValues(AUTHOR_REPOSITORY_V2, author -> new AuthorDTO(author.getId(), author.getName()))
+            getComboBoxValues(authorRepository, author -> new AuthorDTO(author.getId(), author.getName()))
         );
         getPublisherComboBox().setItems(
-            getComboBoxValues(PUBLISHER_REPOSITORY_V2, publisher -> new PublisherDTO(publisher.getId(), publisher.getName()))
+            getComboBoxValues(publisherRepository, publisher -> new PublisherDTO(publisher.getId(), publisher.getName()))
         );
         getCycleComboBox().setItems(
-            getComboBoxValues(CYCLE_REPOSITORY_V2, cycle -> new CycleDTO(cycle.getId(), cycle.getName()))
+            getComboBoxValues(cycleRepository, cycle -> new CycleDTO(cycle.getId(), cycle.getName()))
         );
 
         // Отдельно необходимо обновлять поля при изменении выбранного цикла книги
@@ -178,7 +176,7 @@ public abstract class AbstractBookController extends AbstractViewController {
     private void updateCycleInformation() {
         UUID itemId = getSelectedComboBoxItemId(getCycleComboBox(), CycleDTO::new);
         if (itemId != null) {
-            Cycle cycle = CYCLE_REPOSITORY_V2.getById(itemId);
+            Cycle cycle = cycleRepository.getById(itemId);
             if (cycle != null) {
                 getCycleEndedCheckBox().setSelected(TRUE.equals(cycle.getEnded()));
                 getTotalCountInCycleFieldInput().setText(String.valueOf(cycle.getBooksInCycle()));
@@ -192,7 +190,7 @@ public abstract class AbstractBookController extends AbstractViewController {
     protected void selectBookCover() {
         Stage stage = (Stage) getSelectCoverFileButton().getScene().getWindow();
 
-        File lastChosenFolderPath = USER_SETTINGS_REPOSITORY_V2.getLastChosenCoverFile();
+        File lastChosenFolderPath = userSettingsRepository.getLastChosenCoverFile();
 
         if (lastChosenFolderPath == null) {
             fileChooser.setInitialDirectory(defaultFolder);
@@ -206,7 +204,7 @@ public abstract class AbstractBookController extends AbstractViewController {
             return;
         }
 
-        USER_SETTINGS_REPOSITORY_V2.updateLastChosenCoverFile(file);
+        userSettingsRepository.updateLastChosenCoverFile(file);
         if (isValidImage(file.getAbsolutePath())) {
             getCoverImagePathFieldInput().setText(file.getAbsolutePath());
         } else {
@@ -264,16 +262,16 @@ public abstract class AbstractBookController extends AbstractViewController {
         Book newBook = null;
 
         try {
-            AUTHOR_REPOSITORY_V2.beginTransaction();
-            PUBLISHER_REPOSITORY_V2.beginTransaction();
-            CYCLE_REPOSITORY_V2.beginTransaction();
-            BOOK_REPOSITORY_V2.beginTransaction();
+            authorRepository.beginTransaction();
+            publisherRepository.beginTransaction();
+            cycleRepository.beginTransaction();
+            bookRepository.beginTransaction();
 
             Author newAuthor = new Author(author.getId(), author.getName());
-            AUTHOR_REPOSITORY_V2.save(newAuthor);
+            authorRepository.save(newAuthor);
 
             Publisher newPublisher = new Publisher(publisher.getId(), publisher.getName());
-            PUBLISHER_REPOSITORY_V2.save(newPublisher);
+            publisherRepository.save(newPublisher);
 
             Cycle newCycle = null;
             if (cycle != null) {
@@ -284,7 +282,7 @@ public abstract class AbstractBookController extends AbstractViewController {
                     .booksInCycle(stringToInteger(cycleTotalBookCount))
                     .build();
 
-                CYCLE_REPOSITORY_V2.save(newCycle);
+                cycleRepository.save(newCycle);
             }
 
             newBook = Book.builder()
@@ -303,12 +301,12 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .audioBookSiteIds(audioBookSiteIds)
                 .build();
 
-            BOOK_REPOSITORY_V2.save(newBook);
+            bookRepository.save(newBook);
 
-            BOOK_REPOSITORY_V2.commitTransaction();
-            CYCLE_REPOSITORY_V2.commitTransaction();
-            AUTHOR_REPOSITORY_V2.commitTransaction();
-            PUBLISHER_REPOSITORY_V2.commitTransaction();
+            bookRepository.commitTransaction();
+            cycleRepository.commitTransaction();
+            authorRepository.commitTransaction();
+            publisherRepository.commitTransaction();
 
             doAfterSave(newBook);
 
@@ -318,20 +316,20 @@ public abstract class AbstractBookController extends AbstractViewController {
         } catch (ConstraintException e) {
             log.warn("Constraint exception while trying to save new book '{}'", GSON.toJson(newBook), e);
 
-            AUTHOR_REPOSITORY_V2.abortTransaction();
-            PUBLISHER_REPOSITORY_V2.abortTransaction();
-            CYCLE_REPOSITORY_V2.abortTransaction();
-            BOOK_REPOSITORY_V2.abortTransaction();
+            authorRepository.abortTransaction();
+            publisherRepository.abortTransaction();
+            cycleRepository.abortTransaction();
+            bookRepository.abortTransaction();
 
             riseAlert(WARNING, "Ошибка", "Ошибка при создании новой книги", e.getMessage());
 
         } catch (Exception e) {
             log.error("Exception while trying to save new book '{}'", GSON.toJson(newBook), e);
 
-            AUTHOR_REPOSITORY_V2.abortTransaction();
-            PUBLISHER_REPOSITORY_V2.abortTransaction();
-            CYCLE_REPOSITORY_V2.abortTransaction();
-            BOOK_REPOSITORY_V2.abortTransaction();
+            authorRepository.abortTransaction();
+            publisherRepository.abortTransaction();
+            cycleRepository.abortTransaction();
+            bookRepository.abortTransaction();
 
             riseAlert(WARNING, "Ошибка", "Ошибка при создании новой книги", "Произошла непредвиденная ошибка: " + e.getMessage());
         }

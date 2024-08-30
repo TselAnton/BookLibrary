@@ -1,5 +1,7 @@
 package com.tsel.home.project.booklibrary.controller;
 
+import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+
 import com.tsel.home.project.booklibrary.converter.BookConverter;
 import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepositoryV2;
@@ -7,7 +9,7 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
-import com.tsel.home.project.booklibrary.utils.file.ImageProvider;
+import com.tsel.home.project.booklibrary.provider.ImageProvider;
 import java.net.URI;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;
@@ -18,22 +20,20 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Slf4j
 public abstract class AbstractViewController {
 
     public static final URI RESOURCE_PATH = URI.create("/com/tsel/home/project/booklibrary/");
 
-    protected static final BookRepositoryV2 BOOK_REPOSITORY_V2 = BookRepositoryV2.getInstance();
-    protected static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = CycleRepositoryV2.getInstance();
-    protected static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = AuthorRepositoryV2.getInstance();
-    protected static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = PublisherRepositoryV2.getInstance();
-    protected static final UserSettingsRepositoryV2 USER_SETTINGS_REPOSITORY_V2 = UserSettingsRepositoryV2.getInstance();
+    protected final BookRepositoryV2 bookRepository = getBean(BookRepositoryV2.class);
+    protected final CycleRepositoryV2 cycleRepository = getBean(CycleRepositoryV2.class);
+    protected final AuthorRepositoryV2 authorRepository = getBean(AuthorRepositoryV2.class);
+    protected final PublisherRepositoryV2 publisherRepository = getBean(PublisherRepositoryV2.class);
+    protected final UserSettingsRepositoryV2 userSettingsRepository = getBean(UserSettingsRepositoryV2.class);
 
-    protected static final ImageProvider IMAGE_PROVIDER = ImageProvider.INSTANCE;
-    protected static final BookConverter BOOK_CONVERTER = new BookConverter();
+    protected final ImageProvider imageProvider = getBean(ImageProvider.class);
+    protected final BookConverter bookConverter = new BookConverter();
 
     /**
      * @return {@link AnchorPane} текущего окна
@@ -91,7 +91,7 @@ public abstract class AbstractViewController {
             Stage stage = new Stage();
             stage.setResizable(false);
             stage.setTitle(modalViewTitle);
-            stage.getIcons().add(IMAGE_PROVIDER.getWindowIcon());
+            stage.getIcons().add(imageProvider.getWindowIcon());
             stage.setScene(scene);
             stage.initModality(Modality.WINDOW_MODAL);
 

@@ -14,17 +14,12 @@ public class UserSettingsRepositoryV2 extends AbstractFileRepositoryV2<String, U
 
     private static final String USER_SETTINGS_KEY = "userSettings";
 
-    private static UserSettingsRepositoryV2 instance;
-
-    public static UserSettingsRepositoryV2 getInstance(Path... rootPaths) {
-        if (instance == null) {
-            instance = new UserSettingsRepositoryV2(rootPaths);
-        }
-        return instance;
+    public UserSettingsRepositoryV2(Path rootPath) {
+        super(UserSettings.class, () -> USER_SETTINGS_KEY, rootPath);
     }
 
-    public UserSettingsRepositoryV2(Path... rootPaths) {
-        super(UserSettings.class, () -> USER_SETTINGS_KEY, rootPaths);
+    public UserSettingsRepositoryV2() {
+        super(UserSettings.class, () -> USER_SETTINGS_KEY, null);
     }
 
     public void updateLastChosenCoverFile(File lastChosenCoverFile) {

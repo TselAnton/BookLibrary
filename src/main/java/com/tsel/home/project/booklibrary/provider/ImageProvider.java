@@ -1,4 +1,4 @@
-package com.tsel.home.project.booklibrary.utils.file;
+package com.tsel.home.project.booklibrary.provider;
 
 import static com.tsel.home.project.booklibrary.controller.AbstractViewController.RESOURCE_PATH;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
@@ -16,26 +16,22 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javafx.scene.image.Image;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class ImageProvider {
-
-    public static final ImageProvider INSTANCE = new ImageProvider();
-
-    private static final Logger LOGGER = LogManager.getLogger(ImageProvider.class);
 
     private final Map<UUID, Image> cashedImages = new ConcurrentHashMap<>();
     private final Map<UUID, Image> cashedSmallImages = new ConcurrentHashMap<>();
     private final Image cachedIcon;
     private final Image defaultImg;
 
-    private ImageProvider() {
+    public ImageProvider() {
         try {
             this.cachedIcon = loadImage("img/icon.png");
             this.defaultImg = loadImage("img/default.png");
         } catch (Exception ex) {
-            LOGGER.error("Exception while init abstract constructor", ex);
+            log.error("Exception while init abstract constructor", ex);
             throw ex;
         }
     }
@@ -62,7 +58,7 @@ public final class ImageProvider {
                     return defaultImg;
 
                 } catch (IOException e) {
-                    LOGGER.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
+                    log.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
                 }
             }
         }
@@ -86,7 +82,7 @@ public final class ImageProvider {
                         return bookImage;
                     }
                 } catch (MalformedURLException e) {
-                    LOGGER.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
+                    log.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
                 }
             }
         }

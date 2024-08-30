@@ -34,7 +34,7 @@ public abstract class AbstractAudioBookSiteConnectionController extends Abstract
         }
 
         // Заполнение мапы для отслеживания чекбоксов, где ключ - ID сайта, значение - выбран ли сайт для текущей книги
-        AUDIO_BOOK_SITE_REPOSITORY_V2.getAll()
+        audioBookSiteRepository.getAll()
             .stream()
             .map(AudioBookSite::getId)
             .forEach(audioBookSiteId -> checkedAudioBookSiteItemsMap.put(audioBookSiteId, audioBookSiteIds.contains(audioBookSiteId)));

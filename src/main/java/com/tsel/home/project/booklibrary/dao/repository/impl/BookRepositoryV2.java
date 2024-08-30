@@ -1,5 +1,7 @@
 package com.tsel.home.project.booklibrary.dao.repository.impl;
 
+import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
@@ -13,21 +15,16 @@ import java.util.function.Predicate;
 @FileStorageName("bookStorage.json")
 public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
 
-    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY = AuthorRepositoryV2.getInstance();
-    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY = PublisherRepositoryV2.getInstance();
-    private static final CycleRepositoryV2 CYCLE_REPOSITORY = CycleRepositoryV2.getInstance();
+    private final AuthorRepositoryV2 authorRepository = getBean(AuthorRepositoryV2.class);
+    private final PublisherRepositoryV2 publisherRepository = getBean(PublisherRepositoryV2.class);
+    private final CycleRepositoryV2 cycleRepository = getBean(CycleRepositoryV2.class);
 
-    private static BookRepositoryV2 instance;
-
-    public static BookRepositoryV2 getInstance(Path... rootPaths) {
-        if (instance == null) {
-            instance = new BookRepositoryV2(rootPaths);
-        }
-        return instance;
+    public BookRepositoryV2(Path rootPath) {
+        super(Book.class, new UUIDIdentifierGenerator(), rootPath);
     }
 
-    public BookRepositoryV2(Path... rootPaths) {
-        super(Book.class, new UUIDIdentifierGenerator(), rootPaths);
+    public BookRepositoryV2() {
+        super(Book.class, new UUIDIdentifierGenerator(), null);
     }
 
     @Override
@@ -35,13 +32,13 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
         super.delete(entity);
 
         if (isLatestValue(book -> Objects.equals(book.getAuthorId(), entity.getAuthorId()))) {
-            AUTHOR_REPOSITORY.deleteById(entity.getAuthorId());
+            authorRepository.deleteById(entity.getAuthorId());
         }
         if (isLatestValue(book -> Objects.equals(book.getPublisherId(), entity.getPublisherId()))) {
-            PUBLISHER_REPOSITORY.deleteById(entity.getPublisherId());
+            publisherRepository.deleteById(entity.getPublisherId());
         }
         if (isLatestValue(book -> Objects.equals(book.getCycleId(), entity.getCycleId()))) {
-            CYCLE_REPOSITORY.deleteById(entity.getCycleId());
+            cycleRepository.deleteById(entity.getCycleId());
         }
     }
 

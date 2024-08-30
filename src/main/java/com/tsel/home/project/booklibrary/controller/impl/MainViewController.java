@@ -1,5 +1,6 @@
 package com.tsel.home.project.booklibrary.controller.impl;
 
+import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static com.tsel.home.project.booklibrary.utils.table.TableComparators.CHECK_BOX_COMPARATOR;
 import static com.tsel.home.project.booklibrary.utils.table.TableComparators.NON_COMPARATOR;
@@ -15,7 +16,7 @@ import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
-import com.tsel.home.project.booklibrary.search.SearchServiceV2;
+import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.text.DecimalFormat;
@@ -49,14 +50,11 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Slf4j
 public class MainViewController extends AbstractViewController {
 
     private static final Random RANDOM = new Random(1412423095L);
-    private static final SearchServiceV2 SEARCH_SERVICE_V2 = SearchServiceV2.INSTANCE;
 
     @SuppressWarnings("rawtypes")
     private static final Map<String, Comparator> TABLE_COLUMNS_SORTING;
@@ -86,7 +84,8 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SORTING.put("audioBookSiteGeneratedColumn", CHECK_BOX_COMPARATOR);
     }
 
-    private final TableScroll tableScroll = new TableScroll();
+    private final TableScroll tableScroll = getBean(TableScroll.class);
+    private final SearchService searchService = getBean(SearchService.class);
 
     @FXML
     @Getter
@@ -119,7 +118,7 @@ public class MainViewController extends AbstractViewController {
             Scene scene = new Scene(windowLoader.load());
 
             stage.setTitle("Book library");
-            stage.getIcons().add(IMAGE_PROVIDER.getWindowIcon());
+            stage.getIcons().add(imageProvider.getWindowIcon());
             stage.setScene(scene);
             stage.setMinWidth(812);
             stage.setMinHeight(700);
@@ -171,7 +170,7 @@ public class MainViewController extends AbstractViewController {
             AlertType.INFORMATION,
             "Подсказки команд для поиска",
             "Подсказки команд для поиска",
-            SEARCH_SERVICE_V2.getGeneratedTooltip()
+            searchService.getGeneratedTooltip()
         );
     }
 
@@ -236,7 +235,7 @@ public class MainViewController extends AbstractViewController {
                 );
 
                 if (answer.isOkAnswer()) {
-                    BOOK_REPOSITORY_V2.deleteById(clickedEntity.getId());
+                    bookRepository.deleteById(clickedEntity.getId());
                     updateTableColumns(bookTableView);
                 }
             }
@@ -253,7 +252,7 @@ public class MainViewController extends AbstractViewController {
     @FXML
     private void search() {
         String searchQuery = searchQueryField.getText();
-        bookTableView.setItems(observableArrayList(SEARCH_SERVICE_V2.search(searchQuery, getDtoBooks())));
+        bookTableView.setItems(observableArrayList(searchService.search(searchQuery, getDtoBooks())));
     }
 
     @FXML
@@ -331,9 +330,9 @@ public class MainViewController extends AbstractViewController {
     }
 
     private List<BookDTO> getDtoBooks() {
-        return BOOK_REPOSITORY_V2.getAll()
+        return bookRepository.getAll()
             .stream()
-            .map(BOOK_CONVERTER::convert)
+            .map(bookConverter::convert)
             .toList();
     }
 
@@ -394,7 +393,7 @@ public class MainViewController extends AbstractViewController {
 
             stage.setResizable(false);
             stage.setTitle("Book info");
-            stage.getIcons().add(IMAGE_PROVIDER.getWindowIcon());
+            stage.getIcons().add(imageProvider.getWindowIcon());
             stage.setScene(scene);
             stage.initModality(NONE);
 

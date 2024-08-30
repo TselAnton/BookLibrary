@@ -1,4 +1,4 @@
-package com.tsel.home.project.booklibrary.utils.file;
+package com.tsel.home.project.booklibrary.utils.table;
 
 import static java.util.Optional.ofNullable;
 
@@ -6,7 +6,7 @@ import java.io.File;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
-public class CustomFileChooser {
+public final class CustomFileChooser {
 
     private final FileChooser fileChooser;
 
@@ -16,7 +16,7 @@ public class CustomFileChooser {
         ofNullable(initialDirectory).ifPresent(fileChooser::setInitialDirectory);
     }
 
-    public final void setInitialDirectory(File file) {
+    public void setInitialDirectory(File file) {
         fileChooser.setInitialDirectory(file);
     }
 
