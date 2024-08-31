@@ -17,7 +17,7 @@ public class CycleRepositoryV2 extends AbstractFileRepositoryV2<UUID, Cycle> {
     }
 
     public CycleRepositoryV2() {
-        super(Cycle.class, new UUIDIdentifierGenerator(), null);
+        super(Cycle.class, new UUIDIdentifierGenerator(), DEFAULT_REPOSITORY_PATH);
     }
 
     @Override

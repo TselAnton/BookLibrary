@@ -1,5 +1,7 @@
 package com.tsel.home.project.booklibrary.provider;
 
+import static com.tsel.home.project.booklibrary.TestFileUtils.readFileContent;
+import static com.tsel.home.project.booklibrary.TestFileUtils.writeFileContent;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
@@ -11,14 +13,12 @@ import com.tsel.home.project.booklibrary.TestEntity;
 import com.tsel.home.project.booklibrary.TestFileRepository;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.utils.MyGson;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -132,16 +132,6 @@ class FileRepositoryProviderTest {
 
         List<TestEntity> actualTestEntitiesList = fileRepositoryProvider.readStorageFile();
         assertThat(actualTestEntitiesList).containsExactlyInAnyOrder(testEntityList.toArray(new TestEntity[]{}));
-    }
-
-    @SneakyThrows
-    private static String readFileContent(Path path) {
-        return Files.readString(path);
-    }
-
-    @SneakyThrows
-    private static void writeFileContent(String content, Path path) {
-        Files.writeString(path, content, StandardCharsets.UTF_8);
     }
 
     @FileStorageName(REPOSITORY_FILE)

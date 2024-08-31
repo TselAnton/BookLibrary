@@ -91,9 +91,7 @@ public final class FileRepositoryProvider<K extends Serializable, E extends Base
             return null;
         }
         Path storagePath = Paths.get(repositoryFileName);
-        return rootPath != null
-            ? Path.of(rootPath.toAbsolutePath().toString(), storagePath.toString())
-            : storagePath;
+        return FileUtils.resolvePath(rootPath, storagePath);
     }
 
     /**

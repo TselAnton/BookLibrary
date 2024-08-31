@@ -24,7 +24,7 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
     }
 
     public BookRepositoryV2() {
-        super(Book.class, new UUIDIdentifierGenerator(), null);
+        super(Book.class, new UUIDIdentifierGenerator(), DEFAULT_REPOSITORY_PATH);
     }
 
     @Override

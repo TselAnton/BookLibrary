@@ -17,7 +17,7 @@ public class AudioBookSiteRepositoryV2 extends AbstractFileRepositoryV2<UUID, Au
     }
 
     public AudioBookSiteRepositoryV2() {
-        super(AudioBookSite.class, new UUIDIdentifierGenerator(), null);
+        super(AudioBookSite.class, new UUIDIdentifierGenerator(), DEFAULT_REPOSITORY_PATH);
     }
 
     @Override

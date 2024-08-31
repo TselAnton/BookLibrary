@@ -19,7 +19,7 @@ public class UserSettingsRepositoryV2 extends AbstractFileRepositoryV2<String, U
     }
 
     public UserSettingsRepositoryV2() {
-        super(UserSettings.class, () -> USER_SETTINGS_KEY, null);
+        super(UserSettings.class, () -> USER_SETTINGS_KEY, DEFAULT_REPOSITORY_PATH);
     }
 
     public void updateLastChosenCoverFile(File lastChosenCoverFile) {

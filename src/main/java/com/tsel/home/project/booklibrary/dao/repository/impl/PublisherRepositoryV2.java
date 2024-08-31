@@ -17,7 +17,7 @@ public class PublisherRepositoryV2 extends AbstractFileRepositoryV2<UUID, Publis
     }
 
     public PublisherRepositoryV2() {
-        super(Publisher.class, new UUIDIdentifierGenerator(), null);
+        super(Publisher.class, new UUIDIdentifierGenerator(), DEFAULT_REPOSITORY_PATH);
     }
 
     @Override

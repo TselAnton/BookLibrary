@@ -17,7 +17,7 @@ public class AuthorRepositoryV2 extends AbstractFileRepositoryV2<UUID, Author> {
     }
 
     public AuthorRepositoryV2() {
-        super(Author.class, new UUIDIdentifierGenerator(), null);
+        super(Author.class, new UUIDIdentifierGenerator(), DEFAULT_REPOSITORY_PATH);
     }
 
     @Override

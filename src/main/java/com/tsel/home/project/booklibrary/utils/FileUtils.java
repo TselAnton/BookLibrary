@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,6 +28,18 @@ public final class FileUtils {
                 .toString(),
             pathParts
         );
+    }
+
+    /**
+     * Зарезолвить путь вместе с родительским
+     * @param rootPath Родительский путь
+     * @param path Основной путь к файлу
+     * @return Объеденённый путь
+     */
+    public static Path resolvePath(@Nullable Path rootPath, Path path) {
+        return rootPath != null
+            ? Path.of(rootPath.toAbsolutePath().toString(), path.toString())
+            : path;
     }
 
     /**
