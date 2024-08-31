@@ -1,23 +1,27 @@
-package com.tsel.home.project.booklibrary.utils;
+package com.tsel.home.project.booklibrary.provider;
 
 import static com.tsel.home.project.booklibrary.utils.FileUtils.isNotExists;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static java.lang.String.format;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
+import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
+import com.tsel.home.project.booklibrary.utils.FileUtils;
+import com.tsel.home.project.booklibrary.utils.MyGson;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,60 +29,53 @@ import lombok.extern.slf4j.Slf4j;
  * Утилиты для работы с файлами хранилища
  */
 @Slf4j
-public final class FileRepositoryUtils {
+public final class FileRepositoryProvider<K extends Serializable, E extends BaseEntity<K>> {
 
     private static final Gson GSON = MyGson.buildGson();
 
-    private FileRepositoryUtils() {}
+    private final Type listType;
+    private final Path fileRepositoryPath;
+
+    public FileRepositoryProvider(Class<?> repositoryClass, Class<E> entityClass, @Nullable Path rootPath) {
+        listType = TypeToken.getParameterized(List.class, entityClass).getType();
+        fileRepositoryPath = resolveStoragePath(repositoryClass, rootPath);
+    }
 
     /**
      * Чтение сущностей из фала-хранилища
-     * @param storagePath Путь файла-хранилища
-     * @param entityClass Тип класса сущности
      * @return Список сущностей
-     * @param <T> Тип сущности
      */
-    public static <T> List<T> readStorageFile(Path storagePath, Class<T> entityClass) {
-        if (isNotExists(storagePath)) {
-            log.warn("Not found file '{}'. Can't read anything, so returning empty list", storagePath);
+    public List<E> readStorageFile() {
+        if (isNotExists(fileRepositoryPath)) {
+            log.warn("Not found file '{}'. Can't read anything, so returning empty list", fileRepositoryPath);
             return new ArrayList<>();
         }
 
-        try (Stream<String> fileLines = Files.lines(storagePath, StandardCharsets.UTF_8)) {
-            return fileLines
-                .map(jsonEntity -> GSON.fromJson(jsonEntity, entityClass))
-                .toList();
+        try {
+            return GSON.fromJson(Files.readString(fileRepositoryPath, StandardCharsets.UTF_8), listType);
 
         } catch (IOException e) {
-            log.error("Exception while trying to read storage file '{}' line by line", storagePath);
-            throw new IllegalStateException(format("Проблема при чтении файла хранилища '%s'", storagePath), e);
+            log.error("Exception while trying to read storage file '{}' by bytes", fileRepositoryPath);
+            throw new IllegalStateException(format("Проблема при чтении файла хранилища '%s'", fileRepositoryPath), e);
         }
     }
 
     /**
      * Перезапись контента фала-хранилища
-     * @param storagePath Название фала-хранилища
      * @param entities Список сущностей
-     * @param <T> Тип сущности
      */
-    public static <T> void overwriteStorageFile(Path storagePath, Collection<T> entities) {
-        if (isNotExists(storagePath)) {
-            log.info("File '{}' not exist, trying to create new one", storagePath);
-            FileUtils.createFile(storagePath);
+    public void overwriteStorageFile(Collection<E> entities) {
+        if (isNotExists(fileRepositoryPath)) {
+            log.info("File '{}' not exist, trying to create new one", fileRepositoryPath);
+            FileUtils.createFile(fileRepositoryPath);
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(storagePath.toFile(), false))) {
-            Iterator<T> entitiesIterator = entities.iterator();
-            while (entitiesIterator.hasNext()) {
-                writer.write(GSON.toJson(entitiesIterator.next()));
-                if (entitiesIterator.hasNext()) {
-                    writer.newLine();
-                }
-            }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileRepositoryPath.toFile(), false))) {
+            writer.write(GSON.toJson(entities));
 
         } catch (IOException e) {
-            log.error("Exception while trying to write storage file '{}' line by line", storagePath);
-            throw new IllegalStateException(format("Проблема при записи данных в файл хранилища '%s'", storagePath), e);
+            log.error("Exception while trying to write storage file '{}' line by line", fileRepositoryPath);
+            throw new IllegalStateException(format("Проблема при записи данных в файл хранилища '%s'", fileRepositoryPath), e);
         }
     }
 

@@ -10,7 +10,7 @@ import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.exception.NotNullConstraintException;
 import com.tsel.home.project.booklibrary.dao.identifier.IdentifierGenerator;
-import com.tsel.home.project.booklibrary.utils.FileRepositoryUtils;
+import com.tsel.home.project.booklibrary.provider.FileRepositoryProvider;
 import com.tsel.home.project.booklibrary.utils.StringUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -30,10 +30,9 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     public static final Path DEFAULT_REPOSITORY_PATH = buildPathFromCurrentDir("repository");
 
     private final String entityDisplayName;
-    private final Path storagePath;
-
     private final Map<Field, Property> notNullFields;
     private final IdentifierGenerator<K> keyGenerator;
+    private final FileRepositoryProvider<K, E> fileRepositoryProvider;
 
     private boolean isTransactionOpen;
     private Map<K, E> repositoryMap;
@@ -42,9 +41,9 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     protected AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator, @Nullable Path rootPath) {
         this.keyGenerator = keyGenerator;
         this.entityDisplayName = resolveEntityName(entityClass);
-        this.storagePath = resolveStoragePath(rootPath);
+        this.fileRepositoryProvider = new FileRepositoryProvider<>(this.getClass(), entityClass, rootPath);
 
-        this.repositoryMap = initEntities(entityClass);
+        this.repositoryMap = initEntities();
         this.notNullFields = resolveNotNullFields(entityClass);
 
         this.repositoryMapSnapshot = null;
@@ -78,7 +77,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
         if (isTransactionOpen) {
             log.info("Successfully saved entity '{}' in transaction", entity);
         } else {
-            FileRepositoryUtils.overwriteStorageFile(this.storagePath, repositoryMap.values());
+            fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
             log.info("Successfully saved entity '{}'", entity);
         }
 
@@ -97,7 +96,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
             if (isTransactionOpen) {
                 log.info("Deleted entity '{}' in transaction", removedEntity);
             } else {
-                FileRepositoryUtils.overwriteStorageFile(this.storagePath, repositoryMap.values());
+                fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
                 log.info("Successfully deleted entity '{}'", removedEntity);
             }
         }
@@ -115,7 +114,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     @Override
     public void commitTransaction() {
         if (this.isTransactionOpen) {
-            FileRepositoryUtils.overwriteStorageFile(this.storagePath, repositoryMap.values());
+            fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
 
             this.isTransactionOpen = false;
             this.repositoryMapSnapshot = null;
@@ -127,7 +126,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     public void abortTransaction() {
         if (this.isTransactionOpen) {
             this.repositoryMap = new HashMap<>(this.repositoryMapSnapshot);
-            FileRepositoryUtils.overwriteStorageFile(this.storagePath, repositoryMap.values());
+            fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
 
             this.isTransactionOpen = false;
             this.repositoryMapSnapshot = null;
@@ -167,13 +166,6 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
         }
     }
 
-    private Path resolveStoragePath(@Nullable Path rootPath) {
-        return ofNullable(FileRepositoryUtils.resolveStoragePath(this.getClass(), ofNullable(rootPath).orElse(DEFAULT_REPOSITORY_PATH)))
-            .orElseThrow(() -> new IllegalStateException(
-                format("Невозможно определить путь файла хранилища для репозитория сущности '%s'", this.entityDisplayName))
-            );
-    }
-
     private String resolveEntityName(Class<E> entityClass) {
         return ofNullable(entityClass.getAnnotation(EntityDisplayName.class))
             .map(EntityDisplayName::value)
@@ -197,9 +189,9 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
         return notNullFieldsMap;
     }
 
-    private Map<K, E> initEntities(Class<E> entityClass) {
+    private Map<K, E> initEntities() {
         Map<K, E> entitiesMap = new LinkedHashMap<>();
-        List<E> entitiesList = FileRepositoryUtils.readStorageFile(this.storagePath, entityClass);
+        List<E> entitiesList = fileRepositoryProvider.readStorageFile();
         for (E entity : entitiesList) {
             entitiesMap.put(entity.getId(), entity);
         }

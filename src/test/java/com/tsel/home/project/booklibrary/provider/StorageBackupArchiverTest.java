@@ -9,9 +9,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.tsel.home.project.booklibrary.TestDateProvider;
+import com.tsel.home.project.booklibrary.TestFileRepository;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
-import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
-import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -202,62 +201,15 @@ class StorageBackupArchiverTest {
     }
 
     @FileStorageName(TEST_FILE_1_NAME)
-    protected static class TestRepository1 extends TestFileRepository {}
+    protected static class TestRepository1 extends TestFileRepository<String> {}
 
     @FileStorageName(TEST_FILE_2_NAME)
-    protected static class TestRepository2 extends TestFileRepository {}
+    protected static class TestRepository2 extends TestFileRepository<String> {}
 
     @FileStorageName(TEST_FILE_3_NAME)
-    protected static class TestRepository3 extends TestFileRepository {}
+    protected static class TestRepository3 extends TestFileRepository<String> {}
 
     @FileStorageName(TEST_FILE_4_NAME)
-    protected static class TestRepository4 extends TestFileRepository {}
+    protected static class TestRepository4 extends TestFileRepository<String> {}
 
-    protected abstract static class TestFileRepository implements FileRepository<String, BaseEntity<String>> {
-
-        @Override
-        public BaseEntity<String> getById(String id) {
-            return null;
-        }
-
-        @Override
-        public List<BaseEntity<String>> getAll() {
-            return List.of();
-        }
-
-        @Override
-        public String save(BaseEntity<String> entity) {
-            return null;
-        }
-
-        @Override
-        public void delete(BaseEntity<String> entity) {
-            // ONLY FOR TESTS
-        }
-
-        @Override
-        public void deleteById(String id) {
-            // ONLY FOR TESTS
-        }
-
-        @Override
-        public boolean existById(String id) {
-            return false;
-        }
-
-        @Override
-        public void beginTransaction() {
-            // ONLY FOR TESTS
-        }
-
-        @Override
-        public void commitTransaction() {
-            // ONLY FOR TESTS
-        }
-
-        @Override
-        public void abortTransaction() {
-            // ONLY FOR TESTS
-        }
-    }
 }

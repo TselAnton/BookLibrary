@@ -6,7 +6,6 @@ import static org.reflections.scanners.Scanners.SubTypes;
 import static org.reflections.scanners.Scanners.TypesAnnotated;
 
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
-import com.tsel.home.project.booklibrary.utils.FileRepositoryUtils;
 import com.tsel.home.project.booklibrary.utils.FileUtils;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -69,8 +68,8 @@ public final class StorageBackupArchiver {
             // Попытка собрать в архив все найденные файлы
             for (Class<?> repositoryClass : repositoryClasses) {
                 log.info("Trying to read storage file for repository class {}", repositoryClass.getName());
-                String fileStorageName = FileRepositoryUtils.resolveStorageFileName(repositoryClass);
-                Path resolvedStoragePath = FileRepositoryUtils.resolveStoragePath(repositoryClass, repositoryPath);
+                String fileStorageName = FileRepositoryProvider.resolveStorageFileName(repositoryClass);
+                Path resolvedStoragePath = FileRepositoryProvider.resolveStoragePath(repositoryClass, repositoryPath);
 
                 if (fileStorageName == null || resolvedStoragePath == null || !Files.exists(resolvedStoragePath)) {
                     log.warn("Not found storage file name for repository class {} by name '{}'. Skip it", repositoryClass.getName(), fileStorageName);
