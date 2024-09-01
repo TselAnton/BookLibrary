@@ -14,4 +14,5 @@ open module com.tsel.home.project.booklibrary {
     requires org.apache.logging.log4j;
 
     requires lombok;
+    requires com.google.gson;
 }
