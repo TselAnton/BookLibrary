@@ -40,7 +40,8 @@ public abstract class AbstractAudioBookSiteController extends AbstractViewContro
      * Инициализация начальной таблицы отображения
      * @param audioBookSiteTableView таблица для отображения
      */
-    protected void initTableView(TableView<AudioBookSiteDTO> audioBookSiteTableView, TableColumn<AudioBookSiteDTO, ?> ...tableColumns) {
+    @SafeVarargs
+    protected final void initTableView(TableView<AudioBookSiteDTO> audioBookSiteTableView, TableColumn<AudioBookSiteDTO, ?>... tableColumns) {
         audioBookSiteTableView.setEditable(true);
         audioBookSiteTableView.getColumns().addAll(tableColumns);
         updateBookSiteTableItems(audioBookSiteTableView);

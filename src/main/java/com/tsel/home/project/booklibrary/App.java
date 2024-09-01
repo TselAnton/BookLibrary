@@ -39,7 +39,7 @@ public class App {
         }
 
         private static void initApplicationContext() {
-            SimpleApplicationContextProvider.initBean(PropertyProvider.class, () -> new PropertyProvider(null));
+            SimpleApplicationContextProvider.initBean(PropertyProvider.class, () -> new PropertyProvider(buildPathFromCurrentDir()));
 
             SimpleApplicationContextProvider.initBean(AudioBookSiteRepositoryV2.class, AudioBookSiteRepositoryV2::new);
             SimpleApplicationContextProvider.initBean(AuthorRepositoryV2.class, AuthorRepositoryV2::new);

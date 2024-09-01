@@ -31,6 +31,7 @@ public abstract class CustomCheckBoxTableCell<S> extends TableCell<S, CheckBox> 
         this.setStyle("-fx-alignment: CENTER");
 
         this.checkBox = new CheckBox();
+        this.checkBox.setId("selectAudioBookSiteCheckBox");
         this.checkBox.setOnAction(this::handleActionEvent);
 
         // by default the graphic is null until the cell stops being empty

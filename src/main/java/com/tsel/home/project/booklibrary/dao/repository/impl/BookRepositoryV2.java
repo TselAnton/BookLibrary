@@ -15,10 +15,6 @@ import java.util.function.Predicate;
 @FileStorageName("bookStorage.json")
 public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
 
-    private final AuthorRepositoryV2 authorRepository = getBean(AuthorRepositoryV2.class);
-    private final PublisherRepositoryV2 publisherRepository = getBean(PublisherRepositoryV2.class);
-    private final CycleRepositoryV2 cycleRepository = getBean(CycleRepositoryV2.class);
-
     public BookRepositoryV2(Path rootPath) {
         super(Book.class, new UUIDIdentifierGenerator(), rootPath);
     }
@@ -32,13 +28,13 @@ public class BookRepositoryV2 extends AbstractFileRepositoryV2<UUID, Book> {
         super.delete(entity);
 
         if (isLatestValue(book -> Objects.equals(book.getAuthorId(), entity.getAuthorId()))) {
-            authorRepository.deleteById(entity.getAuthorId());
+            getBean(AuthorRepositoryV2.class).deleteById(entity.getAuthorId());
         }
         if (isLatestValue(book -> Objects.equals(book.getPublisherId(), entity.getPublisherId()))) {
-            publisherRepository.deleteById(entity.getPublisherId());
+            getBean(PublisherRepositoryV2.class).deleteById(entity.getPublisherId());
         }
         if (isLatestValue(book -> Objects.equals(book.getCycleId(), entity.getCycleId()))) {
-            cycleRepository.deleteById(entity.getCycleId());
+            getBean(CycleRepositoryV2.class).deleteById(entity.getCycleId());
         }
     }
 
