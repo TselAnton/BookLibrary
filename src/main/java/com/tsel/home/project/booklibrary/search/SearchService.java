@@ -1,121 +1,178 @@
 package com.tsel.home.project.booklibrary.search;
 
+import static com.tsel.home.project.booklibrary.search.operand.OperatorType.AND;
+import static com.tsel.home.project.booklibrary.search.operand.OperatorType.OR;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
 import com.tsel.home.project.booklibrary.dto.BookDTO;
-import java.util.ArrayList;
+import com.tsel.home.project.booklibrary.search.filter.SearchFilter;
+import com.tsel.home.project.booklibrary.search.operand.BaseOperand;
+import com.tsel.home.project.booklibrary.search.operand.CompositeOperand;
+import com.tsel.home.project.booklibrary.search.operand.OperatorType;
+import com.tsel.home.project.booklibrary.search.operand.SimpleOperand;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import javafx.scene.control.CheckBox;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Deprecated
 public class SearchService {
 
-    private static final String REVERSE_ORDER = "n";
-    private static final String READ_SEARCH_KEY = "read";
-    private static final String ENDED_CYCLE_SEARCH_KEY = "end";
-    private static final String AUTOGRAPH_SEARCH_KEY = "sign";
-    private static final String PRICE_SEARCH_KEY = "price";
-    private static final String LESS_SEARCH_KEY = "<";
-    private static final String EQUALS_SEARCH_KEY = "=";
-    private static final String MORE_SEARCH_KEY = ">";
+    private static final Logger LOGGER = LogManager.getLogger(SearchService.class);
+    private static final Comparator<BookDTO> BOOK_NAME_COMPARATOR = Comparator.comparing(BookDTO::getName);
+    private static final Pattern OPERATOR_PATTERN = Pattern.compile("(.*?) (AND|И|OR|ИЛИ) (.*)");
 
-    public List<BookDTO> search(String searchQuery, List<BookDTO> bookDTOS) {
+    private final Map<Field, SearchFieldDefinition> fieldDefinitionMap = new ConcurrentHashMap<>();
+
+    @Getter
+    private String generatedTooltip;
+
+    public SearchService() {
+        List<Field> searchFields = Arrays.stream(BookDTO.class.getDeclaredFields())
+            .filter(dtoField -> dtoField.isAnnotationPresent(SearchField.class))
+            .peek(searchField -> searchField.setAccessible(true))
+            .toList();
+
+        initializeFieldsDefinitionMap(searchFields);
+        initializeFieldsSearchTooltip(searchFields);
+    }
+
+    /**
+     * Search method
+     * @param searchQuery String query from search bar
+     * @param bookDTOList List of book DTO
+     * @return Filtered list by search query
+     */
+    public List<BookDTO> search(String searchQuery, List<BookDTO> bookDTOList) {
         if (isBlank(searchQuery)) {
-            return bookDTOS.stream()
-                    .sorted(Comparator.comparing(BookDTO::getName))
-                    .toList();
+            LOGGER.debug("Search query is empty");
+            return bookDTOList;
         }
 
-        String filteredSearchQuery = searchQuery.trim().toLowerCase(Locale.ROOT);
-
-        List<BookDTO> result = new ArrayList<>();
-        for (BookDTO dto : bookDTOS) {
-            if (isAvailableByQuery(filteredSearchQuery, dto)) {
-                result.add(dto);
-            }
-        }
-
-        return result.stream()
-                .sorted(Comparator.comparing(BookDTO::getName))
-                .toList();
+        LOGGER.debug("Start search by query '{}'", searchQuery);
+        BaseOperand searchOperands = prepareSearchQuery(searchQuery);
+        return ofNullable(bookDTOList)
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(bookDTO -> filterByLogicalOperators(searchOperands, bookDTO))
+            .sorted(BOOK_NAME_COMPARATOR)
+            .toList();
     }
 
-    private boolean isAvailableByQuery(String searchQuery, BookDTO bookDTO) {
-        return isContainsValue(searchQuery, bookDTO.getName())
-                || isContainsValue(searchQuery, bookDTO.getAuthor())
-                || isContainsValue(searchQuery, bookDTO.getPublisher())
-                || isContainsValue(searchQuery, bookDTO.getCycleName())
-                || isContainsValue(searchQuery, bookDTO.getCycleNumber())
-                || isContainsValue(searchQuery, String.valueOf(bookDTO.getPages()))
-                || searchByKeyWord(searchQuery, bookDTO.getRead(), READ_SEARCH_KEY)
-                || searchByKeyWord(searchQuery, bookDTO.getCycleEnded(), ENDED_CYCLE_SEARCH_KEY)
-                || searchByAutograph(searchQuery, bookDTO.getAutograph().isSelected())
-                || searchByPrice(searchQuery, bookDTO.getPrice());
+    private BaseOperand prepareSearchQuery(String searchQuery) {
+        String filteredSearchQuery = searchQuery.trim();
+        Matcher operatorMatcher = OPERATOR_PATTERN.matcher(filteredSearchQuery);
+        if (operatorMatcher.matches()) {
+            String leftPart = operatorMatcher.group(1);
+            String rightPart = operatorMatcher.group(3);
+            String operator = operatorMatcher.group(2);
+
+            CompositeOperand compositeOperand = new CompositeOperand(OperatorType.getOperator(operator));
+            compositeOperand.getOperands().add(new SimpleOperand(leftPart));
+            compositeOperand.getOperands().add(prepareSearchQuery(rightPart));
+            return compositeOperand;
+        }
+        return new SimpleOperand(filteredSearchQuery.toLowerCase(Locale.ROOT));
     }
 
-    private boolean isContainsValue(String searchQuery, String field) {
-        return isNotBlank(field) && field.toLowerCase(Locale.ROOT).contains(searchQuery);
-    }
-
-    private boolean searchByKeyWord(String searchQuery, CheckBox checkBox, String searchKey) {
-        if (searchQuery.contains(searchKey)) {
-            if (searchQuery.startsWith(REVERSE_ORDER) && searchKey.equals(searchQuery.substring(1))) {
-                return checkBox != null && !checkBox.isSelected();
-            } else {
-                return searchKey.equals(searchQuery) && checkBox != null && checkBox.isSelected();
-            }
+    private boolean filterByLogicalOperators(BaseOperand searchOperands, BookDTO bookDTO) {
+        if (searchOperands instanceof SimpleOperand simpleOperand) {
+            return filterBySearchFilters(simpleOperand.getPredicate(), bookDTO);
         }
-
-        return false;
-    }
-
-    private boolean searchByAutograph(String searchQuery, boolean boolValue) {
-        if (AUTOGRAPH_SEARCH_KEY.equals(searchQuery) || AUTOGRAPH_SEARCH_KEY.equals(searchQuery.substring(1))) {
-            return searchQuery.startsWith(REVERSE_ORDER) != boolValue;
-        }
-        return false;
-    }
-
-    private boolean searchByPrice(String searchQuery, Double price) {
-        if (!searchQuery.contains(PRICE_SEARCH_KEY)) {
-            return false;
-        }
-
-        if (searchQuery.startsWith(REVERSE_ORDER)) {
-            return searchQuery.endsWith(PRICE_SEARCH_KEY) && price == null;
-        }
-
-        if (price == null) {
-            return false;
-        }
-
-        if (searchQuery.startsWith(PRICE_SEARCH_KEY)) {
-            String querySecondHalf = searchQuery.replace(PRICE_SEARCH_KEY, "");
-            String symbol = querySecondHalf.substring(0, 1);
-            Double parsedPrice = parseDouble(querySecondHalf.substring(1));
-            if (parsedPrice == null) {
-                return false;
-            }
-
-            return switch (symbol) {
-                case LESS_SEARCH_KEY -> price < parsedPrice;
-                case EQUALS_SEARCH_KEY -> price.equals(parsedPrice);
-                case MORE_SEARCH_KEY -> price > parsedPrice;
-                default -> false;
+        if (searchOperands instanceof CompositeOperand compositeOperand) {
+            Stream<BaseOperand> operandStream = compositeOperand.getOperands().stream();
+            return switch (compositeOperand.getOperator()) {
+                case AND -> operandStream.allMatch(operand -> filterByLogicalOperators(operand, bookDTO));
+                case OR -> operandStream.anyMatch(operand -> filterByLogicalOperators(operand, bookDTO));
             };
         }
+        return false;
+    }
+
+    private boolean filterBySearchFilters(String searchQuery, BookDTO bookDTO) {
+        for (Entry<Field, SearchFieldDefinition> searchFieldDefinitionEntry : fieldDefinitionMap.entrySet()) {
+            try {
+                Field searchField = searchFieldDefinitionEntry.getKey();
+                SearchFieldDefinition searchFieldDefinition = searchFieldDefinitionEntry.getValue();
+
+                SearchFilter searchFilter = SearchFilterFactory.getSearchFilter(searchField.getType());
+                if (searchFilter != null) {
+                    Object fieldValue = searchField.get(bookDTO);
+                    if (searchFilter.filter(fieldValue, searchQuery, searchFieldDefinition)) {
+                        return true;
+                    }
+                }
+
+            } catch (Exception e) {
+                LOGGER.error("Exception while search by query '{}' for DTO: {}", searchQuery, bookDTO, e);
+            }
+        }
 
         return false;
     }
 
-    private Double parseDouble(String value) {
-        try {
-            return Double.valueOf(value);
-        } catch (Exception e) {
-            return null;
+    private void initializeFieldsDefinitionMap(List<Field> searchFields) {
+        for (Field searchField : searchFields) {
+            SearchField searchFieldAnnotation = searchField.getAnnotation(SearchField.class);
+            SearchFieldDefinition searchFieldDefinition = new SearchFieldDefinition(
+                Arrays.asList(searchFieldAnnotation.aliases())
+            );
+
+            fieldDefinitionMap.put(searchField, searchFieldDefinition);
         }
+    }
+
+    private void initializeFieldsSearchTooltip(List<Field> searchFields) {
+        StringBuilder stringFieldsTooltipBuilder = new StringBuilder();
+        StringBuilder tooltipBuilder = new StringBuilder(
+            format("Поиск через условие: [%s] и [%s]%n",
+                arrayToString(AND.getNames()),
+                arrayToString(OR.getNames())
+            ));
+
+        for (Field searchField : searchFields) {
+            SearchField searchFieldAnnotation = searchField.getAnnotation(SearchField.class);
+            if (searchFieldAnnotation.aliases().length == 0) {
+                stringFieldsTooltipBuilder
+                    .append("- ")
+                    .append(searchFieldAnnotation.description())
+                    .append("\n");
+
+            } else {
+                SearchFilter searchFilter = SearchFilterFactory.getSearchFilter(searchField.getType());
+                tooltipBuilder.append(format("- %s: %s, %s%n",
+                    searchFieldAnnotation.description(),
+                    arrayToString(searchFieldAnnotation.aliases()),
+                    searchFilter.getTooltipInfo()
+                ));
+            }
+        }
+
+        tooltipBuilder
+            .append("\n")
+            .append("Помимо этого происходит:\n")
+            .append(stringFieldsTooltipBuilder);
+
+        this.generatedTooltip = tooltipBuilder.toString();
+    }
+
+    private String arrayToString(String[] aliases) {
+        return arrayToString(Arrays.asList(aliases));
+    }
+
+    private String arrayToString(List<String> names) {
+        return "\"" + String.join("\" или \"", names) + "\"";
     }
 }

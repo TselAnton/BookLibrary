@@ -1,0 +1,80 @@
+package com.tsel.home.project.booklibrary.dao.repository.impl;
+
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+
+import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepository;
+import com.tsel.home.project.booklibrary.dao.data.Author;
+import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Publisher;
+import com.tsel.home.project.booklibrary.utils.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+@Deprecated(since = "4.0")
+public class BookRepository extends AbstractFileRepository<Book> {
+
+    private static final AuthorRepository AUTHOR_REPOSITORY = AuthorRepository.getInstance();
+    private static final PublisherRepository PUBLISHER_REPOSITORY = PublisherRepository.getInstance();
+    private static final CycleRepository CYCLE_REPOSITORY = CycleRepository.getInstance();
+
+    private static final String DEFAULT_STORAGE_FILE_NAME = "my-library-books-storage.txt";
+
+    private static final List<Consumer<Book>> PREPARE_FUNCTIONS = List.of(
+        book -> book.setPrice(book.getPrice() == null ? null : book.getPrice()),
+        book -> book.setHardCover(book.getHardCover() == null || book.getHardCover()),
+        book -> book.setAudiobookSites(book.getAudiobookSites() == null ? new ArrayList<>() : book.getAudiobookSites()),
+        book -> book.setAutograph(book.getAutograph() != null ? book.getAutograph() : false)
+    );
+
+    private static BookRepository INSTANCE;
+
+    public static BookRepository getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new BookRepository(DEFAULT_STORAGE_FILE_NAME);
+        }
+        return INSTANCE;
+    }
+
+    protected BookRepository(String storageFileName) {
+        super(storageFileName);
+    }
+
+    @Override
+    public void delete(Book entity) {
+        String author = entity.getAuthor();
+        String publisher = entity.getPublisher();
+        String cycle = entity.getCycleName();
+
+        super.delete(entity);
+
+        if (isNotLinkedValue(author, Book::getAuthor)) {
+            AUTHOR_REPOSITORY.delete(new Author(author));
+        }
+
+        if (isNotLinkedValue(publisher, Book::getPublisher)) {
+            PUBLISHER_REPOSITORY.delete(new Publisher(publisher));
+        }
+
+        if (isNotBlank(cycle) && isNotLinkedValue(cycle, Book::getCycleName)) {
+            Cycle oldCycle = CYCLE_REPOSITORY.getByName(cycle);
+            CYCLE_REPOSITORY.delete(oldCycle);
+        }
+    }
+
+    private boolean isNotLinkedValue(String value, Function<Book, String> mapFunc) {
+        return repositoryMap.values()
+                .stream()
+                .map(mapFunc)
+                .filter(StringUtils::isNotBlank)
+                .noneMatch(field -> field.equals(value));
+    }
+
+    @Override
+    protected void updateNewFields() {
+        repositoryMap.values().forEach(book -> PREPARE_FUNCTIONS.forEach(prepareFunction -> prepareFunction.accept(book)));
+        updateStorageFile();
+    }
+}

@@ -3,8 +3,14 @@
 /logs/
 /target/
 /setup/
-/Обложки для книг/
-/library-dump/
-/*Features
+/backup/
+/repository/
 /dependency-reduced-pom.xml
-/test_cover.png
+/TODO.txt
+/my-library-audio-book-site-storage.txt
+/my-library-authors-storage.txt
+/my-library-books-storage.txt
+/my-library-cycles-storage.txt
+/my-library-publishers-storage.txt
+/my-library-user-settings-storage.txt
+/.properties

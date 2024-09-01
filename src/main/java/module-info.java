@@ -14,4 +14,9 @@ open module com.tsel.home.project.booklibrary {
     requires org.apache.logging.log4j;
 
     requires lombok;
+    requires org.reflections;
+    requires com.google.gson;
+    requires jsr305;
+    requires backport.util.concurrent;
+    requires org.slf4j;
 }

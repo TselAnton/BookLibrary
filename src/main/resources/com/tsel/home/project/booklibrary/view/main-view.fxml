@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainStage" minHeight="700.0" minWidth="812.0" prefHeight="700.0" prefWidth="1252.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.MainViewController">
+<AnchorPane fx:id="mainAnchorPane" minHeight="700.0" minWidth="812.0" prefHeight="700.0" prefWidth="1252.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.impl.MainViewController">
    <children>
       <AnchorPane maxHeight="240.0" minHeight="125.0" prefHeight="240.0" prefWidth="1226.0" style="-fx-background-color: #8B936B;" AnchorPane.bottomAnchor="460.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
