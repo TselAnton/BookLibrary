@@ -1,9 +1,9 @@
 package com.tsel.home.project.booklibrary.dto;
 
-import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 
 import com.tsel.home.project.booklibrary.dao.data.Book;
-import com.tsel.home.project.booklibrary.provider.ImageProvider;
+import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.search.SearchField;
 import java.util.List;
 import java.util.UUID;

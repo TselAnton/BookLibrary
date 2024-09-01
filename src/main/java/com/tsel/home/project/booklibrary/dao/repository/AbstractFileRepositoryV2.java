@@ -10,7 +10,7 @@ import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.exception.NotNullConstraintException;
 import com.tsel.home.project.booklibrary.dao.identifier.IdentifierGenerator;
-import com.tsel.home.project.booklibrary.provider.FileRepositoryProvider;
+import com.tsel.home.project.booklibrary.helper.FileRepositoryProvider;
 import com.tsel.home.project.booklibrary.utils.StringUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;

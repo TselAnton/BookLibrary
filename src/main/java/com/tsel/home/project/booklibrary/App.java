@@ -10,11 +10,11 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
-import com.tsel.home.project.booklibrary.provider.DateProvider;
-import com.tsel.home.project.booklibrary.provider.ImageProvider;
-import com.tsel.home.project.booklibrary.provider.PropertyProvider;
-import com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider;
-import com.tsel.home.project.booklibrary.provider.StorageBackupArchiver;
+import com.tsel.home.project.booklibrary.helper.DateProvider;
+import com.tsel.home.project.booklibrary.helper.ImageProvider;
+import com.tsel.home.project.booklibrary.helper.PropertyProvider;
+import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
+import com.tsel.home.project.booklibrary.helper.StorageBackupArchiver;
 import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
@@ -39,19 +39,19 @@ public class App {
         }
 
         private static void initApplicationContext() {
-            SimpleApplicationContextProvider.initBean(PropertyProvider.class, () -> new PropertyProvider(buildPathFromCurrentDir()));
+            SimpleApplicationContext.initBean(PropertyProvider.class, () -> new PropertyProvider(buildPathFromCurrentDir()));
 
-            SimpleApplicationContextProvider.initBean(AudioBookSiteRepositoryV2.class, AudioBookSiteRepositoryV2::new);
-            SimpleApplicationContextProvider.initBean(AuthorRepositoryV2.class, AuthorRepositoryV2::new);
-            SimpleApplicationContextProvider.initBean(CycleRepositoryV2.class, CycleRepositoryV2::new);
-            SimpleApplicationContextProvider.initBean(PublisherRepositoryV2.class, PublisherRepositoryV2::new);
-            SimpleApplicationContextProvider.initBean(UserSettingsRepositoryV2.class, UserSettingsRepositoryV2::new);
-            SimpleApplicationContextProvider.initBean(BookRepositoryV2.class, BookRepositoryV2::new);
+            SimpleApplicationContext.initBean(AudioBookSiteRepositoryV2.class, AudioBookSiteRepositoryV2::new);
+            SimpleApplicationContext.initBean(AuthorRepositoryV2.class, AuthorRepositoryV2::new);
+            SimpleApplicationContext.initBean(CycleRepositoryV2.class, CycleRepositoryV2::new);
+            SimpleApplicationContext.initBean(PublisherRepositoryV2.class, PublisherRepositoryV2::new);
+            SimpleApplicationContext.initBean(UserSettingsRepositoryV2.class, UserSettingsRepositoryV2::new);
+            SimpleApplicationContext.initBean(BookRepositoryV2.class, BookRepositoryV2::new);
 
-            SimpleApplicationContextProvider.initBean(ImageProvider.class, ImageProvider::new);
-            SimpleApplicationContextProvider.initBean(SearchService.class, SearchService::new);
-            SimpleApplicationContextProvider.initBean(TableScroll.class, TableScroll::new);
-            SimpleApplicationContextProvider.initBean(DateProvider.class, DateProvider::new);
+            SimpleApplicationContext.initBean(ImageProvider.class, ImageProvider::new);
+            SimpleApplicationContext.initBean(SearchService.class, SearchService::new);
+            SimpleApplicationContext.initBean(TableScroll.class, TableScroll::new);
+            SimpleApplicationContext.initBean(DateProvider.class, DateProvider::new);
 
             StorageBackupArchiver storageBackupArchiver = new StorageBackupArchiver();
             storageBackupArchiver.archiveStorages(DEFAULT_REPOSITORY_PATH, BACKUP_PATH);

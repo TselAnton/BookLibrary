@@ -1,6 +1,6 @@
 package com.tsel.home.project.booklibrary.controller.impl.audiobook;
 
-import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 import static javafx.collections.FXCollections.observableList;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;

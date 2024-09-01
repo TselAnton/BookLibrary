@@ -7,10 +7,10 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
-import com.tsel.home.project.booklibrary.provider.DateProvider;
-import com.tsel.home.project.booklibrary.provider.ImageProvider;
-import com.tsel.home.project.booklibrary.provider.PropertyProvider;
-import com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider;
+import com.tsel.home.project.booklibrary.helper.DateProvider;
+import com.tsel.home.project.booklibrary.helper.ImageProvider;
+import com.tsel.home.project.booklibrary.helper.PropertyProvider;
+import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
 import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
@@ -42,19 +42,19 @@ public abstract class AbstractJavaFxTest {
 
         testDateProvider = new TestDateProvider();
 
-        SimpleApplicationContextProvider.initBean(PropertyProvider.class, () -> new PropertyProvider(temporaryDirectory));
+        SimpleApplicationContext.initBean(PropertyProvider.class, () -> new PropertyProvider(temporaryDirectory));
 
-        SimpleApplicationContextProvider.initBean(AudioBookSiteRepositoryV2.class, () -> audioBookSiteRepository);
-        SimpleApplicationContextProvider.initBean(AuthorRepositoryV2.class, () -> authorRepository);
-        SimpleApplicationContextProvider.initBean(CycleRepositoryV2.class, () -> cycleRepositoryV2);
-        SimpleApplicationContextProvider.initBean(PublisherRepositoryV2.class, () -> publisherRepositoryV2);
-        SimpleApplicationContextProvider.initBean(UserSettingsRepositoryV2.class, () -> userSettingsRepositoryV2);
-        SimpleApplicationContextProvider.initBean(BookRepositoryV2.class, () -> bookRepositoryV2);
+        SimpleApplicationContext.initBean(AudioBookSiteRepositoryV2.class, () -> audioBookSiteRepository);
+        SimpleApplicationContext.initBean(AuthorRepositoryV2.class, () -> authorRepository);
+        SimpleApplicationContext.initBean(CycleRepositoryV2.class, () -> cycleRepositoryV2);
+        SimpleApplicationContext.initBean(PublisherRepositoryV2.class, () -> publisherRepositoryV2);
+        SimpleApplicationContext.initBean(UserSettingsRepositoryV2.class, () -> userSettingsRepositoryV2);
+        SimpleApplicationContext.initBean(BookRepositoryV2.class, () -> bookRepositoryV2);
 
-        SimpleApplicationContextProvider.initBean(ImageProvider.class, ImageProvider::new);
-        SimpleApplicationContextProvider.initBean(SearchService.class, SearchService::new);
-        SimpleApplicationContextProvider.initBean(TableScroll.class, TableScroll::new);
-        SimpleApplicationContextProvider.initBean(DateProvider.class, () -> testDateProvider);
+        SimpleApplicationContext.initBean(ImageProvider.class, ImageProvider::new);
+        SimpleApplicationContext.initBean(SearchService.class, SearchService::new);
+        SimpleApplicationContext.initBean(TableScroll.class, TableScroll::new);
+        SimpleApplicationContext.initBean(DateProvider.class, () -> testDateProvider);
     }
 
     protected void fillInTextField(String elementName, String text, FxRobot robot) {

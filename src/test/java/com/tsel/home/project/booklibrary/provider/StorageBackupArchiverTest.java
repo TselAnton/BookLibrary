@@ -11,6 +11,10 @@ import static org.hamcrest.Matchers.hasSize;
 import com.tsel.home.project.booklibrary.TestDateProvider;
 import com.tsel.home.project.booklibrary.TestFileRepository;
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
+import com.tsel.home.project.booklibrary.helper.DateProvider;
+import com.tsel.home.project.booklibrary.helper.PropertyProvider;
+import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
+import com.tsel.home.project.booklibrary.helper.StorageBackupArchiver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -49,7 +53,7 @@ class StorageBackupArchiverTest {
 
     @Test
     void testArchiveStorages(@TempDir Path tempDirectory) {
-        SimpleApplicationContextProvider.initBean(DateProvider.class, () -> TEST_DATE_PROVIDER);
+        SimpleApplicationContext.initBean(DateProvider.class, () -> TEST_DATE_PROVIDER);
 
         createTempFile(tempDirectory, TEST_FILE_1_NAME, "{\"test1\": \"value1\"}");
         createTempFile(tempDirectory, TEST_FILE_2_NAME, "{\"test2\": \"value2\"}");
@@ -70,8 +74,8 @@ class StorageBackupArchiverTest {
     @Test
     @SneakyThrows
     void testRemoveExpiredArchiveStorages(@TempDir Path tempDirectory) {
-        SimpleApplicationContextProvider.initBean(PropertyProvider.class, () -> new PropertyProvider(tempDirectory));
-        SimpleApplicationContextProvider.initBean(DateProvider.class, () -> TEST_DATE_PROVIDER);
+        SimpleApplicationContext.initBean(PropertyProvider.class, () -> new PropertyProvider(tempDirectory));
+        SimpleApplicationContext.initBean(DateProvider.class, () -> TEST_DATE_PROVIDER);
 
         createTempFile(tempDirectory, TEST_FILE_1_NAME, "{\"test1\": \"value1\"}");
         createTempFile(tempDirectory, TEST_FILE_2_NAME, "{\"test2\": \"value2\"}");

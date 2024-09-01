@@ -1,14 +1,14 @@
-package com.tsel.home.project.booklibrary.provider;
+package com.tsel.home.project.booklibrary.helper;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public final class SimpleApplicationContextProvider {
+public final class SimpleApplicationContext {
 
     private static final Map<Class<?>, ? super Object> APPLICATION_CONTEXT = new HashMap<>();
 
-    private SimpleApplicationContextProvider() {}
+    private SimpleApplicationContext() {}
 
     public static <T> T getBean(Class<T> beanClass) {
         return beanClass.cast(APPLICATION_CONTEXT.get(beanClass));

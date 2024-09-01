@@ -1,7 +1,5 @@
-package com.tsel.home.project.booklibrary.provider;
+package com.tsel.home.project.booklibrary.helper;
 
-import static com.tsel.home.project.booklibrary.provider.PropertyProvider.MAX_ARCHIVED_BACKUPS;
-import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
 import static org.reflections.scanners.Scanners.SubTypes;
 import static org.reflections.scanners.Scanners.TypesAnnotated;
 
@@ -125,14 +123,14 @@ public final class StorageBackupArchiver {
     }
 
     private Path resolveFullArchivePath(Path archivePath) {
-        return archivePath.resolve((PREFIX + DATE_TIME_FORMATTER.format(getBean(DateProvider.class).getNow()) + POSTFIX));
+        return archivePath.resolve((PREFIX + DATE_TIME_FORMATTER.format(SimpleApplicationContext.getBean(DateProvider.class).getNow()) + POSTFIX));
     }
 
     private Integer resolveMaxArchivedBackups() {
         try {
-            return Integer.parseInt(getBean(PropertyProvider.class).getProperty(MAX_ARCHIVED_BACKUPS));
+            return Integer.parseInt(SimpleApplicationContext.getBean(PropertyProvider.class).getProperty(PropertyProvider.MAX_ARCHIVED_BACKUPS));
         } catch (NumberFormatException e) {
-            log.warn("Cant read property '{}'. Set it default as {}", MAX_ARCHIVED_BACKUPS, DEFAULT_EXPIRED_LIMIT);
+            log.warn("Cant read property '{}'. Set it default as {}", PropertyProvider.MAX_ARCHIVED_BACKUPS, DEFAULT_EXPIRED_LIMIT);
             return DEFAULT_EXPIRED_LIMIT;
         }
     }

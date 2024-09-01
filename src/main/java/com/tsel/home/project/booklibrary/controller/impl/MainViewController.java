@@ -1,6 +1,6 @@
 package com.tsel.home.project.booklibrary.controller.impl;
 
-import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static com.tsel.home.project.booklibrary.utils.table.TableComparators.CHECK_BOX_COMPARATOR;
 import static com.tsel.home.project.booklibrary.utils.table.TableComparators.NON_COMPARATOR;

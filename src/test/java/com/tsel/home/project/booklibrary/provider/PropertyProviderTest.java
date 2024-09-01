@@ -2,13 +2,14 @@ package com.tsel.home.project.booklibrary.provider;
 
 import static com.tsel.home.project.booklibrary.TestFileUtils.readFileContent;
 import static com.tsel.home.project.booklibrary.TestFileUtils.writeFileContent;
-import static com.tsel.home.project.booklibrary.provider.PropertyProvider.MAX_ARCHIVED_BACKUPS;
-import static com.tsel.home.project.booklibrary.provider.PropertyProvider.PROPERTY_FILE_PATH;
+import static com.tsel.home.project.booklibrary.helper.PropertyProvider.MAX_ARCHIVED_BACKUPS;
+import static com.tsel.home.project.booklibrary.helper.PropertyProvider.PROPERTY_FILE_PATH;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.tsel.home.project.booklibrary.helper.PropertyProvider;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;

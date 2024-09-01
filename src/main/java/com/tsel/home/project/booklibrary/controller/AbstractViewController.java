@@ -1,6 +1,6 @@
 package com.tsel.home.project.booklibrary.controller;
 
-import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 
 import com.tsel.home.project.booklibrary.converter.BookConverter;
 import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepositoryV2;
@@ -9,7 +9,7 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
-import com.tsel.home.project.booklibrary.provider.ImageProvider;
+import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import java.net.URI;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;

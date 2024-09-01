@@ -1,6 +1,6 @@
 package com.tsel.home.project.booklibrary.dao.repository.impl;
 
-import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.Book;

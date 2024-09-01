@@ -1,6 +1,6 @@
 package com.tsel.home.project.booklibrary.converter;
 
-import static com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvider.getBean;
+import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 import static com.tsel.home.project.booklibrary.utils.CollectionUtils.isNotEmpty;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
