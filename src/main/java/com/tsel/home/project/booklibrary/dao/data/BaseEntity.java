@@ -7,7 +7,4 @@ public interface BaseEntity<K extends Serializable> extends Serializable {
     K getId();
 
     void setId(K id);
-
-    @Deprecated(since = "4.0")
-    String getKey();
 }

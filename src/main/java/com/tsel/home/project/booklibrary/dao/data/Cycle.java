@@ -32,9 +32,4 @@ public class Cycle implements BaseEntity<UUID> {
 
     @Property(value = "книг в цикле", nullable = false)
     private Integer booksInCycle = 1;
-
-    @Override
-    public String getKey() {
-        return name;
-    }
 }

@@ -5,7 +5,6 @@ import com.tsel.home.project.booklibrary.dao.annotation.Property;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +18,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"coverImgAbsolutePath", "bookshelf"})
+@EqualsAndHashCode(exclude = {"coverImgAbsolutePath"})
 @EntityDisplayName("Книга")
 public class Book implements BaseEntity<UUID> {
 
@@ -64,39 +63,4 @@ public class Book implements BaseEntity<UUID> {
 
     @Property(value = "аудиокниги")
     private List<UUID> audioBookSiteIds = new ArrayList<>();
-
-    @Deprecated
-    private List<String> audiobookSites = new ArrayList<>();
-
-    @Deprecated
-    private String author;
-    @Deprecated
-    private Integer bookshelf;
-    @Deprecated
-    private String cycleName;
-    @Deprecated
-    private String publisher;
-
-    @Deprecated
-    @Override
-    public String getKey() {
-        StringBuilder compositeKey = new StringBuilder();
-        compositeKey.append(name.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-        compositeKey.append("_");
-        compositeKey.append(author.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-        compositeKey.append("_");
-        compositeKey.append(publisher.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-
-        if (cycleName != null) {
-            compositeKey.append("_");
-            compositeKey.append(cycleName.replaceAll(" ", "_").toLowerCase(Locale.ROOT));
-        }
-
-        if (numberInSeries != null) {
-            compositeKey.append("_");
-            compositeKey.append(numberInSeries);
-        }
-
-        return compositeKey.toString();
-    }
 }

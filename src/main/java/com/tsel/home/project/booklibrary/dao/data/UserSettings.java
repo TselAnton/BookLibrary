@@ -32,9 +32,4 @@ public class UserSettings implements BaseEntity<String> {
     public void setId(String id) {
         // NOT NEEDED
     }
-
-    @Override
-    public String getKey() {
-        return "userSettings";
-    }
 }

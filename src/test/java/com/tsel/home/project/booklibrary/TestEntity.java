@@ -26,9 +26,4 @@ public class TestEntity implements BaseEntity<String> {
         this.integer = integer;
         this.id = UUID.randomUUID().toString();
     }
-
-    @Override
-    public String getKey() {
-        return "NOOP";
-    }
 }

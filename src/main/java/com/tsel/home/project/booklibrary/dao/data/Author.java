@@ -26,15 +26,4 @@ public class Author implements BaseEntity<UUID> {
 
     @Property(value = "имя", nullable = false)
     private String name;
-
-    @Deprecated(since = "4.0")
-    public Author(String name) {
-        this.id = UUID.randomUUID();
-        this.name = name;
-    }
-
-    @Override
-    public String getKey() {
-        return name;
-    }
 }

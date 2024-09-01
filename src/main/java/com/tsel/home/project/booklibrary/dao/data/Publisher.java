@@ -26,14 +26,4 @@ public class Publisher implements BaseEntity<UUID> {
 
     @Property(value = "название", nullable = false)
     private String name;
-
-    public Publisher(String name) {
-        this.id = UUID.randomUUID();
-        this.name = name;
-    }
-
-    @Override
-    public String getKey() {
-        return name;
-    }
 }

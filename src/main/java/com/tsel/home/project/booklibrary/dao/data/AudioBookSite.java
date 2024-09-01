@@ -26,15 +26,4 @@ public class AudioBookSite implements BaseEntity<UUID> {
 
     @Property(value = "название", nullable = false)
     private String name;
-
-    @Deprecated(since = "4.0")
-    public AudioBookSite(String name) {
-        this.id = UUID.randomUUID();
-        this.name = name;
-    }
-
-    @Override
-    public String getKey() {
-        return name;
-    }
 }
