@@ -14,9 +14,11 @@ import com.tsel.home.project.booklibrary.provider.SimpleApplicationContextProvid
 import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
+import javafx.scene.input.KeyCode;
 import org.junit.jupiter.api.io.TempDir;
 import org.testfx.api.FxRobot;
 
+// Тесты основанные на https://github.com/TestFX/TestFX
 public abstract class AbstractJavaFxTest {
 
     @TempDir
@@ -63,6 +65,16 @@ public abstract class AbstractJavaFxTest {
     protected void fillInNumberField(String elementName, Number number, FxRobot robot) {
         robot.clickOn(elementName.startsWith("#") ? elementName : "#" + elementName);
         robot.write(String.valueOf(number));
+    }
+
+    protected void pressKey(KeyCode keyCode, FxRobot robot) {
+        robot.press(keyCode);
+        robot.release(keyCode);
+    }
+
+    protected void fillIntComboBoxText(String elementName, String text, FxRobot fxRobot) {
+        fillInTextField(elementName, text, fxRobot);
+        pressKey(KeyCode.TAB, fxRobot);
     }
 }
 

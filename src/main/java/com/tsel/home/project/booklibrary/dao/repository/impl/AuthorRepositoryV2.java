@@ -7,6 +7,7 @@ import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
 import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @FileStorageName("authorStorage.json")
@@ -18,6 +19,13 @@ public class AuthorRepositoryV2 extends AbstractFileRepositoryV2<UUID, Author> {
 
     public AuthorRepositoryV2() {
         super(Author.class, new UUIDIdentifierGenerator(), DEFAULT_REPOSITORY_PATH);
+    }
+
+    public Optional<Author> getByName(String name) {
+        return getRepositoryMap().values()
+            .stream()
+            .filter(author -> author.getName().contains(name))
+            .findFirst();
     }
 
     @Override

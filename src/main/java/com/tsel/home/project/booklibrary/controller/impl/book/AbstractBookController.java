@@ -22,9 +22,9 @@ import com.tsel.home.project.booklibrary.dto.AuthorDTO;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
 import com.tsel.home.project.booklibrary.dto.CycleDTO;
 import com.tsel.home.project.booklibrary.dto.PublisherDTO;
-import com.tsel.home.project.booklibrary.utils.table.CustomFileChooser;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import com.tsel.home.project.booklibrary.utils.table.AutoCompleteComboBoxListener;
+import com.tsel.home.project.booklibrary.utils.table.CustomFileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -267,21 +267,14 @@ public abstract class AbstractBookController extends AbstractViewController {
             cycleRepository.beginTransaction();
             bookRepository.beginTransaction();
 
-            Author newAuthor = new Author(author.getId(), author.getName());
+            Author newAuthor = resolveAuthorByComboBox(author);
             authorRepository.save(newAuthor);
 
-            Publisher newPublisher = new Publisher(publisher.getId(), publisher.getName());
+            Publisher newPublisher = resolvePublisherByComboBox(publisher);
             publisherRepository.save(newPublisher);
 
-            Cycle newCycle = null;
-            if (cycle != null) {
-                newCycle = Cycle.builder()
-                    .id(cycle.getId())
-                    .name(cycle.getName())
-                    .ended(cycleEndedFlag)
-                    .booksInCycle(stringToInteger(cycleTotalBookCount))
-                    .build();
-
+            Cycle newCycle = resolveCycleByComboBox(cycle, cycleEndedFlag, stringToInteger(cycleTotalBookCount));
+            if (newCycle != null) {
                 cycleRepository.save(newCycle);
             }
 
@@ -294,7 +287,7 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .read(readBookFlag)
                 .autograph(isChecked(getAutographCheckBox()))
                 .cycleId(newCycle != null ? newCycle.getId() : null)
-                .numberInSeries(stringToInteger(cycleBookNumber))
+                .numberInSeries(newCycle != null ? stringToInteger(cycleBookNumber) : null)
                 .coverImgAbsolutePath(imagePath)
                 .price(stringToDouble(bookPrice))
                 .hardCover(hardCoverFlag)
@@ -451,5 +444,34 @@ public abstract class AbstractBookController extends AbstractViewController {
 
     private static boolean isInvalidIntegerValue(String cycleBookNumber) {
         return isNotBlank(cycleBookNumber) && stringToInteger(cycleBookNumber) == null;
+    }
+
+    private Author resolveAuthorByComboBox(ComboBoxDTO authorComboBox) {
+        return authorComboBox.getId() != null
+            ? new Author(authorComboBox.getId(), authorComboBox.getName())
+            : authorRepository.getByName(authorComboBox.getName()).orElse(new Author(null, authorComboBox.getName()));
+    }
+
+    private Publisher resolvePublisherByComboBox(ComboBoxDTO publisherComboBox) {
+        return publisherComboBox.getId() != null
+            ? new Publisher(publisherComboBox.getId(), publisherComboBox.getName())
+            : publisherRepository.getByName(publisherComboBox.getName()).orElse(new Publisher(null, publisherComboBox.getName()));
+    }
+
+    private Cycle resolveCycleByComboBox(ComboBoxDTO cycleComboBox, boolean isCycleEnded, Integer booksInCycle) {
+        if (cycleComboBox == null) {
+            return null;
+        }
+        if (cycleComboBox.getId() != null) {
+            return new Cycle(cycleComboBox.getId(), cycleComboBox.getName(), isCycleEnded, booksInCycle);
+        }
+
+        return cycleRepository.getByName(cycleComboBox.getName())
+            .map(existedCycle -> {
+                existedCycle.setEnded(isCycleEnded);
+                existedCycle.setBooksInCycle(booksInCycle);
+                return existedCycle;
+            })
+            .orElse(new Cycle(null, cycleComboBox.getName(), isCycleEnded, booksInCycle));
     }
 }

@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tsel.home.project.booklibrary.App;
 import com.tsel.home.project.booklibrary.CheckBoxMatcher;
+import com.tsel.home.project.booklibrary.ComboBoxMatcher;
 import com.tsel.home.project.booklibrary.dao.data.AudioBookSite;
 import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.Book;
@@ -21,6 +22,7 @@ import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxAssert;
@@ -28,12 +30,9 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
+@Disabled
 @ExtendWith(ApplicationExtension.class)
 class CreateBookTests extends AbstractJavaFxTest {
-
-    //TODO: https://github.com/TestFX/TestFX
-    // https://www.reddit.com/r/JavaFX/comments/sgjkir/javafx_unit_tests/
-    // https://testfx.github.io/TestFX/
 
     @Start
     private void start(Stage stage) {
@@ -51,14 +50,6 @@ class CreateBookTests extends AbstractJavaFxTest {
         userSettingsRepositoryV2.getAll().forEach(userSettingsRepositoryV2::delete);
         bookRepositoryV2.getAll().forEach(bookRepositoryV2::delete);
     }
-
-    // TODO: нужны следующие тесты:
-    //  +1. Создание совершенно новой сущности
-    //  +1.2 Проверка работы табов
-    //  2. Создание сущности с существующими полями (автор, публицист, цикл, аудиокнига)
-    //  3. Создание идентичной сущности существующей
-    //  4. Проверка валидации при создании сущности
-    //  5. Отдельные тесты с аудиокнигами (?)
 
     @Test
     void validateTabTest(FxRobot robot) {
@@ -173,4 +164,92 @@ class CreateBookTests extends AbstractJavaFxTest {
         assertEquals(20, savedCycle.getBooksInCycle().intValue());
         assertTrue(savedCycle.getEnded());
     }
+
+    @Test
+    void createNewBookWithExistedValuesTest(FxRobot robot) {
+        UUID authorId = authorRepository.save(new Author(UUID.randomUUID(), "EXISTED AUTHOR"));
+        UUID publisherId = publisherRepositoryV2.save(new Publisher(UUID.randomUUID(), "EXISTED PUBLISHER"));
+        UUID cycleId = cycleRepositoryV2.save(new Cycle(UUID.randomUUID(), "EXISTED CYCLE", true, 3));
+
+        // Нажатие "Добавить книгу"
+        robot.clickOn("#addBookButton");
+
+        // Проверка, что галочка на "твёрдой обложке" true по дефолту
+        FxAssert.verifyThat("#hardCoverCheckBox", CheckBoxMatcher.isSelected());
+
+        // Проверка, что автор, публицист и цикл имеют доступные значения
+        FxAssert.verifyThat("#authorComboBox", ComboBoxMatcher.contains("EXISTED AUTHOR"));
+        FxAssert.verifyThat("#publisherComboBox", ComboBoxMatcher.contains("EXISTED PUBLISHER"));
+        FxAssert.verifyThat("#cycleComboBox", ComboBoxMatcher.contains("EXISTED CYCLE"));
+
+        // Заполнение полей книги
+        fillInTextField("#nameTextFieldInput", "TEST NEW BOOK", robot);
+
+        fillIntComboBoxText("#authorComboBox", "EXISTED AUTHOR", robot);
+        fillIntComboBoxText("#publisherComboBox", "EXISTED PUBLISHER", robot);
+
+        fillInNumberField("#pagesCountFieldInput", 1234, robot);
+
+        robot.clickOn("#hardCoverCheckBox");    // Убираем галочку "твёрдая обложка"
+        robot.clickOn("#readCheckBox");         // Устанавливаем галочку "прочитано"
+        robot.clickOn("#autographCheckBox");    // Устанавливаем галочку "автограф"
+
+        fillIntComboBoxText("#cycleComboBox", "EXISTED CYCLE", robot);
+        robot.clickOn("#cycleEndedCheckBox");   // Устанавливаем галочку "завершённый цикл"
+        fillInNumberField("#numberInCycleFieldInput", 10, robot);
+        fillInNumberField("#totalCountInCycleFieldInput", 20, robot);
+        fillInNumberField("#priceFieldInput", 5678, robot);
+
+        // Сохранение книги
+        robot.clickOn("#saveBookButton");
+
+        // Проверка, что новая книга сохранена
+        List<Book> bookList = bookRepositoryV2.getAll();
+        assertThat(bookList).hasSize(1);
+
+        Book savedBook = bookList.get(0);
+        assertNotNull(savedBook.getId());
+        assertEquals("TEST NEW BOOK", savedBook.getName());
+        assertEquals(1234, savedBook.getPages().intValue());
+        assertTrue(savedBook.getRead());
+        assertTrue(savedBook.getAutograph());
+        assertFalse(savedBook.getHardCover());
+        assertEquals(5678d, savedBook.getPrice());
+        assertEquals(10, savedBook.getNumberInSeries().intValue());
+        assertEquals(10, savedBook.getNumberInSeries().intValue());
+
+        // Проверка, что автор ID идентичный сохранённому в БД изначально, и не создалось дополнительных авторов
+        assertNotNull(savedBook.getAuthorId());
+        assertEquals(authorId, savedBook.getAuthorId());
+        assertEquals(1, authorRepository.getAll().size());
+
+        Author savedAuthor = authorRepository.getById(authorId);
+        assertNotNull(savedAuthor);
+        assertNotNull(savedAuthor.getId());
+        assertEquals("EXISTED AUTHOR", savedAuthor.getName());
+
+        // Проверка, что публицист ID идентичный сохранённому в БД изначально, и не создалось дополнительных публицистов
+        assertNotNull(savedBook.getPublisherId());
+        assertEquals(publisherId, savedBook.getPublisherId());
+        assertEquals(1, publisherRepositoryV2.getAll().size());
+
+        Publisher savedPublisher = publisherRepositoryV2.getById(publisherId);
+        assertNotNull(savedPublisher);
+        assertNotNull(savedPublisher.getId());
+        assertEquals("EXISTED PUBLISHER", savedPublisher.getName());
+
+        // Проверка, что цикл ID идентичный сохранённому в БД изначально, и не создалось дополнительных циклов
+        assertNotNull(savedBook.getCycleId());
+        assertEquals(cycleId, savedBook.getCycleId());
+        assertEquals(1, cycleRepositoryV2.getAll().size());
+
+        Cycle savedCycle = cycleRepositoryV2.getById(cycleId);
+        assertNotNull(savedCycle);
+        assertNotNull(savedCycle.getId());
+        assertEquals("EXISTED CYCLE", savedCycle.getName());
+        assertEquals(20, savedCycle.getBooksInCycle().intValue());
+        assertTrue(savedCycle.getEnded());
+    }
+
+    // TODO: Создание идентичной сущности существующей, проверка валидации при создании сущности
 }

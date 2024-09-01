@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
@@ -148,7 +149,10 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
 
     private void checkConstrains(E entity) {
         checkNotNullFields(entity);
-        this.repositoryMap.values().forEach(existedEntity -> compareEntities(entity, existedEntity));
+        this.repositoryMap.values()
+            .stream()
+            .filter(existedEntity -> !Objects.equals(existedEntity.getId(), entity.getId()))    // Remove same entity from checking
+            .forEach(existedEntity -> compareEntities(entity, existedEntity));
     }
 
     private void checkNotNullFields(E entity) {
