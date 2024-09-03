@@ -3,6 +3,7 @@ package com.tsel.home.project.booklibrary.helper;
 import static com.tsel.home.project.booklibrary.utils.FileUtils.isNotExists;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -15,7 +16,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,10 +52,10 @@ public final class FileRepositoryProvider<K extends Serializable, E extends Base
         }
 
         try {
-            return GSON.fromJson(Files.readString(fileRepositoryPath, StandardCharsets.UTF_8), listType);
+            return GSON.fromJson(Files.readString(fileRepositoryPath, UTF_8), listType);
 
         } catch (IOException e) {
-            log.error("Exception while trying to read storage file '{}' by bytes", fileRepositoryPath);
+            log.error("Exception while trying to read storage file '{}' by bytes", fileRepositoryPath, e);
             throw new IllegalStateException(format("Проблема при чтении файла хранилища '%s'", fileRepositoryPath), e);
         }
     }
@@ -70,11 +70,11 @@ public final class FileRepositoryProvider<K extends Serializable, E extends Base
             FileUtils.createFile(fileRepositoryPath);
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileRepositoryPath.toFile(), false))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileRepositoryPath.toFile(), UTF_8, false))) {
             writer.write(GSON.toJson(entities));
 
         } catch (IOException e) {
-            log.error("Exception while trying to write storage file '{}' line by line", fileRepositoryPath);
+            log.error("Exception while trying to write storage file '{}' line by line", fileRepositoryPath, e);
             throw new IllegalStateException(format("Проблема при записи данных в файл хранилища '%s'", fileRepositoryPath), e);
         }
     }
