@@ -12,6 +12,7 @@ import com.tsel.home.project.booklibrary.dao.exception.NotNullConstraintExceptio
 import com.tsel.home.project.booklibrary.dao.identifier.IdentifierGenerator;
 import com.tsel.home.project.booklibrary.helper.FileRepositoryProvider;
 import com.tsel.home.project.booklibrary.utils.StringUtils;
+import com.tsel.home.project.booklibrary.utils.Timer;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
@@ -26,7 +27,7 @@ import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends BaseEntity<K>> implements FileRepository<K, E> {
+public abstract class AbstractFileRepository<K extends Serializable, E extends BaseEntity<K>> implements FileRepository<K, E> {
 
     public static final Path DEFAULT_REPOSITORY_PATH = buildPathFromCurrentDir("repository");
 
@@ -39,7 +40,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
     private Map<K, E> repositoryMap;
     private Map<K, E> repositoryMapSnapshot;
 
-    protected AbstractFileRepositoryV2(Class<E> entityClass, IdentifierGenerator<K> keyGenerator, @Nullable Path rootPath) {
+    protected AbstractFileRepository(Class<E> entityClass, IdentifierGenerator<K> keyGenerator, @Nullable Path rootPath) {
         this.keyGenerator = keyGenerator;
         this.entityDisplayName = resolveEntityName(entityClass);
         this.fileRepositoryProvider = new FileRepositoryProvider<>(this.getClass(), entityClass, rootPath);
@@ -68,6 +69,8 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
 
     @Override
     public K save(E entity) {
+        Timer timer = Timer.start("Save entity " + entityDisplayName);
+
         if (entity.getId() == null) {
             entity.setId(keyGenerator.generate());
         }
@@ -82,6 +85,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
             log.info("Successfully saved entity '{}'", entity);
         }
 
+        timer.stop();
         return entity.getId();
     }
 
@@ -114,6 +118,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
 
     @Override
     public void commitTransaction() {
+        Timer timer = Timer.start("Commit transaction for " + entityDisplayName);
         if (this.isTransactionOpen) {
             fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
 
@@ -121,6 +126,7 @@ public abstract class AbstractFileRepositoryV2<K extends Serializable, E extends
             this.repositoryMapSnapshot = null;
             log.info("Transaction commited");
         }
+        timer.stop();
     }
 
     @Override

@@ -74,7 +74,7 @@ class CreateBookTests extends AbstractJavaFxTest {
             "#saveBookButton"
         ));
 
-        // Нажимается TAB и проверяется, что элементы фокусируются идут друг за другом
+        // Нажимается TAB и проверяется, что фокусировка элементов идут друг за другом
         String beforeElement = null;
         for (String nextElement : expectedElementsOrder) {
             String finalBeforeElement = beforeElement;

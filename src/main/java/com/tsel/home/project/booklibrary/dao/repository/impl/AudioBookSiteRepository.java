@@ -4,19 +4,19 @@ import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.AudioBookSite;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.identifier.UUIDIdentifierGenerator;
-import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepositoryV2;
+import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepository;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
 
 @FileStorageName("audioBookSiteStorage.json")
-public class AudioBookSiteRepositoryV2 extends AbstractFileRepositoryV2<UUID, AudioBookSite> {
+public class AudioBookSiteRepository extends AbstractFileRepository<UUID, AudioBookSite> {
 
-    public AudioBookSiteRepositoryV2(Path rootPath) {
+    public AudioBookSiteRepository(Path rootPath) {
         super(AudioBookSite.class, new UUIDIdentifierGenerator(), rootPath);
     }
 
-    public AudioBookSiteRepositoryV2() {
+    public AudioBookSiteRepository() {
         super(AudioBookSite.class, new UUIDIdentifierGenerator(), DEFAULT_REPOSITORY_PATH);
     }
 

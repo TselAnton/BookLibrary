@@ -10,10 +10,10 @@ import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
 import com.tsel.home.project.booklibrary.dao.data.Publisher;
-import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
+import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import java.util.Collections;
 import java.util.List;
@@ -22,10 +22,10 @@ import javafx.scene.control.CheckBox;
 
 public class BookConverter implements Converter<Book, BookDTO> {
 
-    private static final CycleRepositoryV2 CYCLE_REPOSITORY_V2 = getBean(CycleRepositoryV2.class);
-    private static final AuthorRepositoryV2 AUTHOR_REPOSITORY_V2 = getBean(AuthorRepositoryV2.class);
-    private static final PublisherRepositoryV2 PUBLISHER_REPOSITORY_V2 = getBean(PublisherRepositoryV2.class);
-    private static final AudioBookSiteRepositoryV2 AUDIO_BOOK_SITE_REPOSITORY_V2 = getBean(AudioBookSiteRepositoryV2.class);
+    private static final CycleRepository CYCLE_REPOSITORY_V2 = getBean(CycleRepository.class);
+    private static final AuthorRepository AUTHOR_REPOSITORY_V2 = getBean(AuthorRepository.class);
+    private static final PublisherRepository PUBLISHER_REPOSITORY_V2 = getBean(PublisherRepository.class);
+    private static final AudioBookSiteRepository AUDIO_BOOK_SITE_REPOSITORY_V2 = getBean(AudioBookSiteRepository.class);
 
     @Override
     public BookDTO convert(Book book) {

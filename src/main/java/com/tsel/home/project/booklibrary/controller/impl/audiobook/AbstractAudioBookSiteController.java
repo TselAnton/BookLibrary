@@ -5,7 +5,7 @@ import static javafx.collections.FXCollections.observableList;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.converter.AudioBookSiteConverter;
-import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteRepositoryV2;
+import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteRepository;
 import com.tsel.home.project.booklibrary.dto.AudioBookSiteDTO;
 import java.util.Comparator;
 import javafx.scene.control.TableColumn;
@@ -15,7 +15,7 @@ import javafx.scene.layout.AnchorPane;
 public abstract class AbstractAudioBookSiteController extends AbstractViewController {
 
     protected final AudioBookSiteConverter audioBookSiteConverter = new AudioBookSiteConverter();
-    protected final AudioBookSiteRepositoryV2 audioBookSiteRepository = getBean(AudioBookSiteRepositoryV2.class);
+    protected final AudioBookSiteRepository audioBookSiteRepository = getBean(AudioBookSiteRepository.class);
 
     @Override
     protected AnchorPane getMainAnchorPane() {

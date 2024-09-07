@@ -3,11 +3,11 @@ package com.tsel.home.project.booklibrary.controller;
 import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 
 import com.tsel.home.project.booklibrary.converter.BookConverter;
-import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepositoryV2;
-import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepositoryV2;
+import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import java.net.URI;
@@ -26,11 +26,11 @@ public abstract class AbstractViewController {
 
     public static final URI RESOURCE_PATH = URI.create("/com/tsel/home/project/booklibrary/");
 
-    protected final BookRepositoryV2 bookRepository = getBean(BookRepositoryV2.class);
-    protected final CycleRepositoryV2 cycleRepository = getBean(CycleRepositoryV2.class);
-    protected final AuthorRepositoryV2 authorRepository = getBean(AuthorRepositoryV2.class);
-    protected final PublisherRepositoryV2 publisherRepository = getBean(PublisherRepositoryV2.class);
-    protected final UserSettingsRepositoryV2 userSettingsRepository = getBean(UserSettingsRepositoryV2.class);
+    protected final BookRepository bookRepository = getBean(BookRepository.class);
+    protected final CycleRepository cycleRepository = getBean(CycleRepository.class);
+    protected final AuthorRepository authorRepository = getBean(AuthorRepository.class);
+    protected final PublisherRepository publisherRepository = getBean(PublisherRepository.class);
+    protected final UserSettingsRepository userSettingsRepository = getBean(UserSettingsRepository.class);
 
     protected final ImageProvider imageProvider = getBean(ImageProvider.class);
     protected final BookConverter bookConverter = new BookConverter();
