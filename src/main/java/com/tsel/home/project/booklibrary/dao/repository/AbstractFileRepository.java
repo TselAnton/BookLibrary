@@ -16,13 +16,8 @@ import com.tsel.home.project.booklibrary.utils.Timer;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
@@ -201,7 +196,7 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
 
     private Map<K, E> initEntities() {
         Map<K, E> entitiesMap = new LinkedHashMap<>();
-        List<E> entitiesList = fileRepositoryProvider.readStorageFile();
+        List<E> entitiesList = ofNullable(fileRepositoryProvider.readStorageFile()).orElse(Collections.emptyList());
         for (E entity : entitiesList) {
             entitiesMap.put(entity.getId(), entity);
         }

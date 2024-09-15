@@ -459,7 +459,7 @@ public abstract class AbstractBookController extends AbstractViewController {
     }
 
     private Cycle resolveCycleByComboBox(ComboBoxDTO cycleComboBox, boolean isCycleEnded, Integer booksInCycle) {
-        if (cycleComboBox == null) {
+        if (cycleComboBox == null || isBlank(cycleComboBox.getName())) {
             return null;
         }
         if (cycleComboBox.getId() != null) {
