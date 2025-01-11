@@ -1,6 +1,6 @@
 package com.tsel.home.project.booklibrary.search.filter.impl;
 
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
+import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 
 import com.tsel.home.project.booklibrary.search.SearchFieldDefinition;
 import com.tsel.home.project.booklibrary.search.filter.AbstractSearchFilter;
@@ -20,6 +20,13 @@ public class StringSearchFilter extends AbstractSearchFilter<String> {
     @Override
     protected boolean filterByQuery(String value, String searchQuery, SearchFieldDefinition definition) {
         LOGGER.debug("Search by query '{}' in value '{}'", searchQuery, value);
-        return isNotBlank(value) && value.toLowerCase(Locale.ROOT).contains(searchQuery);
+        if (isBlank(value)) {
+            return false;
+        }
+
+        String preparedValue = value.toLowerCase(Locale.ROOT).replace("ё", "е");
+        String preparedSearchQuery = searchQuery.toLowerCase(Locale.ROOT).replace("ё", "е");
+
+        return preparedValue.contains(preparedSearchQuery);
     }
 }
