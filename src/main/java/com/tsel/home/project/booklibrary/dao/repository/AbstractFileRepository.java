@@ -141,7 +141,7 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
     }
 
     protected ConstraintException buildConstraintException(String message) {
-        return new ConstraintException(this.entityDisplayName, message);
+        return new ConstraintException(this.entityDisplayName, message.toLowerCase(Locale.ROOT));
     }
 
     protected void compareEntities(E newEntity, E oldEntity) throws ConstraintException {

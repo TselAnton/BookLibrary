@@ -1,6 +1,5 @@
 package com.tsel.home.project.booklibrary.javafx;
 
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
@@ -140,6 +139,9 @@ class CreateBookTests extends AbstractJavaFxTest {
         assertEquals(5678d, savedBook.getPrice());
         assertEquals(10, savedBook.getNumberInSeries().intValue());
         assertEquals(10, savedBook.getNumberInSeries().intValue());
+        assertNotNull(savedBook.getCreatedAt());
+        assertNotNull(savedBook.getUpdatedAt());
+        assertNotNull(savedBook.getReadUpdatedAt());
 
         assertNotNull(savedBook.getAudioBookSiteIds());
         assertThat(savedBook.getAudioBookSiteIds()).containsExactlyInAnyOrder(audioBookSiteId);
@@ -217,6 +219,9 @@ class CreateBookTests extends AbstractJavaFxTest {
         assertEquals(5678d, savedBook.getPrice());
         assertEquals(10, savedBook.getNumberInSeries().intValue());
         assertEquals(10, savedBook.getNumberInSeries().intValue());
+        assertNotNull(savedBook.getCreatedAt());
+        assertNotNull(savedBook.getUpdatedAt());
+        assertNotNull(savedBook.getReadUpdatedAt());
 
         // Проверка, что автор ID идентичный сохранённому в БД изначально, и не создалось дополнительных авторов
         assertNotNull(savedBook.getAuthorId());

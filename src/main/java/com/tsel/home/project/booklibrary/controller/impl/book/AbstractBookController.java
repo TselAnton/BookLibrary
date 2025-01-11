@@ -6,6 +6,7 @@ import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 
@@ -278,6 +279,10 @@ public abstract class AbstractBookController extends AbstractViewController {
                 cycleRepository.save(newCycle);
             }
 
+            Book oldBook = ofNullable(bookId)
+                .map(bookRepository::getById)
+                .orElse(null);
+
             newBook = Book.builder()
                 .id(bookId)
                 .name(bookTitle)
@@ -292,6 +297,9 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .price(stringToDouble(bookPrice))
                 .hardCover(hardCoverFlag)
                 .audioBookSiteIds(audioBookSiteIds)
+                .createdAt(resolveBookCreatedAt(oldBook))
+                .updatedAt(System.currentTimeMillis())
+                .readUpdatedAt(resolveBookReadUpdatedAt(oldBook, readBookFlag))
                 .build();
 
             bookRepository.save(newBook);
@@ -473,5 +481,23 @@ public abstract class AbstractBookController extends AbstractViewController {
                 return existedCycle;
             })
             .orElse(new Cycle(null, cycleComboBox.getName(), isCycleEnded, booksInCycle));
+    }
+
+    private Long resolveBookCreatedAt(@Nullable Book book) {
+        if (book == null) {
+            return System.currentTimeMillis();
+        }
+        return book.getCreatedAt();
+    }
+
+    private Long resolveBookReadUpdatedAt(@Nullable Book book, boolean readBookFlag) {
+        if (!readBookFlag) {
+            return null;
+        }
+        if (book != null && book.getReadUpdatedAt() != null) {
+            return book.getReadUpdatedAt();
+        }
+
+        return System.currentTimeMillis();
     }
 }

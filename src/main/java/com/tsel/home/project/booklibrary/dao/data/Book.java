@@ -63,4 +63,13 @@ public class Book implements BaseEntity<UUID> {
 
     @Property(value = "аудиокниги")
     private List<UUID> audioBookSiteIds = new ArrayList<>();
+
+    @Property(value = "время создания")
+    private Long createdAt;
+
+    @Property(value = "время обновления")
+    private Long updatedAt;
+
+    @Property(value = "время обновления флага 'прочитано'")
+    private Long readUpdatedAt;
 }
