@@ -125,7 +125,27 @@ class SearchServiceTest extends UnitJavaFXTest {
             searchService.search(searchQuery, bookDtoList),
             contains(book1, book2, book3, book4, book5)
         );
+    }
 
+    @ParameterizedTest(name = "Поиск по '{0}' запросу без учёта 'е' и 'ё'")
+    @ValueSource(strings = {"бе", "бё"})
+    void testSearchByBookSearchQueryWithIo(String searchQuery) {
+        var testBook1 = BookDTO.builder()
+                .name("Книга бе")
+                .build();
+
+        var testBook2 = BookDTO.builder()
+                .name("Книга бё")
+                .build();
+
+        var testBook3 = BookDTO.builder()
+                .name("Книга бы")
+                .build();
+
+        assertThat(
+                searchService.search(searchQuery, List.of(testBook1, testBook2, testBook3)),
+                contains(testBook1, testBook2)
+        );
     }
 
     @Test
