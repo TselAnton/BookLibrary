@@ -4,12 +4,7 @@ import static com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepos
 import static com.tsel.home.project.booklibrary.utils.FileUtils.buildPathFromCurrentDir;
 
 import com.tsel.home.project.booklibrary.controller.impl.MainViewController;
-import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.*;
 import com.tsel.home.project.booklibrary.helper.DateProvider;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.PropertyProvider;
@@ -45,6 +40,7 @@ public class App {
             SimpleApplicationContext.initBean(AudioBookSiteRepository.class, AudioBookSiteRepository::new);
             SimpleApplicationContext.initBean(AuthorRepository.class, AuthorRepository::new);
             SimpleApplicationContext.initBean(CycleRepository.class, CycleRepository::new);
+            SimpleApplicationContext.initBean(GenreRepository.class, GenreRepository::new);
             SimpleApplicationContext.initBean(PublisherRepository.class, PublisherRepository::new);
             SimpleApplicationContext.initBean(UserSettingsRepository.class, UserSettingsRepository::new);
             SimpleApplicationContext.initBean(BookRepository.class, BookRepository::new);

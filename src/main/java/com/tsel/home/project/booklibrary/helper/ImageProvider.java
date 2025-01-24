@@ -66,11 +66,11 @@ public final class ImageProvider {
         return defaultImg;
     }
 
-    public Image resolveSmallCover(Book book) {
+    public ImageHolder resolveSmallCover(Book book) {
         if (isNotBlank(book.getCoverImgAbsolutePath())) {
             Image cashedImage = cashedSmallImages.get(book.getId());
             if (cashedImage != null) {
-                return cashedImage;
+                return new ImageHolder(cashedImage, false);
             }
 
             Path imgPath = Paths.get(book.getCoverImgAbsolutePath());
@@ -79,7 +79,7 @@ public final class ImageProvider {
                     Image bookImage = new Image(imgPath.toUri().toURL().toExternalForm(), 12, 0, true, true, true);
                     if (!bookImage.isError()) {
                         cashedSmallImages.put(book.getId(), bookImage);
-                        return bookImage;
+                        return new ImageHolder(bookImage, false);
                     }
                 } catch (MalformedURLException e) {
                     log.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
@@ -87,7 +87,7 @@ public final class ImageProvider {
             }
         }
 
-        return defaultImg;
+        return new ImageHolder(defaultImg, true);
     }
 
     public void deleteImagesFromCache(Book book) {
@@ -102,4 +102,6 @@ public final class ImageProvider {
             throw new IllegalStateException(format("Exception while loading image by path '%s'", path), e);
         }
     }
+
+    public record ImageHolder(Image image, boolean isDefault) {}
 }

@@ -16,12 +16,14 @@ import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Genre;
 import com.tsel.home.project.booklibrary.dao.data.Publisher;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
 import com.tsel.home.project.booklibrary.dto.AuthorDTO;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
 import com.tsel.home.project.booklibrary.dto.CycleDTO;
+import com.tsel.home.project.booklibrary.dto.GenreDTO;
 import com.tsel.home.project.booklibrary.dto.PublisherDTO;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import com.tsel.home.project.booklibrary.utils.table.AutoCompleteComboBoxListener;
@@ -99,6 +101,11 @@ public abstract class AbstractBookController extends AbstractViewController {
     protected abstract ComboBox<ComboBoxDTO> getCycleComboBox();
 
     /**
+     * @return {@link ComboBox} с жанрами
+     */
+    protected abstract ComboBox<ComboBoxDTO> getGenreComboBox();
+
+    /**
      * @return {@link CheckBox} для флага, если цикл является законченным
      */
     protected abstract CheckBox getCycleEndedCheckBox();
@@ -152,6 +159,9 @@ public abstract class AbstractBookController extends AbstractViewController {
         getCycleComboBox().setItems(
             getComboBoxValues(cycleRepository, cycle -> new CycleDTO(cycle.getId(), cycle.getName()))
         );
+        getGenreComboBox().setItems(
+            getComboBoxValues(genreRepository, genre -> new GenreDTO(genre.getId(), genre.getName()))
+        );
 
         // Отдельно необходимо обновлять поля при изменении выбранного цикла книги
         getCycleComboBox().setOnAction(event -> updateCycleInformation());
@@ -159,6 +169,7 @@ public abstract class AbstractBookController extends AbstractViewController {
         // Оборачиваем ComboBox в автозаполняемые
         AutoCompleteComboBoxListener.wrapComboBox(getAuthorComboBox());
         AutoCompleteComboBoxListener.wrapComboBox(getPublisherComboBox());
+        AutoCompleteComboBoxListener.wrapComboBox(getGenreComboBox());
         AutoCompleteComboBoxListener.wrapComboBox(getCycleComboBox());
     }
 
@@ -246,6 +257,7 @@ public abstract class AbstractBookController extends AbstractViewController {
 
         ComboBoxDTO author = getSelectedComboBox(getAuthorComboBox(), AuthorDTO::new);
         ComboBoxDTO publisher = getSelectedComboBox(getPublisherComboBox(), PublisherDTO::new);
+        ComboBoxDTO genre = getSelectedComboBox(getGenreComboBox(), GenreDTO::new);
 
         ComboBoxDTO cycle = getSelectedComboBox(getCycleComboBox(), CycleDTO::new);
         boolean cycleEndedFlag = isChecked(getCycleEndedCheckBox());
@@ -268,11 +280,19 @@ public abstract class AbstractBookController extends AbstractViewController {
             cycleRepository.beginTransaction();
             bookRepository.beginTransaction();
 
+            // Сохранение автора
             Author newAuthor = resolveAuthorByComboBox(author);
             authorRepository.save(newAuthor);
 
+            // Сохранение публициста
             Publisher newPublisher = resolvePublisherByComboBox(publisher);
             publisherRepository.save(newPublisher);
+
+            // Сохранение жанра
+            Genre newGenre = resolveGenreByComboBox(genre);
+            if (newGenre != null) {
+                genreRepository.save(newGenre);
+            }
 
             Cycle newCycle = resolveCycleByComboBox(cycle, cycleEndedFlag, stringToInteger(cycleTotalBookCount));
             if (newCycle != null) {
@@ -288,6 +308,7 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .name(bookTitle)
                 .authorId(newAuthor.getId())
                 .publisherId(newPublisher.getId())
+                .genreId(newGenre != null ? newGenre.getId() : null)
                 .pages(stringToInteger(bookPagesCount))
                 .read(readBookFlag)
                 .autograph(isChecked(getAutographCheckBox()))
@@ -464,6 +485,15 @@ public abstract class AbstractBookController extends AbstractViewController {
         return publisherComboBox.getId() != null
             ? new Publisher(publisherComboBox.getId(), publisherComboBox.getName())
             : publisherRepository.getByName(publisherComboBox.getName()).orElse(new Publisher(null, publisherComboBox.getName()));
+    }
+
+    private Genre resolveGenreByComboBox(ComboBoxDTO genreComboBox) {
+        if (genreComboBox == null || isBlank(genreComboBox.getName())) {
+            return null;
+        }
+        return genreComboBox.getId() != null
+            ? new Genre(genreComboBox.getId(), genreComboBox.getName())
+            : genreRepository.getByName(genreComboBox.getName()).orElse(new Genre(null, genreComboBox.getName()));
     }
 
     private Cycle resolveCycleByComboBox(ComboBoxDTO cycleComboBox, boolean isCycleEnded, Integer booksInCycle) {

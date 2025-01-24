@@ -31,7 +31,7 @@ public class CycleRepository extends AbstractFileRepository<UUID, Cycle> {
     @Override
     protected void compareEntities(Cycle newEntity, Cycle oldEntity) throws ConstraintException {
         if (Objects.equals(oldEntity.getName(), newEntity.getName())) {
-            throw buildConstraintException("цикл с таким же названием уже существует");
+            throw buildConstraintException("цикл с таким названием уже существует");
         }
     }
 }

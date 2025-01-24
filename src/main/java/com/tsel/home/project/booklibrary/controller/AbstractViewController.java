@@ -3,11 +3,7 @@ package com.tsel.home.project.booklibrary.controller;
 import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 
 import com.tsel.home.project.booklibrary.converter.BookConverter;
-import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository;
-import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.*;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import java.net.URI;
@@ -28,6 +24,7 @@ public abstract class AbstractViewController {
 
     protected final BookRepository bookRepository = getBean(BookRepository.class);
     protected final CycleRepository cycleRepository = getBean(CycleRepository.class);
+    protected final GenreRepository genreRepository = getBean(GenreRepository.class);
     protected final AuthorRepository authorRepository = getBean(AuthorRepository.class);
     protected final PublisherRepository publisherRepository = getBean(PublisherRepository.class);
     protected final UserSettingsRepository userSettingsRepository = getBean(UserSettingsRepository.class);

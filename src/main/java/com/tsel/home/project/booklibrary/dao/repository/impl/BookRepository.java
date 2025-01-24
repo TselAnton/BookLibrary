@@ -36,6 +36,9 @@ public class BookRepository extends AbstractFileRepository<UUID, Book> {
         if (isLatestValue(book -> Objects.equals(book.getCycleId(), entity.getCycleId()))) {
             getBean(CycleRepository.class).deleteById(entity.getCycleId());
         }
+        if (isLatestValue(book -> Objects.equals(book.getGenreId(), entity.getGenreId()))) {
+            getBean(GenreRepository.class).deleteById(entity.getGenreId());
+        }
     }
 
     private boolean isLatestValue(Predicate<Book> checkPredicate) {

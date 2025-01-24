@@ -10,6 +10,7 @@ import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Genre;
 import com.tsel.home.project.booklibrary.dao.data.Publisher;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import java.text.DecimalFormat;
@@ -57,6 +58,9 @@ public class BookInfoViewController extends AbstractViewController {
 
     @FXML
     private Label authorLabel;
+
+    @FXML
+    private Label genreLabel;
 
     @FXML
     private Label publisherLabel;
@@ -177,6 +181,11 @@ public class BookInfoViewController extends AbstractViewController {
         setTextWithSizeControl(publisherLabel,
             ofNullable(publisherRepository.getById(bookForView.getPublisherId()))
                 .map(Publisher::getName)
+                .orElse(null)
+        );
+        setTextWithSizeControl(genreLabel,
+            ofNullable(genreRepository.getById(bookForView.getGenreId()))
+                .map(Genre::getName)
                 .orElse(null)
         );
 

@@ -163,10 +163,10 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
 
             try {
                 if (field.get(entity) == null) {
-                    throw new NotNullConstraintException(this.entityDisplayName, fieldAnnotation.value());
+                    throw new NotNullConstraintException(this.entityDisplayName, fieldAnnotation.value().toLowerCase(Locale.ROOT));
                 }
             } catch (IllegalAccessException e) {
-                throw new NotNullConstraintException(this.entityDisplayName, fieldAnnotation.value());
+                throw new NotNullConstraintException(this.entityDisplayName, fieldAnnotation.value().toLowerCase(Locale.ROOT));
             }
         }
     }

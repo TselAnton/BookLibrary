@@ -66,6 +66,9 @@ public class EditBookController extends AbstractBookController {
     @FXML
     private ComboBox<ComboBoxDTO> publisherComboBox;
 
+    @FXML
+    private ComboBox<ComboBoxDTO> genreComboBox;
+
     // Настройки цикла
 
     @FXML
@@ -117,6 +120,7 @@ public class EditBookController extends AbstractBookController {
 
         initComboBoxValue(authorComboBox, bookForEdit.getAuthorId());
         initComboBoxValue(publisherComboBox, bookForEdit.getPublisherId());
+        initComboBoxValue(genreComboBox, bookForEdit.getGenreId());
         initComboBoxValue(cycleComboBox, bookForEdit.getCycleId());
 
         priceFieldInput.setText(bookForEdit.getPrice() != null ? String.valueOf(bookForEdit.getPrice()) : "");

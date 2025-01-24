@@ -33,11 +33,17 @@ public class BookDTO {
 
     private ImageView cover;
 
-    @SearchField(description = "Поиск по автору")
+    @SearchField(aliases = {"image", "картинка"}, description = "Поиск по наличию картинки для обложки")
+    private Boolean hasCoverImage;
+
+    @SearchField(aliases = {"author", "автор"}, description = "Поиск по автору")
     private String author;
 
-    @SearchField(description = "Поиск по издателю")
+    @SearchField(aliases = {"publisher", "издатель"}, description = "Поиск по издателю")
     private String publisher;
+
+    @SearchField(aliases = {"year", "год"}, description = "Поиск по году публикации")
+    private Integer publicationYear;
 
     @SearchField(description = "Поиск по названию цикла")
     private String cycleName;
@@ -46,6 +52,9 @@ public class BookDTO {
 
     @SearchField(aliases = {"cycle", "цикл"}, description = "Поиск по законченным циклам")
     private CheckBox cycleEnded;
+
+    @SearchField(aliases = {"genre", "жанр"}, description = "Поиск по названию жанра")
+    private String genre;
 
     @SearchField(aliases = {"read", "прочитано"}, description = "Поиск по прочитанному")
     private CheckBox read;
@@ -69,10 +78,15 @@ public class BookDTO {
 
     public static class BookDTOBuilder {
 
+        @SuppressWarnings("FieldCanBeLocal")
         private ImageView cover;
 
         public BookDTOBuilder cover(Book book) {
-            this.cover = new ImageView(getBean(ImageProvider.class).resolveSmallCover(book));
+            ImageProvider imageProvider = getBean(ImageProvider.class);
+            ImageProvider.ImageHolder imageHolder = imageProvider.resolveSmallCover(book);
+
+            this.cover = new ImageView(imageHolder.image());
+            this.hasCoverImage = !imageHolder.isDefault();
             return this;
         }
     }

@@ -15,6 +15,9 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
+import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
+import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
@@ -22,10 +25,12 @@ import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.ToDoubleFunction;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -114,6 +119,8 @@ public class MainViewController extends AbstractViewController {
     @SuppressWarnings("unchecked")
     public void startScene(Stage stage) {
         try {
+            cleanUpRepositoryData();    // Предварительно чистятся репозитории от лишних данных
+
             FXMLLoader windowLoader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + "view/main-view.fxml"));
             Scene scene = new Scene(windowLoader.load());
 
@@ -268,47 +275,49 @@ public class MainViewController extends AbstractViewController {
         if (bookTableView.getSortOrder().isEmpty()) {
             // Nothing chosen. Sort by book name by default
             bookTableView.getItems().sort(comparing(BookDTO::getName));
+            return;
+        }
+
+        // Sort by cycle name + book number in cycle
+        if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
+            if (cycleColumnSortedByASC) {
+                bookTableView.getItems()
+                  .sort(comparing(
+                      BookDTO::getCycleName,
+                      nullsLast(naturalOrder())
+                  ).thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle));
+            } else {
+                bookTableView.getItems()
+                  .sort(comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
+                    .reversed()
+                    .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
+                  );
+            }
+            cycleColumnSortedByASC = !cycleColumnSortedByASC;
+
         } else {
-            // Sort by cycle name + book number in cycle
-            if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
-                if (cycleColumnSortedByASC) {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getCycleName, nullsLast(naturalOrder()))
-                                .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
-                        );
-                } else {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getCycleName, nullsFirst(naturalOrder()))
-                            .reversed()
-                            .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
-                        );
-                }
-                cycleColumnSortedByASC = !cycleColumnSortedByASC;
+            cycleColumnSortedByASC = true;
+        }
+
+        // Sort by pages + !read
+        if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
+            if (pagesColumnSortedByASC) {
+                bookTableView.getItems()
+                  .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
+                    .thenComparing(BookDTO::getPages)
+                  );
 
             } else {
-                cycleColumnSortedByASC = true;
+                bookTableView.getItems()
+                  .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
+                    .thenComparing(BookDTO::getPages)
+                    .reversed()
+                  );
             }
+            pagesColumnSortedByASC = !pagesColumnSortedByASC;
 
-            // Sort by pages + !read
-            if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
-                if (pagesColumnSortedByASC) {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
-                            .thenComparing(BookDTO::getPages)
-                        );
-
-                } else {
-                    bookTableView.getItems()
-                        .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c2.isSelected(), c1.isSelected()))
-                            .thenComparing(BookDTO::getPages)
-                            .reversed()
-                        );
-                }
-                pagesColumnSortedByASC = !pagesColumnSortedByASC;
-
-            } else {
-                pagesColumnSortedByASC = true;
-            }
+        } else {
+            pagesColumnSortedByASC = true;
         }
     }
 
@@ -325,8 +334,8 @@ public class MainViewController extends AbstractViewController {
 
     private Integer getBookNumberInCycle(String bookNumber) {
         return isNotBlank(bookNumber)
-                ? Integer.parseInt(bookNumber.split("/")[0])
-                : null;
+            ? Integer.parseInt(bookNumber.split("/")[0])
+            : null;
     }
 
     private List<BookDTO> getDtoBooks() {
@@ -422,5 +431,40 @@ public class MainViewController extends AbstractViewController {
                 .sorted(Comparator.comparing(BookDTO::getName))
                 .toList()
         ));
+    }
+
+    /**
+     * Чистка из репозиториев всех записей, не связанных с book
+     */
+    private void cleanUpRepositoryData() {
+        try {
+            Set<UUID> usedCycleIds = new HashSet<>();
+            Set<UUID> usedGenreIds = new HashSet<>();
+            Set<UUID> usedAuthorIds = new HashSet<>();
+            Set<UUID> usedPublisherIds = new HashSet<>();
+
+            for (Book book : bookRepository.getAll()) {
+                if (book.getCycleId() != null) usedCycleIds.add(book.getCycleId());
+                if (book.getGenreId() != null) usedGenreIds.add(book.getGenreId());
+                if (book.getAuthorId() != null) usedAuthorIds.add(book.getAuthorId());
+                if (book.getPublisherId() != null) usedPublisherIds.add(book.getPublisherId());
+            }
+
+            cleanUpRepository(cycleRepository, usedCycleIds);
+            cleanUpRepository(genreRepository, usedGenreIds);
+            cleanUpRepository(authorRepository, usedAuthorIds);
+            cleanUpRepository(publisherRepository, usedPublisherIds);
+
+        } catch (Exception e) {
+            log.error("Exception while cleaning repository data", e);
+        }
+    }
+
+    private <T extends BaseEntity<UUID>, R extends FileRepository<UUID, T>> void cleanUpRepository(R repository, Set<UUID> userIdSet) {
+        repository.getAll()
+            .stream()
+            .map(BaseEntity::getId)
+            .filter(id -> !userIdSet.contains(id))
+            .forEach(repository::deleteById);
     }
 }
