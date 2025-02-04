@@ -31,6 +31,9 @@ public class Book implements BaseEntity<UUID> {
     @Property(value = "название", nullable = false)
     private String name;
 
+    @Property(value = "жанр книги")
+    private UUID genreId;
+
     @Property(value = "автор", nullable = false)
     private UUID authorId;
 
@@ -60,6 +63,9 @@ public class Book implements BaseEntity<UUID> {
 
     @Property(value = "цена")
     private Double price;
+
+    @Property(value = "год издания", nullable = false)
+    private Integer publicationYear;
 
     @Property(value = "аудиокниги")
     private List<UUID> audioBookSiteIds = new ArrayList<>();

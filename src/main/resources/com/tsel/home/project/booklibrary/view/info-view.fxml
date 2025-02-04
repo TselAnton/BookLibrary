@@ -59,6 +59,8 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
                   <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="244.0" text="Название:">
@@ -108,7 +110,50 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="229.0" text="Прочитано:" GridPane.rowIndex="5">
+                  <Label alignment="CENTER_RIGHT" layoutX="15.0" layoutY="95.0" prefHeight="27.0" prefWidth="250.0" text="Год издания:" GridPane.rowIndex="4">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <padding>
+                        <Insets right="5.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="publicationYearLabel" layoutX="207.0" layoutY="95.0" prefHeight="27.0" prefWidth="347.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                  </Label>
+                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Жанр" GridPane.rowIndex="5">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <padding>
+                        <Insets right="5.0" />
+                     </padding>
+                  </Label>
+                  <Label alignment="CENTER_RIGHT" layoutX="15.0" layoutY="287.0" prefHeight="27.0" prefWidth="237.0" text="Твёрдая обложка:" GridPane.rowIndex="6">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <padding>
+                        <Insets right="5.0" />
+                     </padding>
+                  </Label>
+                  <CheckBox fx:id="isHardCoverCheckBox" disable="true" layoutX="207.0" layoutY="290.0" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                     <padding>
+                        <Insets left="15.0" />
+                     </padding>
+                  </CheckBox>
+                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="229.0" text="Прочитано:" GridPane.rowIndex="7">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -119,7 +164,7 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Label fx:id="cycleEndedTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Цикл завершён:" GridPane.rowIndex="9">
+                  <Label fx:id="cycleEndedTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Цикл завершён:" GridPane.rowIndex="11">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -130,7 +175,7 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Label fx:id="cycleTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="226.0" text="Цикл:" GridPane.rowIndex="8">
+                  <Label fx:id="cycleTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="226.0" text="Цикл:" GridPane.rowIndex="10">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -182,7 +227,7 @@
                         <Insets left="5.0" />
                      </padding>
                   </Label>
-                  <Label fx:id="cycleLabel" prefHeight="86.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                  <Label fx:id="cycleLabel" prefHeight="86.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="10">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -193,7 +238,7 @@
                         <Insets left="5.0" />
                      </padding>
                   </Label>
-                  <CheckBox fx:id="readCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                  <CheckBox fx:id="readCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="7">
                      <font>
                         <Font size="15.0" />
                      </font>
@@ -201,7 +246,7 @@
                         <Insets left="15.0" />
                      </padding>
                   </CheckBox>
-                  <CheckBox fx:id="cycleEndedCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                  <CheckBox fx:id="cycleEndedCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="11">
                      <font>
                         <Font size="15.0" />
                      </font>
@@ -210,7 +255,7 @@
                      </padding>
                   </CheckBox>
                   <TextFlow prefHeight="200.0" prefWidth="200.0" />
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="229.0" text="Автограф:" GridPane.rowIndex="6">
+                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="229.0" text="Автограф:" GridPane.rowIndex="8">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -218,7 +263,7 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <CheckBox fx:id="autographCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                  <CheckBox fx:id="autographCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="8">
                      <font>
                         <Font size="15.0" />
                      </font>
@@ -226,7 +271,7 @@
                         <Insets left="15.0" />
                      </padding>
                   </CheckBox>
-                  <Label fx:id="priceTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Стоимость: " GridPane.rowIndex="7">
+                  <Label fx:id="priceTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Стоимость: " GridPane.rowIndex="9">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -234,7 +279,7 @@
                         <Insets right="5.0" />
                      </padding>
                   </Label>
-                  <Label fx:id="priceLabel" prefHeight="86.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                  <Label fx:id="priceLabel" prefHeight="86.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="9">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -245,22 +290,11 @@
                         <Insets left="5.0" />
                      </padding>
                   </Label>
-                  <Label alignment="CENTER_RIGHT" layoutX="15.0" layoutY="287.0" prefHeight="27.0" prefWidth="237.0" text="Твёрдая обложка:" GridPane.rowIndex="4">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
+                  <Label fx:id="genreLabel" prefHeight="86.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <padding>
-                        <Insets right="5.0" />
+                        <Insets left="5.0" />
                      </padding>
                   </Label>
-                  <CheckBox fx:id="isHardCoverCheckBox" disable="true" layoutX="207.0" layoutY="290.0" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                     <padding>
-                        <Insets left="15.0" />
-                     </padding>
-                  </CheckBox>
                </children>
             </GridPane>
             <Label alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="8.0" prefHeight="37.0" prefWidth="242.0" text="Обложка">

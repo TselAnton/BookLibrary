@@ -10,6 +10,7 @@ import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Genre;
 import com.tsel.home.project.booklibrary.dao.data.Publisher;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import java.text.DecimalFormat;
@@ -59,10 +60,16 @@ public class BookInfoViewController extends AbstractViewController {
     private Label authorLabel;
 
     @FXML
+    private Label genreLabel;
+
+    @FXML
     private Label publisherLabel;
 
     @FXML
     private Label pageCountLabel;
+
+    @FXML
+    private Label publicationYearLabel;
 
     @FXML
     private CheckBox readCheckBox;
@@ -179,8 +186,14 @@ public class BookInfoViewController extends AbstractViewController {
                 .map(Publisher::getName)
                 .orElse(null)
         );
+        setTextWithSizeControl(genreLabel,
+            ofNullable(genreRepository.getById(bookForView.getGenreId()))
+                .map(Genre::getName)
+                .orElse(null)
+        );
 
         pageCountLabel.setText(String.valueOf(bookForView.getPages()));
+        publicationYearLabel.setText(String.valueOf(bookForView.getPublicationYear()));
         priceLabel.setText(resolvePrice(bookForView.getPrice()));
 
         readCheckBox.setSelected(bookForView.getRead());

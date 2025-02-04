@@ -4,8 +4,8 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 import com.google.gson.Gson;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
-import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.MyGson;
+import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +46,9 @@ public class NewBookController extends AbstractBookController {
     private TextField pagesCountFieldInput;
 
     @FXML
+    private TextField publicationYearFieldInput;
+
+    @FXML
     private TextField priceFieldInput;
 
     @FXML
@@ -64,6 +67,9 @@ public class NewBookController extends AbstractBookController {
 
     @FXML
     private ComboBox<ComboBoxDTO> publisherComboBox;
+
+    @FXML
+    private ComboBox<ComboBoxDTO> genreComboBox;
 
     // Настройки цикла
 

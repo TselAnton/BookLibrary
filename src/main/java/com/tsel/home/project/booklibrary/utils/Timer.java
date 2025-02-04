@@ -25,6 +25,6 @@ public class Timer {
    public void stop() {
       long endTime = System.nanoTime() - this.startTime;
       String message = this.description == null ? "Timer" : (this.description + ". Timer");
-      log.warn("{}: {} m / {} s / {} ms / {} ns", message, (endTime / 60000000000L), (endTime / 1000000000L), (endTime / 1000000L), endTime);
+      log.warn("[Timer] {}: {} m / {} s / {} ms / {} ns", message, (endTime / 60000000000L), (endTime / 1000000000L), (endTime / 1000000L), endTime);
    }
 }

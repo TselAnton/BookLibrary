@@ -16,12 +16,14 @@ import com.tsel.home.project.booklibrary.dao.data.Author;
 import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
+import com.tsel.home.project.booklibrary.dao.data.Genre;
 import com.tsel.home.project.booklibrary.dao.data.Publisher;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
 import com.tsel.home.project.booklibrary.dto.AuthorDTO;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
 import com.tsel.home.project.booklibrary.dto.CycleDTO;
+import com.tsel.home.project.booklibrary.dto.GenreDTO;
 import com.tsel.home.project.booklibrary.dto.PublisherDTO;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import com.tsel.home.project.booklibrary.utils.table.AutoCompleteComboBoxListener;
@@ -32,6 +34,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -62,6 +65,11 @@ public abstract class AbstractBookController extends AbstractViewController {
      * @return {@link TextField} для заполнения количества страниц
      */
     protected abstract TextField getPagesCountFieldInput();
+
+    /**
+     * @return {@link TextField} для заполнения года выпуска книги
+     */
+    protected abstract TextField getPublicationYearFieldInput();
 
     /**
      * @return {@link TextField} для заполнения стоимости книги
@@ -97,6 +105,11 @@ public abstract class AbstractBookController extends AbstractViewController {
      * @return {@link ComboBox} с циклами
      */
     protected abstract ComboBox<ComboBoxDTO> getCycleComboBox();
+
+    /**
+     * @return {@link ComboBox} с жанрами
+     */
+    protected abstract ComboBox<ComboBoxDTO> getGenreComboBox();
 
     /**
      * @return {@link CheckBox} для флага, если цикл является законченным
@@ -152,6 +165,9 @@ public abstract class AbstractBookController extends AbstractViewController {
         getCycleComboBox().setItems(
             getComboBoxValues(cycleRepository, cycle -> new CycleDTO(cycle.getId(), cycle.getName()))
         );
+        getGenreComboBox().setItems(
+            getComboBoxValues(genreRepository, genre -> new GenreDTO(genre.getId(), genre.getName()))
+        );
 
         // Отдельно необходимо обновлять поля при изменении выбранного цикла книги
         getCycleComboBox().setOnAction(event -> updateCycleInformation());
@@ -159,6 +175,7 @@ public abstract class AbstractBookController extends AbstractViewController {
         // Оборачиваем ComboBox в автозаполняемые
         AutoCompleteComboBoxListener.wrapComboBox(getAuthorComboBox());
         AutoCompleteComboBoxListener.wrapComboBox(getPublisherComboBox());
+        AutoCompleteComboBoxListener.wrapComboBox(getGenreComboBox());
         AutoCompleteComboBoxListener.wrapComboBox(getCycleComboBox());
     }
 
@@ -235,17 +252,20 @@ public abstract class AbstractBookController extends AbstractViewController {
 
     /**
      * Сохранение новой книги
+     * @param bookId ID сохраняемой книги
      * @param audioBookSiteIds Идентификаторы сайтов аудиокниг
      */
     protected void saveNewBook(@Nullable UUID bookId, List<UUID> audioBookSiteIds) {
         String bookTitle = getInputText(getNameTextFieldInput());
         String bookPagesCount = getInputText(getPagesCountFieldInput());
+        String bookPublishYear = getInputText(getPublicationYearFieldInput());
         String bookPrice = getInputText(getPriceFieldInput());
         boolean readBookFlag = isChecked(getReadCheckBox());
         boolean hardCoverFlag = isChecked(getHardCoverCheckBox());
 
         ComboBoxDTO author = getSelectedComboBox(getAuthorComboBox(), AuthorDTO::new);
         ComboBoxDTO publisher = getSelectedComboBox(getPublisherComboBox(), PublisherDTO::new);
+        ComboBoxDTO genre = getSelectedComboBox(getGenreComboBox(), GenreDTO::new);
 
         ComboBoxDTO cycle = getSelectedComboBox(getCycleComboBox(), CycleDTO::new);
         boolean cycleEndedFlag = isChecked(getCycleEndedCheckBox());
@@ -254,7 +274,7 @@ public abstract class AbstractBookController extends AbstractViewController {
 
         String imagePath = getInputText(getCoverImagePathFieldInput());
 
-        if (isBookFieldsInvalid(bookTitle, bookPagesCount, bookPrice)
+        if (isBookFieldsInvalid(bookTitle, bookPagesCount, bookPrice, bookPublishYear)
             || isAuthorAndPublisherFieldsInvalid(author, publisher)
             || isCycleFieldsInvalid(cycle, cycleBookNumber, cycleTotalBookCount, cycleEndedFlag)) {
             return;
@@ -268,11 +288,19 @@ public abstract class AbstractBookController extends AbstractViewController {
             cycleRepository.beginTransaction();
             bookRepository.beginTransaction();
 
+            // Сохранение автора
             Author newAuthor = resolveAuthorByComboBox(author);
             authorRepository.save(newAuthor);
 
+            // Сохранение публициста
             Publisher newPublisher = resolvePublisherByComboBox(publisher);
             publisherRepository.save(newPublisher);
+
+            // Сохранение жанра
+            Genre newGenre = resolveGenreByComboBox(genre);
+            if (newGenre != null) {
+                genreRepository.save(newGenre);
+            }
 
             Cycle newCycle = resolveCycleByComboBox(cycle, cycleEndedFlag, stringToInteger(cycleTotalBookCount));
             if (newCycle != null) {
@@ -288,7 +316,9 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .name(bookTitle)
                 .authorId(newAuthor.getId())
                 .publisherId(newPublisher.getId())
+                .genreId(newGenre != null ? newGenre.getId() : null)
                 .pages(stringToInteger(bookPagesCount))
+                .publicationYear(stringToInteger(bookPublishYear))
                 .read(readBookFlag)
                 .autograph(isChecked(getAutographCheckBox()))
                 .cycleId(newCycle != null ? newCycle.getId() : null)
@@ -365,7 +395,7 @@ public abstract class AbstractBookController extends AbstractViewController {
         return checkBox.isSelected();
     }
 
-    private boolean isBookFieldsInvalid(String bookTitle, String bookPagesCount, String bookPrice) {
+    private boolean isBookFieldsInvalid(String bookTitle, String bookPagesCount, String bookPrice, String bookPublishYear) {
         if (isBlank(bookTitle)) {
             riseAlert(WARNING, "Ошибка", "Название книги не заполнено", "Название книги не может быть пустым");
             return true;
@@ -386,6 +416,22 @@ public abstract class AbstractBookController extends AbstractViewController {
         if (stringToInteger(bookPagesCount) == null) {
             riseAlert(WARNING, "Ошибка", "Неверно заполнено количество страниц",
                 "Количество страниц должно быть записано в виде целого числа");
+            return true;
+        }
+        if (isBlank(bookPublishYear)) {
+            riseAlert(WARNING, "Ошибка", "Не заполнен год выпуска книги",
+                "Год выпуска книги не может быть пустым");
+            return true;
+        }
+        Integer bookPublishYearInt = stringToInteger(bookPublishYear);
+        if (bookPublishYearInt == null) {
+            riseAlert(WARNING, "Ошибка", "Неверно заполнен год выпуска книги",
+                "Год выпуска книги должен быть записан в виде целого числа");
+            return true;
+        }
+        if (bookPublishYearInt < 1900 || bookPublishYearInt > LocalDateTime.now().getYear()) {
+            riseAlert(WARNING, "Ошибка", "Неверно заполнен год выпуска книги",
+                "Год не может быть меньше 1900 года и больше текущего (или ты из будущего? :)");
             return true;
         }
         return false;
@@ -464,6 +510,15 @@ public abstract class AbstractBookController extends AbstractViewController {
         return publisherComboBox.getId() != null
             ? new Publisher(publisherComboBox.getId(), publisherComboBox.getName())
             : publisherRepository.getByName(publisherComboBox.getName()).orElse(new Publisher(null, publisherComboBox.getName()));
+    }
+
+    private Genre resolveGenreByComboBox(ComboBoxDTO genreComboBox) {
+        if (genreComboBox == null || isBlank(genreComboBox.getName())) {
+            return null;
+        }
+        return genreComboBox.getId() != null
+            ? new Genre(genreComboBox.getId(), genreComboBox.getName())
+            : genreRepository.getByName(genreComboBox.getName()).orElse(new Genre(null, genreComboBox.getName()));
     }
 
     private Cycle resolveCycleByComboBox(ComboBoxDTO cycleComboBox, boolean isCycleEnded, Integer booksInCycle) {

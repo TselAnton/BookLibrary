@@ -8,6 +8,7 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteReposi
 import com.tsel.home.project.booklibrary.dao.repository.impl.AuthorRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
+import com.tsel.home.project.booklibrary.dao.repository.impl.GenreRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.helper.DateProvider;
@@ -45,6 +46,7 @@ public class App {
             SimpleApplicationContext.initBean(AudioBookSiteRepository.class, AudioBookSiteRepository::new);
             SimpleApplicationContext.initBean(AuthorRepository.class, AuthorRepository::new);
             SimpleApplicationContext.initBean(CycleRepository.class, CycleRepository::new);
+            SimpleApplicationContext.initBean(GenreRepository.class, GenreRepository::new);
             SimpleApplicationContext.initBean(PublisherRepository.class, PublisherRepository::new);
             SimpleApplicationContext.initBean(UserSettingsRepository.class, UserSettingsRepository::new);
             SimpleApplicationContext.initBean(BookRepository.class, BookRepository::new);

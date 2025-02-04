@@ -47,6 +47,9 @@ public class EditBookController extends AbstractBookController {
     private TextField pagesCountFieldInput;
 
     @FXML
+    private TextField publicationYearFieldInput;
+
+    @FXML
     private TextField priceFieldInput;
 
     @FXML
@@ -65,6 +68,9 @@ public class EditBookController extends AbstractBookController {
 
     @FXML
     private ComboBox<ComboBoxDTO> publisherComboBox;
+
+    @FXML
+    private ComboBox<ComboBoxDTO> genreComboBox;
 
     // Настройки цикла
 
@@ -109,6 +115,7 @@ public class EditBookController extends AbstractBookController {
 
         nameTextFieldInput.setText(bookForEdit.getName());
         pagesCountFieldInput.setText(String.valueOf(bookForEdit.getPages()));
+        publicationYearFieldInput.setText(String.valueOf(bookForEdit.getPublicationYear()));
         coverImagePathFieldInput.setText(bookForEdit.getCoverImgAbsolutePath());
 
         readCheckBox.setSelected(TRUE.equals(bookForEdit.getRead()));
@@ -117,6 +124,7 @@ public class EditBookController extends AbstractBookController {
 
         initComboBoxValue(authorComboBox, bookForEdit.getAuthorId());
         initComboBoxValue(publisherComboBox, bookForEdit.getPublisherId());
+        initComboBoxValue(genreComboBox, bookForEdit.getGenreId());
         initComboBoxValue(cycleComboBox, bookForEdit.getCycleId());
 
         priceFieldInput.setText(bookForEdit.getPrice() != null ? String.valueOf(bookForEdit.getPrice()) : "");

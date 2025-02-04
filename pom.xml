@@ -6,7 +6,7 @@
 
     <groupId>com.tsel.home.project</groupId>
     <artifactId>BookLibrary</artifactId>
-    <version>4.0.0</version>
+    <version>4.1.0</version>
     <name>BookLibrary</name>
     <packaging>jar</packaging>
 

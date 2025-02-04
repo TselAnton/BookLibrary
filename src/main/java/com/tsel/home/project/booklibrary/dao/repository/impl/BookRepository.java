@@ -36,6 +36,9 @@ public class BookRepository extends AbstractFileRepository<UUID, Book> {
         if (isLatestValue(book -> Objects.equals(book.getCycleId(), entity.getCycleId()))) {
             getBean(CycleRepository.class).deleteById(entity.getCycleId());
         }
+        if (isLatestValue(book -> Objects.equals(book.getGenreId(), entity.getGenreId()))) {
+            getBean(GenreRepository.class).deleteById(entity.getGenreId());
+        }
     }
 
     private boolean isLatestValue(Predicate<Book> checkPredicate) {
@@ -56,6 +59,14 @@ public class BookRepository extends AbstractFileRepository<UUID, Book> {
             && Objects.equals(existedBook.getAuthorId(), newBook.getAuthorId())
             && Objects.equals(existedBook.getPublisherId(), newBook.getPublisherId())
             && Objects.equals(existedBook.getCycleId(), newBook.getCycleId())
-            && Objects.equals(existedBook.getNumberInSeries(), newBook.getNumberInSeries());
+            && Objects.equals(existedBook.getNumberInSeries(), newBook.getNumberInSeries())
+            && Objects.equals(existedBook.getPublicationYear(), newBook.getPublicationYear());
+    }
+
+    @Override
+    protected void preCreateEntity(Book entity) {
+        if (entity.getPublicationYear() == null) {
+            entity.setPublicationYear(0);   // Задаётся дефолтный год, если он не был указан
+        }
     }
 }
