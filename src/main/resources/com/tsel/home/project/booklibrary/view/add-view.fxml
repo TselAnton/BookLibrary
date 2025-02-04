@@ -16,6 +16,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -58,23 +59,7 @@
                 <Insets />
             </GridPane.margin>
         </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Прочитано" GridPane.rowIndex="5">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Автограф" GridPane.rowIndex="6">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </Label>
-      <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Жанр" GridPane.rowIndex="7">
+      <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="116.0" prefHeight="27.0" prefWidth="178.0" text="Год издания" GridPane.rowIndex="4">
          <font>
             <Font size="18.0" />
          </font>
@@ -82,7 +67,7 @@
             <Insets left="10.0" right="10.0" />
          </GridPane.margin>
       </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Цикл" GridPane.rowIndex="8">
+        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Твёрдая обложка" GridPane.rowIndex="5">
             <font>
                 <Font size="18.0" />
             </font>
@@ -90,15 +75,7 @@
                 <Insets right="10.0" />
             </GridPane.margin>
         </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Завершённый цикл" GridPane.rowIndex="9">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="183.0" text="Номер в цикле" GridPane.rowIndex="10">
+        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Прочитано" GridPane.rowIndex="6">
             <font>
                 <Font size="18.0" />
             </font>
@@ -106,7 +83,23 @@
                 <Insets left="10.0" right="10.0" />
             </GridPane.margin>
         </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Обложка" GridPane.rowIndex="11">
+        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Автограф" GridPane.rowIndex="7">
+            <font>
+                <Font size="18.0" />
+            </font>
+            <GridPane.margin>
+                <Insets left="10.0" right="10.0" />
+            </GridPane.margin>
+        </Label>
+      <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Жанр" GridPane.rowIndex="8">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <GridPane.margin>
+            <Insets left="10.0" right="10.0" />
+         </GridPane.margin>
+      </Label>
+        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Цикл" GridPane.rowIndex="9">
             <font>
                 <Font size="18.0" />
             </font>
@@ -114,7 +107,7 @@
                 <Insets right="10.0" />
             </GridPane.margin>
         </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Твёрдая обложка" GridPane.rowIndex="4">
+        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Завершённый цикл" GridPane.rowIndex="10">
             <font>
                 <Font size="18.0" />
             </font>
@@ -122,7 +115,23 @@
                 <Insets right="10.0" />
             </GridPane.margin>
         </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Стоимость" GridPane.rowIndex="12">
+        <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="183.0" text="Номер в цикле" GridPane.rowIndex="11">
+            <font>
+                <Font size="18.0" />
+            </font>
+            <GridPane.margin>
+                <Insets left="10.0" right="10.0" />
+            </GridPane.margin>
+        </Label>
+        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Обложка" GridPane.rowIndex="12">
+            <font>
+                <Font size="18.0" />
+            </font>
+            <GridPane.margin>
+                <Insets right="10.0" />
+            </GridPane.margin>
+        </Label>
+        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Стоимость" GridPane.rowIndex="13">
             <font>
                 <Font size="18.0" />
             </font>
@@ -150,36 +159,41 @@
                 <Insets left="10.0" right="10.0" />
             </GridPane.margin>
         </TextField>
-        <CheckBox fx:id="hardCoverCheckBox" mnemonicParsing="true" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="4">
+      <TextField fx:id="publicationYearFieldInput" GridPane.columnIndex="1" GridPane.rowIndex="4">
+        <GridPane.margin>
+          <Insets left="10.0" right="10.0" />
+        </GridPane.margin>
+      </TextField>
+        <CheckBox fx:id="hardCoverCheckBox" mnemonicParsing="true" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="5">
             <GridPane.margin>
                 <Insets left="10.0" />
             </GridPane.margin>
         </CheckBox>
-        <CheckBox fx:id="readCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5">
+        <CheckBox fx:id="readCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6">
             <GridPane.margin>
                 <Insets left="10.0" />
             </GridPane.margin>
         </CheckBox>
-        <CheckBox fx:id="autographCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6">
+        <CheckBox fx:id="autographCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="7">
             <GridPane.margin>
                 <Insets left="10.0" />
             </GridPane.margin>
         </CheckBox>
-      <ComboBox fx:id="genreComboBox" editable="true" prefHeight="25.0" prefWidth="272.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
+      <ComboBox fx:id="genreComboBox" editable="true" prefHeight="25.0" prefWidth="272.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
          <GridPane.margin>
             <Insets left="10.0" right="10.0" />
          </GridPane.margin></ComboBox>
-        <ComboBox fx:id="cycleComboBox" editable="true" prefHeight="25.0" prefWidth="272.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+        <ComboBox fx:id="cycleComboBox" editable="true" prefHeight="25.0" prefWidth="272.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
             <GridPane.margin>
                 <Insets left="10.0" right="10.0" />
             </GridPane.margin>
         </ComboBox>
-        <CheckBox fx:id="cycleEndedCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="9">
+        <CheckBox fx:id="cycleEndedCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="10">
             <GridPane.margin>
                 <Insets left="10.0" />
             </GridPane.margin>
         </CheckBox>
-        <GridPane prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+        <GridPane prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="118.0" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="19.0" />
@@ -202,7 +216,7 @@
                 </GridPane.margin>
             </Label>
         </GridPane>
-        <GridPane prefHeight="21.0" prefWidth="227.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
+        <GridPane prefHeight="21.0" prefWidth="227.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="226.0" minWidth="10.0" prefWidth="219.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="128.0" minWidth="10.0" prefWidth="47.0" />
@@ -223,7 +237,7 @@
                 </Button>
             </children>
         </GridPane>
-        <TextField fx:id="priceFieldInput" GridPane.columnIndex="1" GridPane.rowIndex="12">
+        <TextField fx:id="priceFieldInput" GridPane.columnIndex="1" GridPane.rowIndex="13">
             <GridPane.margin>
                 <Insets left="10.0" right="10.0" />
             </GridPane.margin>

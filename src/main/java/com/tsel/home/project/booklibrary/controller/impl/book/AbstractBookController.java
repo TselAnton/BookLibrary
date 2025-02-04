@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -64,6 +65,11 @@ public abstract class AbstractBookController extends AbstractViewController {
      * @return {@link TextField} для заполнения количества страниц
      */
     protected abstract TextField getPagesCountFieldInput();
+
+    /**
+     * @return {@link TextField} для заполнения года выпуска книги
+     */
+    protected abstract TextField getPublicationYearFieldInput();
 
     /**
      * @return {@link TextField} для заполнения стоимости книги
@@ -246,11 +252,13 @@ public abstract class AbstractBookController extends AbstractViewController {
 
     /**
      * Сохранение новой книги
+     * @param bookId ID сохраняемой книги
      * @param audioBookSiteIds Идентификаторы сайтов аудиокниг
      */
     protected void saveNewBook(@Nullable UUID bookId, List<UUID> audioBookSiteIds) {
         String bookTitle = getInputText(getNameTextFieldInput());
         String bookPagesCount = getInputText(getPagesCountFieldInput());
+        String bookPublishYear = getInputText(getPublicationYearFieldInput());
         String bookPrice = getInputText(getPriceFieldInput());
         boolean readBookFlag = isChecked(getReadCheckBox());
         boolean hardCoverFlag = isChecked(getHardCoverCheckBox());
@@ -266,7 +274,7 @@ public abstract class AbstractBookController extends AbstractViewController {
 
         String imagePath = getInputText(getCoverImagePathFieldInput());
 
-        if (isBookFieldsInvalid(bookTitle, bookPagesCount, bookPrice)
+        if (isBookFieldsInvalid(bookTitle, bookPagesCount, bookPrice, bookPublishYear)
             || isAuthorAndPublisherFieldsInvalid(author, publisher)
             || isCycleFieldsInvalid(cycle, cycleBookNumber, cycleTotalBookCount, cycleEndedFlag)) {
             return;
@@ -310,6 +318,7 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .publisherId(newPublisher.getId())
                 .genreId(newGenre != null ? newGenre.getId() : null)
                 .pages(stringToInteger(bookPagesCount))
+                .publicationYear(stringToInteger(bookPublishYear))
                 .read(readBookFlag)
                 .autograph(isChecked(getAutographCheckBox()))
                 .cycleId(newCycle != null ? newCycle.getId() : null)
@@ -386,7 +395,7 @@ public abstract class AbstractBookController extends AbstractViewController {
         return checkBox.isSelected();
     }
 
-    private boolean isBookFieldsInvalid(String bookTitle, String bookPagesCount, String bookPrice) {
+    private boolean isBookFieldsInvalid(String bookTitle, String bookPagesCount, String bookPrice, String bookPublishYear) {
         if (isBlank(bookTitle)) {
             riseAlert(WARNING, "Ошибка", "Название книги не заполнено", "Название книги не может быть пустым");
             return true;
@@ -407,6 +416,22 @@ public abstract class AbstractBookController extends AbstractViewController {
         if (stringToInteger(bookPagesCount) == null) {
             riseAlert(WARNING, "Ошибка", "Неверно заполнено количество страниц",
                 "Количество страниц должно быть записано в виде целого числа");
+            return true;
+        }
+        if (isBlank(bookPublishYear)) {
+            riseAlert(WARNING, "Ошибка", "Не заполнен год выпуска книги",
+                "Год выпуска книги не может быть пустым");
+            return true;
+        }
+        Integer bookPublishYearInt = stringToInteger(bookPublishYear);
+        if (bookPublishYearInt == null) {
+            riseAlert(WARNING, "Ошибка", "Неверно заполнен год выпуска книги",
+                "Год выпуска книги должен быть записан в виде целого числа");
+            return true;
+        }
+        if (bookPublishYearInt < 1900 || bookPublishYearInt > LocalDateTime.now().getYear()) {
+            riseAlert(WARNING, "Ошибка", "Неверно заполнен год выпуска книги",
+                "Год не может быть меньше 1900 года и больше текущего (или ты из будущего? :)");
             return true;
         }
         return false;

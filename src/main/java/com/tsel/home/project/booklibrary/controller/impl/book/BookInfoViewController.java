@@ -69,6 +69,9 @@ public class BookInfoViewController extends AbstractViewController {
     private Label pageCountLabel;
 
     @FXML
+    private Label publicationYearLabel;
+
+    @FXML
     private CheckBox readCheckBox;
 
     @FXML
@@ -190,6 +193,7 @@ public class BookInfoViewController extends AbstractViewController {
         );
 
         pageCountLabel.setText(String.valueOf(bookForView.getPages()));
+        publicationYearLabel.setText(String.valueOf(bookForView.getPublicationYear()));
         priceLabel.setText(resolvePrice(bookForView.getPrice()));
 
         readCheckBox.setSelected(bookForView.getRead());

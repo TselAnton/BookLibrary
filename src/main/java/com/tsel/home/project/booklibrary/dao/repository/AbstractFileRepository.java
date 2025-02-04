@@ -144,7 +144,21 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
         return new ConstraintException(this.entityDisplayName, message.toLowerCase(Locale.ROOT));
     }
 
+    /**
+     * Сравнение сущностей при проверки ограничений
+     * @param newEntity Сохраняемая сущность
+     * @param oldEntity Существующая сущность
+     * @throws ConstraintException Ошибкка в случае, если сохраняемая сущность нарушает ограничения и не может быть сохранена
+     */
     protected void compareEntities(E newEntity, E oldEntity) throws ConstraintException {
+        // FOR OVERWRITE
+    }
+
+    /**
+     * Метод для пре-чтения сущность в репозиторий
+     * @param entity Сущность
+     */
+    protected void preCreateEntity(E entity) {
         // FOR OVERWRITE
     }
 
@@ -198,6 +212,7 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
         Map<K, E> entitiesMap = new LinkedHashMap<>();
         List<E> entitiesList = ofNullable(fileRepositoryProvider.readStorageFile()).orElse(Collections.emptyList());
         for (E entity : entitiesList) {
+            preCreateEntity(entity);
             entitiesMap.put(entity.getId(), entity);
         }
         return entitiesMap;

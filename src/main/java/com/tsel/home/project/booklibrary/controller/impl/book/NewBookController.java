@@ -46,6 +46,9 @@ public class NewBookController extends AbstractBookController {
     private TextField pagesCountFieldInput;
 
     @FXML
+    private TextField publicationYearFieldInput;
+
+    @FXML
     private TextField priceFieldInput;
 
     @FXML

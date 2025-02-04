@@ -64,7 +64,7 @@ public class Book implements BaseEntity<UUID> {
     @Property(value = "цена")
     private Double price;
 
-    @Property(value = "год издания")
+    @Property(value = "год издания", nullable = false)
     private Integer publicationYear;
 
     @Property(value = "аудиокниги")
