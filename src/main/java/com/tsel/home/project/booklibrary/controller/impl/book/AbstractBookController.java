@@ -34,7 +34,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -303,6 +302,10 @@ public abstract class AbstractBookController extends AbstractViewController {
             }
 
             Cycle newCycle = resolveCycleByComboBox(cycle, cycleEndedFlag, stringToInteger(cycleTotalBookCount));
+            log.info("Resolved cycle for book '{}': '{}'",
+                bookTitle,
+                ofNullable(newCycle).map(Cycle::getName).orElse("NULL")
+            );
             if (newCycle != null) {
                 cycleRepository.save(newCycle);
             }
@@ -429,9 +432,9 @@ public abstract class AbstractBookController extends AbstractViewController {
                 "Год выпуска книги должен быть записан в виде целого числа");
             return true;
         }
-        if (bookPublishYearInt < 1900 || bookPublishYearInt > LocalDateTime.now().getYear()) {
+        if (bookPublishYearInt < 0) {
             riseAlert(WARNING, "Ошибка", "Неверно заполнен год выпуска книги",
-                "Год не может быть меньше 1900 года и больше текущего (или ты из будущего? :)");
+                "Год не может быть отрицательным числом");
             return true;
         }
         return false;

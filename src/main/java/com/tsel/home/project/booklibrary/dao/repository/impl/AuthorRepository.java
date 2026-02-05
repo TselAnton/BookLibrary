@@ -24,7 +24,7 @@ public class AuthorRepository extends AbstractFileRepository<UUID, Author> {
     public Optional<Author> getByName(String name) {
         return getRepositoryMap().values()
             .stream()
-            .filter(author -> author.getName().contains(name))
+            .filter(author -> author.getName().equalsIgnoreCase(name))
             .findFirst();
     }
 

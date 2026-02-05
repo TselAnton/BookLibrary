@@ -24,7 +24,7 @@ public class PublisherRepository extends AbstractFileRepository<UUID, Publisher>
     public Optional<Publisher> getByName(String name) {
         return getRepositoryMap().values()
             .stream()
-            .filter(publisher -> publisher.getName().contains(name))
+            .filter(publisher -> publisher.getName().equalsIgnoreCase(name))
             .findFirst();
     }
 

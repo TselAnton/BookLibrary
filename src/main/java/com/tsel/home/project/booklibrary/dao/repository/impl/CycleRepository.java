@@ -24,7 +24,7 @@ public class CycleRepository extends AbstractFileRepository<UUID, Cycle> {
     public Optional<Cycle> getByName(String name) {
         return getRepositoryMap().values()
             .stream()
-            .filter(cycle -> cycle.getName().contains(name))
+            .filter(cycle -> cycle.getName().equalsIgnoreCase(name))
             .findFirst();
     }
 

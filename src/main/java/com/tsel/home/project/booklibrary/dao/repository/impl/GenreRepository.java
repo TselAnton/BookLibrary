@@ -24,7 +24,7 @@ public class GenreRepository extends AbstractFileRepository<UUID, Genre> {
     public Optional<Genre> getByName(String name) {
         return getRepositoryMap().values()
             .stream()
-            .filter(genre -> genre.getName().contains(name))
+            .filter(genre -> genre.getName().equalsIgnoreCase(name))
             .findFirst();
     }
 
