@@ -33,13 +33,13 @@
 <text x="124" y="295" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">ruble.svg</text>
 <rect x="240" y="194" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
 <svg x="316" y="204" width="48" height="48" viewBox="0 0 24 24">
-<path d="M12 2 L22 7.5 V17 L12 22 L2 17 V7.5 Z M2 7.5 L12 13 L22 7.5 M12 13 V22" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M8.1 6.8 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M14.1 7.3 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M4.6 12 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M7.6 16 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M14.6 16.5 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M18.1 12 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 2 L20.66 7 V17 L12 22 L3.34 17 V7 Z M3.34 7 L12 12 L20.66 7 M12 12 V22" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M11.05 7 a.95 .55 0 1 0 1.9 0 a.95 .55 0 1 0 -1.9 0" fill="#20372C" stroke="none" stroke-width="0"/>
+  <path d="M5.513 10.764 a.85 .65 60 1 0 .85 1.472 a.85 .65 60 1 0 -.85 -1.472" fill="#20372C" stroke="none" stroke-width="0"/>
+  <path d="M8.977 16.764 a.85 .65 60 1 0 .85 1.472 a.85 .65 60 1 0 -.85 -1.472" fill="#20372C" stroke="none" stroke-width="0"/>
+  <path d="M14.173 18.236 a.85 .65 120 1 0 .85 -1.472 a.85 .65 120 1 0 -.85 1.472" fill="#20372C" stroke="none" stroke-width="0"/>
+  <path d="M15.905 15.236 a.85 .65 120 1 0 .85 -1.472 a.85 .65 120 1 0 -.85 1.472" fill="#20372C" stroke="none" stroke-width="0"/>
+  <path d="M17.637 12.236 a.85 .65 120 1 0 .85 -1.472 a.85 .65 120 1 0 -.85 1.472" fill="#20372C" stroke="none" stroke-width="0"/>
 </svg>
 <text x="340" y="274" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Случайная книга</text>
 <text x="340" y="295" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">dice.svg</text>
