@@ -2,13 +2,11 @@ package com.tsel.home.project.booklibrary.controller.impl.book;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
-import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.data.Cycle;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
-import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import java.util.Objects;
 import java.util.UUID;
 import javafx.fxml.FXML;
@@ -17,7 +15,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
@@ -127,7 +124,7 @@ public class EditBookController extends AbstractBookController {
         initComboBoxValue(genreComboBox, bookForEdit.getGenreId());
         initComboBoxValue(cycleComboBox, bookForEdit.getCycleId());
 
-        priceFieldInput.setText(bookForEdit.getPrice() != null ? String.valueOf(bookForEdit.getPrice()) : "");
+        priceFieldInput.setText(formatPrice(bookForEdit.getPrice()));
 
         if (bookForEdit.getCycleId() != null) {
             Cycle cycle = cycleRepository.getById(bookForEdit.getCycleId());
@@ -142,28 +139,12 @@ public class EditBookController extends AbstractBookController {
     }
 
     @FXML
-    public void stageKeyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            ButtonAnswer answer = riseAlert(
-                CONFIRMATION,
-                "Внимание!",
-                "Закрыть окно?",
-                "Все несохранённые данные будут потеряны"
-            );
-
-            if (answer.isOkAnswer()) {
-                closeStage(getExitButton());
-            }
-
-        } else if (keyEvent.getCode() == KeyCode.ENTER) {
-            editBook();
-        }
-    }
+    public void stageKeyPressed(KeyEvent keyEvent) { handleFormKey(keyEvent); }
 
 
     @FXML
     public void cancelEditing() {
-        closeStage(getExitButton());
+        cancelForm();
     }
 
     @FXML
@@ -174,6 +155,13 @@ public class EditBookController extends AbstractBookController {
     @FXML
     public void editBook() {
         saveNewBook(bookForEdit.getId(), bookForEdit.getAudioBookSiteIds());
+    }
+
+    @Override
+    protected Double resolvePriceForSave(String price) {
+        // A display change must not round legacy fractional prices when editing unrelated fields.
+        return Objects.equals(price, formatPrice(bookForEdit.getPrice()))
+            ? bookForEdit.getPrice() : super.resolvePriceForSave(price);
     }
 
     @Override
