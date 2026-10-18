@@ -1,11 +1,7 @@
 package com.tsel.home.project.booklibrary.controller.impl.book;
 
-import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
-import com.google.gson.Gson;
 import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
-import com.tsel.home.project.booklibrary.utils.MyGson;
-import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
@@ -24,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class NewBookController extends AbstractBookController {
 
-    private static final Gson GSON = MyGson.buildGson();
 
     // Основные элементы
 
@@ -103,7 +97,7 @@ public class NewBookController extends AbstractBookController {
 
     @FXML
     public void cancelAdding() {
-        closeStage(getExitButton());
+        cancelForm();
     }
 
     @FXML
@@ -112,23 +106,8 @@ public class NewBookController extends AbstractBookController {
     }
 
     @FXML
-    public void stageKeyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            ButtonAnswer answer = riseAlert(
-                CONFIRMATION,
-                "Внимание!",
-                "Закрыть окно?",
-                "Все несохранённые данные будут потеряны"
-            );
+    public void stageKeyPressed(KeyEvent keyEvent) { handleFormKey(keyEvent); }
 
-            if (answer.isOkAnswer()) {
-                closeStage(getExitButton());
-            }
-
-        } else if (keyEvent.getCode() == KeyCode.ENTER) {
-            addBook();
-        }
-    }
 
     @FXML
     public void addBook() {

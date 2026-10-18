@@ -1,5 +1,7 @@
 package com.tsel.home.project.booklibrary.utils.table;
 
+import java.util.Locale;
+import java.util.Objects;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -7,96 +9,50 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-/**
- * This solution taken from https://stackoverflow.com/questions/19924852/autocomplete-combobox-in-javafx
- * @param <T> CheckBox values type
- */
-public class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
-
+/** Filters lookup suggestions after text edits without interfering with native selection shortcuts. */
+public final class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
     private final ComboBox<T> comboBox;
     private final ObservableList<T> data;
-    private boolean moveCaretToPos = false;
-    private int caretPos;
+    private String lastFilteredText;
 
-    public static <T> void wrapComboBox(final ComboBox<T> comboBox) {
+    public static <T> void wrapComboBox(ComboBox<T> comboBox) {
         new AutoCompleteComboBoxListener<>(comboBox);
     }
 
-    private AutoCompleteComboBoxListener(final ComboBox<T> comboBox) {
+    private AutoCompleteComboBoxListener(ComboBox<T> comboBox) {
         this.comboBox = comboBox;
-        data = comboBox.getItems();
-
-        this.comboBox.setEditable(true);
-        this.comboBox.setOnKeyPressed(t -> comboBox.hide());
-        this.comboBox.setOnKeyReleased(AutoCompleteComboBoxListener.this);
+        data = FXCollections.observableArrayList(comboBox.getItems());
+        comboBox.setEditable(true);
+        lastFilteredText = comboBox.getEditor().getText();
+        comboBox.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (isTextEdit(event) && !event.isShortcutDown()) comboBox.hide();
+        });
+        comboBox.addEventHandler(KeyEvent.KEY_RELEASED, this);
     }
 
-    @Override
-    public void handle(KeyEvent event) {
-        switch (event.getCode()) {
-            case UP -> {
-                caretPos = -1;
-                moveCaret(comboBox.getEditor().getText().length());
-            }
-            case DOWN -> {
-                if (!comboBox.isShowing()) {
-                    comboBox.show();
-                }
-                caretPos = -1;
-                moveCaret(comboBox.getEditor().getText().length());
-            }
-            case BACK_SPACE, DELETE -> {
-                moveCaretToPos = true;
-                caretPos = comboBox.getEditor().getCaretPosition();
-            }
-            default -> {
-                // NOT NEEDED
-            }
-        }
-
-        if (event.getCode() == KeyCode.RIGHT
-                || event.getCode() == KeyCode.LEFT
-                || event.isControlDown()
-                || event.getCode() == KeyCode.HOME
-                || event.getCode() == KeyCode.END
-                || event.getCode() == KeyCode.TAB) {
-            return;
-        }
-
-        ObservableList<T> list = FXCollections.observableArrayList();
-        for (T datum : data) {
-            String comboBoxText = AutoCompleteComboBoxListener.this.comboBox
-                    .getEditor()
-                    .getText()
-                    .toLowerCase();
-
-            if (datum.toString().toLowerCase().startsWith(comboBoxText)) {
-                list.add(datum);
-            }
-        }
-
-        String t = comboBox.getEditor().getText();
-
-        comboBox.setItems(list);
-        comboBox.getEditor().setText(t);
-
-        if (!moveCaretToPos) {
-            caretPos = -1;
-        }
-
-        moveCaret(t.length());
-        if (!list.isEmpty()) {
-            comboBox.show();
-        }
+    private static boolean isTextEdit(KeyEvent event) {
+        KeyCode code = event.getCode();
+        return !code.isModifierKey() && !code.isNavigationKey() && !code.isFunctionKey()
+            && code != KeyCode.ESCAPE && code != KeyCode.ENTER && code != KeyCode.TAB
+            && (!event.isShortcutDown() || code == KeyCode.V || code == KeyCode.X);
     }
 
-    private void moveCaret(int textLength) {
-        if (caretPos == -1) {
-            comboBox.getEditor().positionCaret(textLength);
-        } else {
-            comboBox.getEditor().positionCaret(caretPos);
+    @Override public void handle(KeyEvent event) {
+        if (!isTextEdit(event)) return;
+        String text = comboBox.getEditor().getText();
+        if (Objects.equals(text, lastFilteredText)) return;
+        lastFilteredText = text;
+        int anchor = comboBox.getEditor().getAnchor();
+        int caret = comboBox.getEditor().getCaretPosition();
+        String prefix = text.toLowerCase(Locale.ROOT);
+        ObservableList<T> matches = FXCollections.observableArrayList();
+        for (T item : data) {
+            if (item.toString().toLowerCase(Locale.ROOT).startsWith(prefix)) matches.add(item);
         }
-        moveCaretToPos = false;
+        comboBox.setItems(matches);
+        comboBox.getEditor().setText(text);
+        if (matches.isEmpty()) comboBox.hide();
+        else if (comboBox.getScene() != null && comboBox.getScene().getWindow().isShowing()) comboBox.show();
+        comboBox.getEditor().selectRange(anchor, caret);
     }
-
 }

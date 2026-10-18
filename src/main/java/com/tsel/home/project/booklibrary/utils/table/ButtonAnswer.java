@@ -4,8 +4,6 @@ import javafx.scene.control.ButtonType;
 
 public final class ButtonAnswer {
 
-    private static final String OK = "OK";
-
     private final ButtonType buttonType;
 
     public ButtonAnswer(ButtonType buttonType) {
@@ -14,6 +12,6 @@ public final class ButtonAnswer {
 
     public boolean isOkAnswer() {
         return buttonType != null
-            && OK.equals(buttonType.getText());
+            && buttonType.getButtonData() == javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
     }
 }

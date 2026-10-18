@@ -11,6 +11,10 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
+import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.controller.impl.book.AbstractBookController;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
 import java.net.URI;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;
@@ -55,6 +59,20 @@ public abstract class AbstractViewController {
         warnAlert.setTitle(title);
         warnAlert.setHeaderText(warnMsg);
         warnAlert.setContentText(explanationMsg);
+        if (getMainAnchorPane() != null && getMainAnchorPane().getScene() != null)
+            warnAlert.initOwner(getMainAnchorPane().getScene().getWindow());
+        SageTheme.apply(warnAlert.getDialogPane().getScene());
+        warnAlert.setOnShown(event -> ((Stage) warnAlert.getDialogPane().getScene().getWindow())
+            .getIcons().setAll(imageProvider.getWindowIcon()));
+        ButtonType accept = new ButtonType(alertType == Alert.AlertType.CONFIRMATION ? "Продолжить" : "Понятно", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        warnAlert.getButtonTypes().setAll(accept);
+        if (alertType == Alert.AlertType.CONFIRMATION) {
+            warnAlert.getButtonTypes().add(cancel);
+            ((javafx.scene.control.Button) warnAlert.getDialogPane().lookupButton(accept)).setDefaultButton(false);
+            ((javafx.scene.control.Button) warnAlert.getDialogPane().lookupButton(cancel)).setDefaultButton(true);
+            javafx.application.Platform.runLater(() -> warnAlert.getDialogPane().lookupButton(cancel).requestFocus());
+        }
 
         log.info("Raised alert {} with message '{}'", alertType, explanationMsg);
         return new ButtonAnswer(warnAlert.showAndWait().orElse(null));
@@ -92,7 +110,7 @@ public abstract class AbstractViewController {
 
             Stage stage = new Stage();
             stage.setResizable(false);
-            stage.setTitle(modalViewTitle);
+            SageTheme.install(stage, scene, modalViewTitle, false);
             stage.getIcons().add(imageProvider.getWindowIcon());
             stage.setScene(scene);
             stage.initModality(Modality.WINDOW_MODAL);
@@ -105,12 +123,20 @@ public abstract class AbstractViewController {
 
             AbstractViewController controller = loader.getController();
             controller.initController(loader, this, initParameters);
+            if (controller instanceof AbstractBookController bookController) bookController.configureWindow(stage);
+            stage.setX(primaryStage.getX() + Math.max(0, (primaryStage.getWidth() - scene.getRoot().prefWidth(-1)) / 2));
+            javafx.geometry.Rectangle2D bounds = javafx.stage.Screen.getScreensForRectangle(
+                primaryStage.getX(), primaryStage.getY(), primaryStage.getWidth(), primaryStage.getHeight())
+                .stream().findFirst().orElse(javafx.stage.Screen.getPrimary()).getVisualBounds();
+            stage.setX(Math.max(bounds.getMinX(), Math.min(stage.getX(), bounds.getMaxX() - scene.getRoot().prefWidth(-1))));
+            stage.setY(Math.max(bounds.getMinY(), Math.min(stage.getY(), bounds.getMaxY() - scene.getRoot().prefHeight(-1))));
 
             log.info("Opening modal window {}", modalViewResourceFile);
             stage.showAndWait();
 
         } catch (Exception e) {
             log.error("Exception while load model view", e);
+            riseAlert(Alert.AlertType.ERROR, "Ошибка", "Не удалось открыть окно", "Повторите попытку. Подробности доступны в журнале приложения.");
         }
     }
 

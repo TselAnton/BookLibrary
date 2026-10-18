@@ -1,313 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
-<AnchorPane fx:id="mainAnchorPane" maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="812.0" prefHeight="600.0" prefWidth="812.0" style="-fx-background-color: #F7F3F2;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.impl.book.BookInfoViewController">
-   <children>
-      <AnchorPane prefHeight="125.0" prefWidth="1000.0" style="-fx-background-color: #8B936B;" AnchorPane.bottomAnchor="460.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <Label layoutX="24.0" layoutY="20.0" text="𝐁𝐨𝐨𝐤" textFill="#3a3d20" AnchorPane.leftAnchor="20.0">
-               <font>
-                  <Font size="60.0" />
-               </font>
-            </Label>
-            <Label layoutX="169.0" layoutY="20.0" text="𝐈𝐧𝐟𝐨" textFill="#f7f3f2">
-               <font>
-                  <Font size="60.0" />
-               </font>
-            </Label>
-         </children>
-      </AnchorPane>
-      <AnchorPane layoutX="1.0" layoutY="140.0" minHeight="0.0" minWidth="0.0" onKeyPressed="#stageKeyPressed" prefHeight="461.0" prefWidth="812.0" style="-fx-background-color: #C7CCB3;">
-         <children>
-            <Label alignment="CENTER" layoutX="260.0" layoutY="8.0" prefHeight="37.0" prefWidth="543.0" text="Информация о книге" AnchorPane.bottomAnchor="416.0" AnchorPane.leftAnchor="260.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="8.0">
-               <font>
-                  <Font name="System Bold" size="20.0" />
-               </font>
-               <padding>
-                  <Insets left="5.0" />
-               </padding>
-            </Label>
-            <ImageView fx:id="coverImage" fitHeight="351.0" fitWidth="242.0" layoutX="16.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="45.0" />
-            <Button fx:id="editBookButton" layoutX="14.0" layoutY="417.0" mnemonicParsing="false" onAction="#editBook" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Изменить" textFill="WHITE" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="675.0">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Button>
-            <Button fx:id="deleteBookButton" layoutX="148.0" layoutY="417.0" mnemonicParsing="false" onAction="#deleteBook" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Удалить" textFill="WHITE" AnchorPane.leftAnchor="145.0">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Button>
-            <GridPane fx:id="bookInfoGrid" layoutX="266.0" layoutY="50.0" prefHeight="310.0" prefWidth="213.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="266.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="50.0">
-               <columnConstraints>
-                  <ColumnConstraints fx:id="gridPane" hgrow="SOMETIMES" maxWidth="228.0" minWidth="0.0" prefWidth="197.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="359.0" minWidth="10.0" prefWidth="335.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints fx:id="column" maxHeight="300.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               </rowConstraints>
-               <children>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="244.0" text="Название:">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="313.0" text="Автор:" GridPane.rowIndex="1">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="326.0" text="Издатель:" GridPane.rowIndex="2">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="250.0" text="Количество страниц:" GridPane.rowIndex="3">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" layoutX="15.0" layoutY="95.0" prefHeight="27.0" prefWidth="250.0" text="Год издания:" GridPane.rowIndex="4">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="publicationYearLabel" layoutX="207.0" layoutY="95.0" prefHeight="27.0" prefWidth="347.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Жанр" GridPane.rowIndex="5">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label alignment="CENTER_RIGHT" layoutX="15.0" layoutY="287.0" prefHeight="27.0" prefWidth="237.0" text="Твёрдая обложка:" GridPane.rowIndex="6">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <CheckBox fx:id="isHardCoverCheckBox" disable="true" layoutX="207.0" layoutY="290.0" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="6">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                     <padding>
-                        <Insets left="15.0" />
-                     </padding>
-                  </CheckBox>
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="229.0" text="Прочитано:" GridPane.rowIndex="7">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="cycleEndedTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Цикл завершён:" GridPane.rowIndex="11">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <GridPane.margin>
-                        <Insets left="5.0" />
-                     </GridPane.margin>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="cycleTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="226.0" text="Цикл:" GridPane.rowIndex="10">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="nameLabel" prefHeight="80.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="authorLabel" prefHeight="52.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="publisherLabel" prefHeight="80.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="pageCountLabel" prefHeight="27.0" prefWidth="347.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="cycleLabel" prefHeight="86.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="10">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </Label>
-                  <CheckBox fx:id="readCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="7">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                     <padding>
-                        <Insets left="15.0" />
-                     </padding>
-                  </CheckBox>
-                  <CheckBox fx:id="cycleEndedCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="11">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                     <padding>
-                        <Insets left="15.0" />
-                     </padding>
-                  </CheckBox>
-                  <TextFlow prefHeight="200.0" prefWidth="200.0" />
-                  <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="229.0" text="Автограф:" GridPane.rowIndex="8">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <CheckBox fx:id="autographCheckBox" disable="true" mnemonicParsing="false" styleClass="disabled-check-box" stylesheets="@../css/check-box.css" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                     <padding>
-                        <Insets left="15.0" />
-                     </padding>
-                  </CheckBox>
-                  <Label fx:id="priceTitle" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="237.0" text="Стоимость: " GridPane.rowIndex="9">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="priceLabel" prefHeight="86.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="9">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="genreLabel" prefHeight="86.0" prefWidth="335.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </Label>
-               </children>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+<?import com.tsel.home.project.booklibrary.ui.LineIcon?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="mainAnchorPane" prefWidth="812" prefHeight="600" onKeyPressed="#stageKeyPressed" fx:controller="com.tsel.home.project.booklibrary.controller.impl.book.BookInfoViewController">
+    <VBox AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <HBox fx:id="windowHeader" styleClass="window-header" minHeight="56" prefHeight="56" maxHeight="56"/>
+        <HBox spacing="20" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets top="16" left="16" right="16"/>
+            </padding>
+            <VBox alignment="TOP_CENTER" spacing="8" minWidth="244" prefWidth="244">
+                <StackPane minHeight="370" prefHeight="370" maxHeight="370" styleClass="cover-surface">
+                    <LineIcon fx:id="missingCover"/>
+                    <ImageView fx:id="coverImage" fitWidth="244" fitHeight="370" preserveRatio="true"/>
+                </StackPane>
+            </VBox>
+            <GridPane hgap="12" HBox.hgrow="ALWAYS">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="190" prefWidth="190"/>
+                    <ColumnConstraints prefWidth="314" hgrow="ALWAYS"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                    <RowConstraints minHeight="34" prefHeight="34" maxHeight="34"/>
+                </rowConstraints>
+                <Label text="Название" styleClass="detail-key" GridPane.rowIndex="0"/>
+                <Label fx:id="nameLabel" text="—" maxWidth="Infinity" styleClass="book-name" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Label text="Автор" styleClass="detail-key" GridPane.rowIndex="1"/>
+                <Label fx:id="authorLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label text="Издатель" styleClass="detail-key" GridPane.rowIndex="2"/>
+                <Label fx:id="publisherLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label text="Количество страниц" styleClass="detail-key" GridPane.rowIndex="3"/>
+                <Label fx:id="pageCountLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <Label text="Год издания" styleClass="detail-key" GridPane.rowIndex="4"/>
+                <Label fx:id="publicationYearLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                <Label text="Жанр" styleClass="detail-key" GridPane.rowIndex="5"/>
+                <Label fx:id="genreLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                <Label text="Твёрдая обложка" styleClass="detail-key" GridPane.rowIndex="6"/>
+                <Label fx:id="hardCoverLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                <Label text="Прочитано" styleClass="detail-key" GridPane.rowIndex="7"/>
+                <Label fx:id="readLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                <Label text="Автограф" styleClass="detail-key" GridPane.rowIndex="8"/>
+                <Label fx:id="autographLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+                <Label text="Стоимость" styleClass="detail-key" GridPane.rowIndex="9"/>
+                <Label fx:id="priceLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="9"/>
+                <Label text="Цикл" styleClass="detail-key" GridPane.rowIndex="10"/>
+                <Label fx:id="cycleLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
+                <Label text="Цикл завершён" styleClass="detail-key" GridPane.rowIndex="11"/>
+                <Label fx:id="cycleEndedLabel" text="—" maxWidth="Infinity" styleClass="detail-value" GridPane.columnIndex="1" GridPane.rowIndex="11"/>
             </GridPane>
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="8.0" prefHeight="37.0" prefWidth="242.0" text="Обложка">
-               <font>
-                  <Font name="System Bold" size="20.0" />
-               </font>
-            </Label>
-            <Button fx:id="viewAudioBookSitesButton" layoutX="296.0" layoutY="417.0" mnemonicParsing="false" onAction="#audioBookSitesView" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Аудиокниги" textFill="WHITE" AnchorPane.leftAnchor="300.0">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Button>
-         </children>
-      </AnchorPane>
-   </children>
+        </HBox>
+        <HBox styleClass="dialog-footer" alignment="CENTER_LEFT" spacing="8">
+            <Button fx:id="editBookButton" text="Изменить" styleClass="primary" onAction="#editBook"/>
+            <Button fx:id="deleteBookButton" text="Удалить" styleClass="danger" onAction="#deleteBook"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Закрыть" onAction="#closeWindow"/>
+        </HBox>
+    </VBox>
 </AnchorPane>

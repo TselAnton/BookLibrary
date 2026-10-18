@@ -37,8 +37,11 @@ public final class ImageProvider {
     }
 
     public Image getWindowIcon() {
-        return cachedIcon;
+        return javafx.application.Platform.isFxApplicationThread()
+            ? com.tsel.home.project.booklibrary.ui.SageTheme.windowIcon() : cachedIcon;
     }
+
+    public boolean isPlaceholder(Image image) { return image == defaultImg; }
 
     public Image resolveCover(Book book) {
         if (isNotBlank(book.getCoverImgAbsolutePath())) {
@@ -76,7 +79,7 @@ public final class ImageProvider {
             Path imgPath = Paths.get(book.getCoverImgAbsolutePath());
             if (Files.exists(imgPath)) {
                 try {
-                    Image bookImage = new Image(imgPath.toUri().toURL().toExternalForm(), 12, 0, true, true, true);
+                    Image bookImage = new Image(imgPath.toUri().toURL().toExternalForm(), 24, 32, true, true, false);
                     if (!bookImage.isError()) {
                         cashedSmallImages.put(book.getId(), bookImage);
                         return new ImageHolder(bookImage, false);

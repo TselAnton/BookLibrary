@@ -1,261 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
-<AnchorPane fx:id="mainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#stageKeyPressed" prefHeight="675.0" prefWidth="484.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.impl.book.NewBookController">
-    <GridPane layoutX="14.0" layoutY="133.0" prefHeight="475.0" prefWidth="457.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="130.0">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="224.0" minWidth="10.0" prefWidth="185.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="281.0" minWidth="10.0" prefWidth="272.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-        <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="170.0" text="Название" textAlignment="RIGHT">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="170.0" text="Автор" GridPane.rowIndex="1">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="170.0" text="Издатель" GridPane.rowIndex="2">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label prefHeight="27.0" prefWidth="178.0" text="Количество страниц" GridPane.rowIndex="3">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets />
-            </GridPane.margin>
-        </Label>
-      <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="116.0" prefHeight="27.0" prefWidth="178.0" text="Год издания" GridPane.rowIndex="4">
-         <font>
-            <Font size="18.0" />
-         </font>
-         <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
-         </GridPane.margin>
-      </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Твёрдая обложка" GridPane.rowIndex="5">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Прочитано" GridPane.rowIndex="6">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Автограф" GridPane.rowIndex="7">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </Label>
-      <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Жанр" GridPane.rowIndex="8">
-         <font>
-            <Font size="18.0" />
-         </font>
-         <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
-         </GridPane.margin>
-      </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Цикл" GridPane.rowIndex="9">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Завершённый цикл" GridPane.rowIndex="10">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="183.0" text="Номер в цикле" GridPane.rowIndex="11">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Обложка" GridPane.rowIndex="12">
-            <font>
-                <Font size="18.0" />
-            </font>
-            <GridPane.margin>
-                <Insets right="10.0" />
-            </GridPane.margin>
-        </Label>
-        <Label alignment="CENTER_RIGHT" prefWidth="180.0" text="Стоимость" GridPane.rowIndex="13">
-            <font>
-                <Font size="18.0" />
-            </font>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+<?import com.tsel.home.project.booklibrary.ui.LineIcon?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="mainAnchorPane" prefWidth="484" prefHeight="675" onKeyPressed="#stageKeyPressed" fx:controller="com.tsel.home.project.booklibrary.controller.impl.book.NewBookController">
+    <VBox AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <HBox fx:id="windowHeader" styleClass="window-header" minHeight="56" prefHeight="56" maxHeight="56"/>
+        <GridPane hgap="12" styleClass="form-grid">
             <padding>
-                <Insets right="10.0" />
+                <Insets top="12" left="16" right="16"/>
             </padding>
-        </Label>
-        <TextField fx:id="nameTextFieldInput" GridPane.columnIndex="1">
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </TextField>
-        <ComboBox fx:id="authorComboBox" editable="true" prefHeight="25.0" prefWidth="272.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </ComboBox>
-        <ComboBox fx:id="publisherComboBox" editable="true" prefHeight="25.0" prefWidth="272.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </ComboBox>
-        <TextField fx:id="pagesCountFieldInput" GridPane.columnIndex="1" GridPane.rowIndex="3">
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </TextField>
-      <TextField fx:id="publicationYearFieldInput" GridPane.columnIndex="1" GridPane.rowIndex="4">
-        <GridPane.margin>
-          <Insets left="10.0" right="10.0" />
-        </GridPane.margin>
-      </TextField>
-        <CheckBox fx:id="hardCoverCheckBox" mnemonicParsing="true" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="5">
-            <GridPane.margin>
-                <Insets left="10.0" />
-            </GridPane.margin>
-        </CheckBox>
-        <CheckBox fx:id="readCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6">
-            <GridPane.margin>
-                <Insets left="10.0" />
-            </GridPane.margin>
-        </CheckBox>
-        <CheckBox fx:id="autographCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="7">
-            <GridPane.margin>
-                <Insets left="10.0" />
-            </GridPane.margin>
-        </CheckBox>
-      <ComboBox fx:id="genreComboBox" editable="true" prefHeight="25.0" prefWidth="272.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
-         <GridPane.margin>
-            <Insets left="10.0" right="10.0" />
-         </GridPane.margin></ComboBox>
-        <ComboBox fx:id="cycleComboBox" editable="true" prefHeight="25.0" prefWidth="272.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </ComboBox>
-        <CheckBox fx:id="cycleEndedCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="10">
-            <GridPane.margin>
-                <Insets left="10.0" />
-            </GridPane.margin>
-        </CheckBox>
-        <GridPane prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="118.0" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="19.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints minWidth="154" prefWidth="154"/>
+                <ColumnConstraints minWidth="0" prefWidth="286" maxWidth="286" hgrow="ALWAYS"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
+                <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
             </rowConstraints>
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-            <TextField fx:id="numberInCycleFieldInput" prefHeight="25.0" prefWidth="100.0" />
-            <TextField fx:id="totalCountInCycleFieldInput" prefHeight="25.0" prefWidth="100.0" GridPane.columnIndex="2" />
-            <Label alignment="TOP_CENTER" prefHeight="30.0" prefWidth="64.0" text="из" GridPane.columnIndex="1">
-                <font>
-                    <Font size="18.0" />
-                </font>
-                <GridPane.margin>
-                    <Insets />
-                </GridPane.margin>
-            </Label>
-        </GridPane>
-        <GridPane prefHeight="21.0" prefWidth="227.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
-            <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="226.0" minWidth="10.0" prefWidth="219.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="128.0" minWidth="10.0" prefWidth="47.0" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            </rowConstraints>
-            <children>
-                <TextField fx:id="coverImagePathFieldInput" editable="false" prefHeight="25.0" prefWidth="217.0">
-                    <GridPane.margin>
-                        <Insets left="10.0" />
-                    </GridPane.margin>
-                </TextField>
-                <Button fx:id="selectCoverFileButton" maxHeight="25.0" minHeight="25.0" mnemonicParsing="false" onAction="#chooseBookCover" prefHeight="25.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="+" textFill="WHITE" GridPane.columnIndex="1">
-                    <GridPane.margin>
-                        <Insets left="10.0" right="10.0" />
-                    </GridPane.margin>
+            <Label text="Название *" labelFor="$nameTextFieldInput" GridPane.rowIndex="0" styleClass="form-label"/>
+            <TextField minWidth="0" fx:id="nameTextFieldInput" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Автор *" labelFor="$authorComboBox" GridPane.rowIndex="1" styleClass="form-label"/>
+            <ComboBox fx:id="authorComboBox" editable="true" promptText="Выберите или введите" minWidth="0" prefWidth="286" maxWidth="286" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Издатель *" labelFor="$publisherComboBox" GridPane.rowIndex="2" styleClass="form-label"/>
+            <ComboBox fx:id="publisherComboBox" editable="true" promptText="Выберите или введите" minWidth="0" prefWidth="286" maxWidth="286" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="Количество страниц *" labelFor="$pagesCountFieldInput" GridPane.rowIndex="3" styleClass="form-label"/>
+            <TextField minWidth="0" fx:id="pagesCountFieldInput" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <Label text="Год издания *" labelFor="$publicationYearFieldInput" GridPane.rowIndex="4" styleClass="form-label"/>
+            <TextField minWidth="0" fx:id="publicationYearFieldInput" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            <Label text="Твёрдая обложка" labelFor="$hardCoverCheckBox" GridPane.rowIndex="5" styleClass="form-label"/>
+            <CheckBox fx:id="hardCoverCheckBox" selected="true" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            <Label text="Прочитано" labelFor="$readCheckBox" GridPane.rowIndex="6" styleClass="form-label"/>
+            <CheckBox fx:id="readCheckBox" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+            <Label text="Автограф" labelFor="$autographCheckBox" GridPane.rowIndex="7" styleClass="form-label"/>
+            <CheckBox fx:id="autographCheckBox" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+            <Label text="Жанр" labelFor="$genreComboBox" GridPane.rowIndex="8" styleClass="form-label"/>
+            <ComboBox fx:id="genreComboBox" editable="true" promptText="Не выбран" minWidth="0" prefWidth="286" maxWidth="286" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+            <Label text="Цикл" labelFor="$cycleComboBox" GridPane.rowIndex="9" styleClass="form-label"/>
+            <ComboBox fx:id="cycleComboBox" editable="true" promptText="Не выбран" minWidth="0" prefWidth="286" maxWidth="286" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+            <Label text="Завершённый цикл" labelFor="$cycleEndedCheckBox" GridPane.rowIndex="10" styleClass="form-label"/>
+            <CheckBox fx:id="cycleEndedCheckBox" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+            <Label text="Номер в цикле" labelFor="$numberInCycleFieldInput" GridPane.rowIndex="11" styleClass="form-label"/>
+            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="11" GridPane.columnIndex="1">
+                <TextField minWidth="0" fx:id="numberInCycleFieldInput" prefWidth="124" accessibleText="Номер в цикле"/>
+                <Label text="из" alignment="CENTER" minWidth="38"/>
+                <TextField minWidth="0" fx:id="totalCountInCycleFieldInput" prefWidth="124" accessibleText="Количество книг в цикле"/>
+            </HBox>
+            <Label text="Обложка" labelFor="$coverImagePathFieldInput" GridPane.rowIndex="12" styleClass="form-label"/>
+            <HBox alignment="CENTER_LEFT" spacing="8" minWidth="0" GridPane.rowIndex="12" GridPane.columnIndex="1">
+                <TextField minWidth="0" fx:id="coverImagePathFieldInput" editable="false" promptText="Файл не выбран" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="selectCoverFileButton" onAction="#chooseBookCover" styleClass="icon-button, cover-browse" accessibleText="Выбрать обложку">
+                    <graphic>
+                        <LineIcon name="folder"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Выбрать обложку"/>
+                    </tooltip>
                 </Button>
-            </children>
+            </HBox>
+            <Label text="Стоимость *" labelFor="$priceFieldInput" GridPane.rowIndex="13" styleClass="form-label"/>
+            <HBox alignment="CENTER_LEFT" styleClass="price-input" minWidth="0" GridPane.rowIndex="13" GridPane.columnIndex="1">
+                <TextField minWidth="0" fx:id="priceFieldInput" HBox.hgrow="ALWAYS"/>
+                <StackPane styleClass="currency-suffix"><LineIcon name="ruble"/></StackPane>
+            </HBox>
         </GridPane>
-        <TextField fx:id="priceFieldInput" GridPane.columnIndex="1" GridPane.rowIndex="13">
-            <GridPane.margin>
-                <Insets left="10.0" right="10.0" />
-            </GridPane.margin>
-        </TextField>
-    </GridPane>
-    <AnchorPane layoutY="-1.0" prefHeight="125.0" prefWidth="484.0" style="-fx-background-color: #8B936B;" AnchorPane.bottomAnchor="550.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <Label layoutX="21.0" layoutY="19.0" text="𝐀𝐝𝐝" textFill="#3a3d20" AnchorPane.bottomAnchor="18.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="349.0" AnchorPane.topAnchor="19.0">
-            <font>
-                <Font size="60.0" />
-            </font>
-        </Label>
-        <Label layoutX="135.0" layoutY="19.0" text="𝐁𝐨𝐨𝐤" textFill="#f7f3f2" AnchorPane.leftAnchor="135.0">
-            <font>
-                <Font size="60.0" />
-            </font>
-        </Label>
-    </AnchorPane>
-    <Button fx:id="saveBookButton" layoutX="131.0" layoutY="623.0" mnemonicParsing="false" onAction="#addBook" styleClass="default-button" stylesheets="@../css/search-button.css" text="Добавить" textFill="WHITE" />
-   <Button fx:id="audioBookSitesButton" layoutX="207.0" layoutY="623.0" mnemonicParsing="false" onAction="#addAudioBookSites" styleClass="default-button" stylesheets="@../css/search-button.css" text="Аудиокниги" textFill="WHITE" />
-    <Button fx:id="exitButton" layoutX="295.0" layoutY="623.0" mnemonicParsing="false" onAction="#cancelAdding" styleClass="default-button" stylesheets="@../css/search-button.css" text="Отмена" textFill="WHITE" />
+        <VBox minHeight="40" prefHeight="40" styleClass="form-status">
+            <Label fx:id="validationStatus" styleClass="error-message" maxWidth="Infinity"/>
+        </VBox>
+        <Region VBox.vgrow="ALWAYS"/>
+        <HBox styleClass="dialog-footer" alignment="CENTER_LEFT" spacing="8">
+            <Button fx:id="saveBookButton" text="Добавить" defaultButton="true" styleClass="primary" minWidth="150" onAction="#addBook"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="exitButton" text="Отмена" minWidth="100" onAction="#cancelAdding"/>
+        </HBox>
+    </VBox>
 </AnchorPane>
