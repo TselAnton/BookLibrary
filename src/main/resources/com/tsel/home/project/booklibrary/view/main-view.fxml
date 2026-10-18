@@ -1,84 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Font?>
-
-<AnchorPane fx:id="mainAnchorPane" minHeight="700.0" minWidth="812.0" prefHeight="700.0" prefWidth="1252.0" style="-fx-background-color: #C7CCB3;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsel.home.project.booklibrary.controller.impl.MainViewController">
-   <children>
-      <AnchorPane maxHeight="240.0" minHeight="125.0" prefHeight="240.0" prefWidth="1226.0" style="-fx-background-color: #8B936B;" AnchorPane.bottomAnchor="460.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <Label layoutX="24.0" layoutY="20.0" text="𝐌𝐲" textFill="#3a3d20" AnchorPane.leftAnchor="20.0">
-               <font>
-                  <Font size="60.0" />
-               </font>
-            </Label>
-            <Label layoutX="105.0" layoutY="20.0" text="𝐋𝐢𝐛𝐫𝐚𝐫𝐲" textFill="#f7f3f2">
-               <font>
-                  <Font size="60.0" />
-               </font>
-            </Label>
-         </children>
-      </AnchorPane>
-    <AnchorPane layoutX="14.0" layoutY="140.0" minHeight="0.0" minWidth="0.0" prefHeight="460.0" prefWidth="120.0" style="-fx-background-color: #C7CCB3;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="140.0">
-         <children>
-            <Button fx:id="addBookButton" layoutX="10.0" layoutY="14.0" minHeight="30.0" mnemonicParsing="false" onAction="#addBook" prefHeight="3.0" prefWidth="123.0" styleClass="default-button" stylesheets="@../css/search-button.css" text="Добавить книгу" textFill="WHITE" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
-               <font>
-                  <Font size="14.0" />
-               </font>
+<?import com.tsel.home.project.booklibrary.ui.LineIcon?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="mainAnchorPane" prefWidth="1252" prefHeight="700" fx:controller="com.tsel.home.project.booklibrary.controller.impl.MainViewController">
+    <VBox AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <HBox fx:id="windowHeader" styleClass="window-header" minHeight="56" prefHeight="56" maxHeight="56"/>
+        <MenuBar>
+            <menus>
+                <Menu text="Файл">
+                    <items>
+                        <MenuItem text="Добавить книгу" onAction="#addBook"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem text="Выход" onAction="#exitApplication"/>
+                    </items>
+                </Menu>
+                <Menu text="Правка">
+                    <items>
+                        <MenuItem text="Открыть выбранную книгу" onAction="#openSelectedBook"/>
+                    </items>
+                </Menu>
+                <Menu text="Вид">
+                    <items>
+                        <MenuItem text="Обновить" onAction="#search"/>
+                    </items>
+                </Menu>
+                <Menu text="Справка">
+                    <items>
+                        <MenuItem text="Команды поиска" onAction="#showSearchHelp"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <HBox minHeight="52" prefHeight="52" spacing="8" alignment="CENTER_LEFT" styleClass="toolbar">
+            <Button fx:id="addBookButton" text="Добавить книгу" styleClass="primary" onAction="#addBook">
+                <graphic>
+                    <LineIcon name="plus"/>
+                </graphic>
             </Button>
-            <Button fx:id="searchButton" layoutX="153.0" layoutY="10.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#search" prefHeight="30.0" prefWidth="30.0" style="-fx-rotate: 90;" styleClass="search-button" stylesheets="@../css/search-button.css" />
-            <HBox layoutX="196.0" layoutY="13.0" prefHeight="25.0" prefWidth="994.0" AnchorPane.leftAnchor="196.0" AnchorPane.rightAnchor="24.0">
-               <children>
-                  <TextField fx:id="searchQueryField" onKeyPressed="#searchLabelKeyPressed" prefHeight="25.0" prefWidth="743.0" />
-                  <Button fx:id="searchHelpButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#showSearchHelp" prefHeight="30.0" prefWidth="30.0" styleClass="search-help-button" stylesheets="@../css/main-view-buttons.css">
-                     <HBox.margin>
-                        <Insets left="10.0" right="5.0" />
-                     </HBox.margin>
-                  </Button>
-                  <Button fx:id="priceButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#showBooksPrice" prefHeight="30.0" prefWidth="30.0" styleClass="count-price-button" stylesheets="@../css/main-view-buttons.css">
-                     <HBox.margin>
-                        <Insets right="5.0" />
-                     </HBox.margin>
-                  </Button>
-                  <Button fx:id="audioBookSiteButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#manageAudioBookSites" prefHeight="30.0" prefWidth="30.0" styleClass="audio-book-sites-table-button" stylesheets="@../css/main-view-buttons.css" />
-                  <Button fx:id="randomBookButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#chooseRandomBook" prefHeight="30.0" prefWidth="30.0" styleClass="random-book-button" stylesheets="@../css/main-view-buttons.css">
-                     <HBox.margin>
-                        <Insets left="5.0" />
-                     </HBox.margin>
-                  </Button>
-               </children>
+            <HBox styleClass="search-box" alignment="CENTER_LEFT" spacing="8" HBox.hgrow="ALWAYS">
+                <LineIcon name="search"/>
+                <TextField fx:id="searchQueryField" promptText="Название, автор или цикл…" onAction="#search" HBox.hgrow="ALWAYS"/>
             </HBox>
-            <TableView fx:id="bookTableView" layoutX="12.0" layoutY="52.0" onKeyPressed="#tableViewKeyPressed" onMouseClicked="#clickOnTable" onSort="#onSort" prefHeight="398.0" prefWidth="980.0" style="-fx-alignment: CENTER-RIGHT; -fx-background-color: #C7CCB3;" styleClass="table-row-cell" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="52.0">
-              <columns>
-                  <TableColumn fx:id="imageColumn" editable="false" maxWidth="100.0" prefWidth="30.0" sortable="false" style="-fx-alignment: BASELINE_CENTER;" />
-                  <TableColumn fx:id="numberColumn" editable="false" maxWidth="100.0" prefWidth="50.0" sortable="false" style="-fx-alignment: BASELINE_CENTER;" text="№" />
-                  <TableColumn fx:id="nameColumn" editable="false" prefWidth="319.0" text="Название" />
-                  <TableColumn fx:id="authorColumn" maxWidth="1000.0" prefWidth="180.0" text="Автор" />
-                  <TableColumn fx:id="publisherColumn" maxWidth="200.0" prefWidth="90.0" style="-fx-alignment: BASELINE_CENTER;" text="Издание" />
-                  <TableColumn fx:id="cycleColumn" maxWidth="2000.0" prefWidth="150.0" text="Цикл" />
-                  <TableColumn fx:id="cycleNumberColumn" maxWidth="80.0" minWidth="80.0" sortType="DESCENDING" sortable="false" style="-fx-alignment: BASELINE_CENTER;" text="Номер" />
-                  <TableColumn fx:id="cycleEndColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Завершён" />
-                  <TableColumn fx:id="readColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Прочитано" />
-                  <TableColumn fx:id="audioBookSiteGeneratedColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Аудио" />
-                  <TableColumn fx:id="pagesColumn" editable="false" maxWidth="80.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" text="Страницы" />
-              </columns>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <stylesheets>
-                  <URL value="@../css/check-box.css" />
-                  <URL value="@../css/table.css" />
-               </stylesheets>
+            <Button fx:id="filtersButton" text="Фильтры" onAction="#toggleFilters">
+                <graphic>
+                    <LineIcon name="filter"/>
+                </graphic>
+            </Button>
+            <Button fx:id="priceButton" styleClass="icon-button" accessibleText="Стоимость книг" onAction="#showBooksPrice">
+                <graphic>
+                    <LineIcon name="ruble"/>
+                </graphic>
+            </Button>
+            <Button fx:id="randomBookButton" styleClass="icon-button" accessibleText="Случайная непрочитанная книга" onAction="#chooseRandomBook">
+                <graphic>
+                    <LineIcon name="dice"/>
+                </graphic>
+            </Button>
+        </HBox>
+        <HBox fx:id="activeFilters" visible="false" managed="false" spacing="8" alignment="CENTER_LEFT" minHeight="40" styleClass="toolbar"/>
+        <FlowPane fx:id="filterEditor" visible="false" managed="false" hgap="12" vgap="8" styleClass="filter-editor">
+            <Label text="Прочитано"/>
+            <ComboBox fx:id="readFilter" prefWidth="140"/>
+            <Label text="Жанр"/>
+            <ComboBox fx:id="genreFilter" prefWidth="180"/>
+            <Button text="Сбросить" onAction="#resetFilters" styleClass="text-button"/>
+        </FlowPane>
+        <VBox VBox.vgrow="ALWAYS" styleClass="table-container">
+            <TableView fx:id="bookTableView" editable="false" onKeyPressed="#tableViewKeyPressed" onMouseClicked="#clickOnTable" onSort="#onSort" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="imageColumn" text="" prefWidth="36" minWidth="20" sortable="false"/>
+                    <TableColumn fx:id="numberColumn" text="№" prefWidth="40" minWidth="20" sortable="false"/>
+                    <TableColumn fx:id="nameColumn" text="Название" prefWidth="268" minWidth="20"/>
+                    <TableColumn fx:id="authorColumn" text="Автор" prefWidth="190" minWidth="20"/>
+                    <TableColumn fx:id="publisherColumn" text="Издание" prefWidth="90" minWidth="20"/>
+                    <TableColumn fx:id="cycleColumn" text="Цикл" prefWidth="180" minWidth="20"/>
+                    <TableColumn fx:id="cycleNumberColumn" text="Номер" prefWidth="80" minWidth="20" sortable="false"/>
+                    <TableColumn fx:id="cycleEndColumn" text="Завершён" prefWidth="88" minWidth="20"/>
+                    <TableColumn fx:id="readColumn" text="Прочитано" prefWidth="88" minWidth="20"/>
+                    <TableColumn fx:id="pagesColumn" text="Страницы" prefWidth="80" minWidth="20"/>
+                </columns>
             </TableView>
-         </children>
-      </AnchorPane>
-   </children>
+        </VBox>
+        <HBox minHeight="28" prefHeight="28" alignment="CENTER_LEFT" styleClass="status-footer">
+            <Label fx:id="resultStatus" text="Нет книг"/>
+        </HBox>
+    </VBox>
 </AnchorPane>

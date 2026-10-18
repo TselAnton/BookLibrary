@@ -39,6 +39,15 @@ import java.util.UUID;
 import java.util.function.Function;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.Node;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
+import javafx.application.Platform;
+import com.tsel.home.project.booklibrary.ui.SageTheme;
+import java.util.ArrayList;
+import java.util.Objects;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -54,6 +63,99 @@ public abstract class AbstractBookController extends AbstractViewController {
 
     private File defaultFolder;
     private CustomFileChooser fileChooser;
+    private List<String> initialValues = List.of();
+
+    public void configureWindow(Stage stage) {
+        stage.getScene().getRoot().applyCss();
+        initialValues = formValues();
+        stage.setOnCloseRequest(e -> { if (!canDiscard()) e.consume(); });
+        stage.setOnShown(e -> {
+            stage.getScene().getRoot().applyCss();
+            initialValues = formValues();
+            Platform.runLater(() -> getNameTextFieldInput().requestFocus());
+        });
+        Tooltip path = new Tooltip();
+        path.textProperty().bind(getCoverImagePathFieldInput().textProperty());
+        getCoverImagePathFieldInput().setTooltip(path);
+        List<Node> fields = List.of(getNameTextFieldInput(), getAuthorComboBox(), getPublisherComboBox(),
+            getPagesCountFieldInput(), getPublicationYearFieldInput(), getHardCoverCheckBox(), getReadCheckBox(),
+            getAutographCheckBox(), getGenreComboBox(), getCycleComboBox(), getCycleEndedCheckBox(),
+            getNumberInCycleFieldInput(), getCoverImagePathFieldInput(), getPriceFieldInput());
+        for (Node node : getMainAnchorPane().lookupAll(".form-label")) {
+            Label label = (Label) node;
+            Integer row = javafx.scene.layout.GridPane.getRowIndex(label);
+            Node field = fields.get(row == null ? 0 : row);
+            label.setLabelFor(field);
+            field.setAccessibleText(label.getText().replace("*", ", обязательное поле"));
+            if (field instanceof CheckBox check) label.setOnMouseClicked(e -> {
+                if (!check.isDisabled()) { check.fire(); check.requestFocus(); }
+            });
+        }
+    }
+
+    private List<String> formValues() {
+        List<String> values = new ArrayList<>();
+        for (TextField f : List.of(getNameTextFieldInput(), getPagesCountFieldInput(), getPublicationYearFieldInput(),
+            getPriceFieldInput(), getNumberInCycleFieldInput(), getTotalCountInCycleFieldInput(), getCoverImagePathFieldInput()))
+            values.add(Objects.toString(f.getText(), ""));
+        for (ComboBox<ComboBoxDTO> c : List.of(getAuthorComboBox(), getPublisherComboBox(), getGenreComboBox(), getCycleComboBox()))
+            values.add(Objects.toString(c.getEditor().getText(), ""));
+        for (CheckBox c : List.of(getReadCheckBox(), getAutographCheckBox(), getHardCoverCheckBox(), getCycleEndedCheckBox()))
+            values.add(Boolean.toString(c.isSelected()));
+        return values;
+    }
+
+    private boolean canDiscard() {
+        return initialValues.equals(formValues()) || riseAlert(javafx.scene.control.Alert.AlertType.CONFIRMATION,
+            "Несохранённые изменения", "Закрыть без сохранения?", "Введённые изменения будут потеряны.").isOkAnswer();
+    }
+
+    protected void cancelForm() { SageTheme.requestClose((Stage) getExitButton().getScene().getWindow()); }
+
+    protected void handleFormKey(KeyEvent event) {
+        if (event.getCode() != KeyCode.ESCAPE) return;
+        for (ComboBox<?> combo : List.of(getAuthorComboBox(), getPublisherComboBox(), getGenreComboBox(), getCycleComboBox())) {
+            if (combo.isShowing()) { combo.hide(); event.consume(); return; }
+        }
+        cancelForm(); event.consume();
+    }
+
+    private boolean validateForm() {
+        for (Node node : getMainAnchorPane().lookupAll(".invalid")) node.getStyleClass().remove("invalid");
+        String message = null;
+        Node invalid = null;
+        if (isBlank(getNameTextFieldInput().getText())) { invalid = getNameTextFieldInput(); message = "Введите название книги"; }
+        else if (isBlank(getAuthorComboBox().getEditor().getText())) { invalid = getAuthorComboBox(); message = "Введите имя автора"; }
+        else if (isBlank(getPublisherComboBox().getEditor().getText())) { invalid = getPublisherComboBox(); message = "Введите название издателя"; }
+        else {
+            TextField[] numbers = {getPagesCountFieldInput(), getPublicationYearFieldInput(), getPriceFieldInput()};
+            String[] names = {"Количество страниц", "Год издания", "Стоимость"};
+            for (int i = 0; i < numbers.length; i++) {
+                Double value = i == 2 ? stringToDouble(numbers[i].getText())
+                    : stringToInteger(numbers[i].getText()) == null ? null : stringToInteger(numbers[i].getText()).doubleValue();
+                if (value == null || !Double.isFinite(value) || value < 0) {
+                    invalid = numbers[i]; message = names[i] + (i == 2 ? ": введите число от 0" : ": введите целое число от 0"); break;
+                }
+            }
+        }
+        if (invalid == null && isNotBlank(getCycleComboBox().getEditor().getText())) {
+            TextField[] cycleFields = {getNumberInCycleFieldInput(), getTotalCountInCycleFieldInput()};
+            String[] names = {"Номер в цикле", "Количество книг в цикле"};
+            for (int i = 0; i < cycleFields.length; i++) {
+                Integer value = stringToInteger(cycleFields[i].getText());
+                if (value == null || value < 0) {
+                    invalid = cycleFields[i]; message = names[i] + ": введите целое число от 0"; break;
+                }
+            }
+        }
+        Label status = (Label) getMainAnchorPane().lookup("#validationStatus");
+        if (status != null) { status.setText(message == null ? "" : message); status.setTooltip(message == null ? null : new Tooltip(message)); }
+        if (invalid != null) {
+            invalid.getStyleClass().add("invalid"); invalid.setAccessibleHelp(message); invalid.requestFocus(); return false;
+        }
+        return true;
+    }
+
 
     /**
      * @return {@link TextField} для заполнения названия книги
@@ -176,6 +278,19 @@ public abstract class AbstractBookController extends AbstractViewController {
         AutoCompleteComboBoxListener.wrapComboBox(getPublisherComboBox());
         AutoCompleteComboBoxListener.wrapComboBox(getGenreComboBox());
         AutoCompleteComboBoxListener.wrapComboBox(getCycleComboBox());
+        getCycleComboBox().getEditor().textProperty().addListener((o, a, b) -> updateCycleAvailability());
+        updateCycleAvailability();
+    }
+
+    private void updateCycleAvailability() {
+        boolean absent = isBlank(getCycleComboBox().getEditor().getText());
+        getCycleEndedCheckBox().setDisable(absent);
+        getNumberInCycleFieldInput().setDisable(absent);
+        getTotalCountInCycleFieldInput().setDisable(absent);
+        if (absent) {
+            getCycleEndedCheckBox().setSelected(false);
+            getNumberInCycleFieldInput().clear(); getTotalCountInCycleFieldInput().clear();
+        }
     }
 
     private <E extends BaseEntity<UUID>> ObservableList<ComboBoxDTO> getComboBoxValues(
@@ -255,6 +370,7 @@ public abstract class AbstractBookController extends AbstractViewController {
      * @param audioBookSiteIds Идентификаторы сайтов аудиокниг
      */
     protected void saveNewBook(@Nullable UUID bookId, List<UUID> audioBookSiteIds) {
+        if (!validateForm()) return;
         String bookTitle = getInputText(getNameTextFieldInput());
         String bookPagesCount = getInputText(getPagesCountFieldInput());
         String bookPublishYear = getInputText(getPublicationYearFieldInput());
@@ -374,7 +490,11 @@ public abstract class AbstractBookController extends AbstractViewController {
     }
 
     private ComboBoxDTO getSelectedComboBox(ComboBox<?> comboBox, Function<String, ComboBoxDTO> comboBoxDTOFunction) {
+        String typed = comboBox.isEditable() ? comboBox.getEditor().getText() : null;
+        if (comboBox.isEditable() && isBlank(typed)) return null;
         Object comboBoxObject = comboBox.getSelectionModel().getSelectedItem();
+        if (comboBox.isEditable() && (!(comboBoxObject instanceof ComboBoxDTO dto) || !typed.equals(dto.getName())))
+            return comboBoxDTOFunction.apply(typed);
         if (comboBoxObject instanceof String stringValue) {
             return comboBoxDTOFunction.apply(stringValue);
         }
@@ -453,12 +573,12 @@ public abstract class AbstractBookController extends AbstractViewController {
     }
 
     private boolean isCycleFieldsInvalid(ComboBoxDTO cycle, String cycleBookNumber, String cycleTotalBookCount, boolean cycleEndedFlag) {
-        if (isInvalidIntegerValue(cycleBookNumber)) {
+        if (isInvalidIntegerValue(cycleBookNumber) || (stringToInteger(cycleBookNumber) != null && stringToInteger(cycleBookNumber) < 0)) {
             riseAlert(WARNING, "Ошибка", "Неверно заполнен номер книги в цикле",
                 "Номер книги в цикле должен быть записан в виде целого числа");
             return true;
         }
-        if (isInvalidIntegerValue(cycleTotalBookCount)) {
+        if (isInvalidIntegerValue(cycleTotalBookCount) || (stringToInteger(cycleTotalBookCount) != null && stringToInteger(cycleTotalBookCount) < 0)) {
             riseAlert(WARNING, "Ошибка", "Неверно заполнено количество книги в цикле",
                 "Количество книг в цикле должно быть записано в виде целого числа");
             return true;

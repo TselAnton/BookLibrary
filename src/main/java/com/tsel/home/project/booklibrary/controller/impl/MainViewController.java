@@ -4,7 +4,6 @@ import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static com.tsel.home.project.booklibrary.utils.table.TableComparators.CHECK_BOX_COMPARATOR;
 import static com.tsel.home.project.booklibrary.utils.table.TableComparators.NON_COMPARATOR;
-import static com.tsel.home.project.booklibrary.utils.table.TableComparators.STRING_NUMBER_COMPARATOR;
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
@@ -22,6 +21,11 @@ import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
+import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.LineIcon;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.geometry.Pos;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -76,17 +80,15 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.put("readColumn", "read");
         TABLE_COLUMNS_SETTINGS.put("pagesColumn", "pages");
         TABLE_COLUMNS_SETTINGS.put("imageColumn", "cover");
-        TABLE_COLUMNS_SETTINGS.put("audioBookSiteGeneratedColumn", "hasAnyAudioBookSite");
+
 
         TABLE_COLUMNS_SORTING = new HashMap<>();
         TABLE_COLUMNS_SORTING.put("readColumn", CHECK_BOX_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("cycleEndColumn", CHECK_BOX_COMPARATOR);
-        TABLE_COLUMNS_SORTING.put("shelfColumn", STRING_NUMBER_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("nameColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("authorColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("cycleColumn", NON_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("pagesColumn", NON_COMPARATOR);
-        TABLE_COLUMNS_SORTING.put("audioBookSiteGeneratedColumn", CHECK_BOX_COMPARATOR);
     }
 
     private final TableScroll tableScroll = getBean(TableScroll.class);
@@ -104,54 +106,191 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     private TableColumn<BookDTO, String> cycleColumn;
-    private boolean cycleColumnSortedByASC = true;
 
     @FXML
     private TableColumn<BookDTO, Integer> pagesColumn;
-    private boolean pagesColumnSortedByASC = true;
 
     private Stage lastOpenedBookViewStage;
+    @FXML private Button addBookButton;
+    @FXML private Button filtersButton;
+    @FXML private HBox activeFilters;
+    @FXML private FlowPane filterEditor;
+    @FXML private ComboBox<String> readFilter;
+    @FXML private ComboBox<String> genreFilter;
+    @FXML private Label resultStatus;
+    private String appliedQuery = "";
+    private boolean compact;
+
 
     /**
      * Запуск окна контроллера
      * @param stage текущий {@link Stage}
      */
-    @SuppressWarnings("unchecked")
     public void startScene(Stage stage) {
         try {
-            cleanUpRepositoryData();    // Предварительно чистятся репозитории от лишних данных
-
-            FXMLLoader windowLoader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + "view/main-view.fxml"));
-            Scene scene = new Scene(windowLoader.load());
-
-            stage.setTitle("Book library");
-            stage.getIcons().add(imageProvider.getWindowIcon());
-            stage.setScene(scene);
-            stage.setMinWidth(812);
-            stage.setMinHeight(700);
-
-            TableView<BookDTO> initBookTableView = (TableView<BookDTO>) windowLoader.getNamespace().get("bookTableView");
-            initTableColumns(windowLoader, initBookTableView);
-            updateTableColumns(initBookTableView);
-            initBookTableView.getItems().sort(comparing(BookDTO::getName));
-
-            initBookTableView.addEventFilter(ScrollEvent.ANY, scrollEvent -> updateTableScale(scrollEvent, initBookTableView));
-
-            addTooltip("searchHelpButton", "Подсказки для поисковых команд", windowLoader);
-            addTooltip("priceButton", "Посчитать стоимость выбранных книг", windowLoader);
-            addTooltip("audioBookSiteButton", "Управление сайтами аудиокниг", windowLoader);
-            addTooltip("randomBookButton", "Показать случайную книгу из выбранных", windowLoader);
-
+            cleanUpRepositoryData();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(RESOURCE_PATH + "view/main-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            MainViewController controller = loader.getController();
+            controller.configure(stage, scene, loader);
             stage.show();
-
+            scene.getRoot().applyCss();
+            for (javafx.scene.Node node : scene.getRoot().lookupAll(".column-header .label")) {
+                if (node instanceof Label label && !label.getText().isBlank())
+                    Tooltip.install(label, new Tooltip(label.getText()));
+            }
         } catch (Exception e) {
-            log.error("Exception while start scene", e);
+            log.error("Exception while starting main window", e);
+            throw new IllegalStateException("Не удалось открыть библиотеку", e);
         }
     }
 
+    private void configure(Stage stage, Scene scene, FXMLLoader loader) {
+        SageTheme.install(stage, scene, "Моя библиотека", true);
+        stage.getIcons().add(imageProvider.getWindowIcon());
+        stage.setScene(scene);
+        stage.setMinWidth(812);
+        stage.setMinHeight(700);
+        initTableColumns(loader, bookTableView);
+        bookTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        bookTableView.addEventFilter(ScrollEvent.SCROLL, event -> {
+            if (event.isControlDown()) { updateTableScale(event, bookTableView); event.consume(); }
+        });
+        bookTableView.getSelectionModel().selectedItemProperty().addListener((o, a, b) -> updateStatus());
+        readFilter.getItems().setAll("Все", "Не прочитано", "Прочитано");
+        readFilter.setValue("Все");
+        readFilter.setAccessibleText("Фильтр по прочтению");
+        genreFilter.setAccessibleText("Фильтр по жанру");
+        refreshGenres();
+        readFilter.valueProperty().addListener((o, a, b) -> applyFilters());
+        genreFilter.valueProperty().addListener((o, a, b) -> applyFilters());
+        stage.widthProperty().addListener((o, a, b) -> updateCompact(b.doubleValue()));
+        updateCompact(1252);
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (e.isControlDown() && e.getCode() == KeyCode.F) { searchQueryField.requestFocus(); e.consume(); }
+            if (e.isControlDown() && e.getCode() == KeyCode.N) { addBook(); e.consume(); }
+        });
+        addTooltip("priceButton", "Посчитать стоимость найденных книг", loader);
+        addTooltip("randomBookButton", "Случайная непрочитанная книга из найденных", loader);
+        addBookButton.setTooltip(new Tooltip("Добавить книгу (Ctrl+N)"));
+        updateTableColumns(bookTableView);
+    }
+
+    private void refreshGenres() {
+        String selected = genreFilter.getValue();
+        genreFilter.getItems().setAll("Все жанры");
+        genreRepository.getAll().stream().map(com.tsel.home.project.booklibrary.dao.data.Genre::getName)
+            .sorted().forEach(genreFilter.getItems()::add);
+        genreFilter.setValue(genreFilter.getItems().contains(selected) ? selected : "Все жанры");
+    }
+
+    private void updateCompact(double width) {
+        compact = width < 1050;
+        if (compact) { if (!mainAnchorPane.getStyleClass().contains("compact")) mainAnchorPane.getStyleClass().add("compact"); }
+        else mainAnchorPane.getStyleClass().remove("compact");
+        addBookButton.setText(compact ? "" : "Добавить книгу");
+        updateFilterButton();
+        double[] widths = compact ? new double[]{24,28,154,112,58,112,64,76,80,72}
+            : new double[]{36,40,268,190,90,180,80,88,88,80};
+        double available = Math.max(740, width - 48);
+        double total = java.util.Arrays.stream(widths).sum();
+        for (int i = 0; i < widths.length; i++) {
+            TableColumn<BookDTO, ?> column = bookTableView.getColumns().get(i);
+            column.setReorderable(false);
+            double size = Math.floor(widths[i] * available / total);
+            column.setMinWidth(size); column.setMaxWidth(size); column.setPrefWidth(size);
+        }
+        bookTableView.refresh();
+    }
+
+    @FXML public void toggleFilters() {
+        boolean visible = !filterEditor.isVisible();
+        filterEditor.setVisible(visible); filterEditor.setManaged(visible);
+        updateFilterButton();
+    }
+
+    @FXML public void resetFilters() {
+        readFilter.setValue("Все"); genreFilter.setValue("Все жанры");
+        applyFilters();
+    }
+
+    private void updateFilterButton() {
+        int count = (readFilter.getValue() != null && !"Все".equals(readFilter.getValue()) ? 1 : 0)
+            + (genreFilter.getValue() != null && !"Все жанры".equals(genreFilter.getValue()) ? 1 : 0);
+        HBox content = new HBox(8);
+        content.setAlignment(Pos.CENTER);
+        content.getChildren().add(new LineIcon("filter"));
+        if (!compact) content.getChildren().add(new Label("Фильтры"));
+        if (count > 0) {
+            Label badge = new Label(Integer.toString(count));
+            badge.getStyleClass().add("filter-count");
+            content.getChildren().add(badge);
+        }
+        if (!compact) {
+            LineIcon chevron = new LineIcon("down");
+            chevron.setRotate(filterEditor.isVisible() ? 180 : 0);
+            content.getChildren().add(chevron);
+        }
+        filtersButton.setText(null);
+        filtersButton.setGraphic(content);
+        filtersButton.setAccessibleText("Фильтры, активно: " + count + (filterEditor.isVisible() ? ", свернуть" : ", развернуть"));
+        filtersButton.setTooltip(new Tooltip(filtersButton.getAccessibleText()));
+    }
+
+    private void applyFilters() {
+        UUID selected = bookTableView.getSelectionModel().getSelectedItem() == null ? null
+            : bookTableView.getSelectionModel().getSelectedItem().getId();
+        List<BookDTO> all = getDtoBooks();
+        List<BookDTO> results = searchService.search(appliedQuery, all);
+        results = results.stream().sorted(comparing(BookDTO::getName, String.CASE_INSENSITIVE_ORDER)).toList();
+        if ("Не прочитано".equals(readFilter.getValue())) results = searchService.search("!read", results);
+        if ("Прочитано".equals(readFilter.getValue())) results = searchService.search("read", results);
+        String genre = genreFilter.getValue();
+        if (genre != null && !"Все жанры".equals(genre)) results = results.stream().filter(b -> genre.equals(b.getGenre())).toList();
+        bookTableView.setItems(observableArrayList(results));
+        bookTableView.getItems().stream().filter(b -> b.getId().equals(selected)).findFirst()
+            .ifPresent(b -> bookTableView.getSelectionModel().select(b));
+        if (!bookTableView.getSortOrder().isEmpty()) bookTableView.sort();
+        activeFilters.getChildren().clear();
+        if (readFilter.getValue() != null && !"Все".equals(readFilter.getValue()))
+            addChip(readFilter.getValue(), () -> readFilter.setValue("Все"));
+        if (genre != null && !"Все жанры".equals(genre)) addChip("Жанр: " + genre, () -> genreFilter.setValue("Все жанры"));
+        boolean active = !activeFilters.getChildren().isEmpty();
+        if (active) { Button reset = new Button("Сбросить"); reset.getStyleClass().add("text-button"); reset.setOnAction(e -> resetFilters()); activeFilters.getChildren().add(reset); }
+        activeFilters.setVisible(active); activeFilters.setManaged(active);
+        updateFilterButton(); updateStatus();
+        VBox empty = new VBox(8); empty.setAlignment(Pos.CENTER);
+        empty.getChildren().add(new Label(all.isEmpty() ? "Нет книг" : "Ничего не найдено"));
+        Button action = new Button(all.isEmpty() ? "Добавить книгу" : "Сбросить");
+        action.setOnAction(e -> { if (all.isEmpty()) addBook(); else { searchQueryField.clear(); appliedQuery = ""; resetFilters(); } });
+        empty.getChildren().add(action); bookTableView.setPlaceholder(empty);
+    }
+
+    private void addChip(String text, Runnable remove) {
+        HBox chip = new HBox(4); chip.setAlignment(Pos.CENTER_LEFT); chip.getStyleClass().add("chip");
+        chip.getChildren().addAll(new Label(text), SageTheme.iconButton("close", "Убрать условие: " + text, remove));
+        activeFilters.getChildren().add(chip);
+    }
+
+    private void updateStatus() {
+        resultStatus.setText("Найдено: " + bookTableView.getItems().size() + " из " + bookRepository.getAll().size()
+            + "   |   Выбрано: " + (bookTableView.getSelectionModel().getSelectedItem() == null ? 0 : 1));
+    }
+
+    @FXML public void exitApplication() { SageTheme.requestClose((Stage) mainAnchorPane.getScene().getWindow()); }
+    @FXML public void openSelectedBook() {
+        BookDTO selected = bookTableView.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            if (lastOpenedBookViewStage != null) lastOpenedBookViewStage.close();
+            loadBookViewWindow(selected.getId());
+        }
+    }
+
+    @Override public void updateControllerState(UUID entityId) { updateTableColumns(bookTableView); }
+
     @FXML
     public void addBook() {
-        loadModalView("Add new book", "view/add-view.fxml", 400, 15);
+        loadModalView("Добавить книгу", "view/add-view.fxml", 240, 10);
         updateTableColumns(bookTableView);
     }
 
@@ -223,6 +362,10 @@ public class MainViewController extends AbstractViewController {
             lastOpenedBookViewStage.close();
         }
 
+        if (notReadBooks.isEmpty()) {
+            riseAlert(AlertType.INFORMATION, "Случайная книга", "Нет непрочитанных книг", "Измените поиск или фильтры.");
+            return;
+        }
         BookDTO randomBook = notReadBooks.get(RANDOM.nextInt(notReadBooks.size()));
         loadBookViewWindow(randomBook.getId());
         updateTableColumns(bookTableView);
@@ -238,28 +381,29 @@ public class MainViewController extends AbstractViewController {
                     CONFIRMATION,
                     "Внимание!",
                     "Вы уверены?",
-                    "Книга будет безвозвратно удалена из библиотеки"
+                    "Удалить книгу «" + clickedEntity.getName() + "»?"
                 );
 
                 if (answer.isOkAnswer()) {
-                    bookRepository.deleteById(clickedEntity.getId());
+                    bookRepository.delete(bookRepository.getById(clickedEntity.getId()));
                     updateTableColumns(bookTableView);
                 }
             }
 
+        } else if (keyEvent.getCode() == KeyCode.ENTER) {
+            openSelectedBook(); keyEvent.consume();
         } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
             ButtonAnswer answer = riseAlert(CONFIRMATION, "Внимание!", "Закрыть приложение?", "");
             if (answer.isOkAnswer()) {
-                System.exit(0);
+                exitApplication();
             }
         }
     }
 
-    //todo: price <= 100 обновляет список после просмотра карточки, нужно починить
     @FXML
     private void search() {
-        String searchQuery = searchQueryField.getText();
-        bookTableView.setItems(observableArrayList(searchService.search(searchQuery, getDtoBooks())));
+        appliedQuery = searchQueryField.getText();
+        applyFilters();
     }
 
     @FXML
@@ -280,7 +424,7 @@ public class MainViewController extends AbstractViewController {
 
         // Sort by cycle name + book number in cycle
         if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
-            if (cycleColumnSortedByASC) {
+            if (cycleColumn.getSortType() == TableColumn.SortType.ASCENDING) {
                 bookTableView.getItems()
                   .sort(comparing(
                       BookDTO::getCycleName,
@@ -293,15 +437,11 @@ public class MainViewController extends AbstractViewController {
                     .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
                   );
             }
-            cycleColumnSortedByASC = !cycleColumnSortedByASC;
-
-        } else {
-            cycleColumnSortedByASC = true;
         }
 
         // Sort by pages + !read
         if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
-            if (pagesColumnSortedByASC) {
+            if (pagesColumn.getSortType() == TableColumn.SortType.ASCENDING) {
                 bookTableView.getItems()
                   .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
                     .thenComparing(BookDTO::getPages)
@@ -314,10 +454,6 @@ public class MainViewController extends AbstractViewController {
                     .reversed()
                   );
             }
-            pagesColumnSortedByASC = !pagesColumnSortedByASC;
-
-        } else {
-            pagesColumnSortedByASC = true;
         }
     }
 
@@ -356,6 +492,7 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.forEach((columnName, fieldName) -> {
             TableColumn<BookDTO, ?> column = (TableColumn<BookDTO, ?>) loader.getNamespace().get(columnName);
             column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
+            installCellFactory(column);
 
             if (TABLE_COLUMNS_SORTING.containsKey(columnName)) {
                 column.setComparator(TABLE_COLUMNS_SORTING.get(columnName));
@@ -365,6 +502,7 @@ public class MainViewController extends AbstractViewController {
         // Проставление порядковых номеров для записей
         TableColumn<BookDTO, Number> numberColumn = (TableColumn<BookDTO, Number>) loader.getNamespace().get("numberColumn");
         numberColumn.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(bookTableView.getItems().indexOf(column.getValue()) + 1));
+        numberColumn.setStyle("-fx-alignment: CENTER;");
     }
 
     private void updateTableScale(ScrollEvent scrollEvent, TableView<BookDTO> bookTableView) {
@@ -401,7 +539,7 @@ public class MainViewController extends AbstractViewController {
             };
 
             stage.setResizable(false);
-            stage.setTitle("Book info");
+            SageTheme.install(stage, scene, "Карточка книги", false);
             stage.getIcons().add(imageProvider.getWindowIcon());
             stage.setScene(scene);
             stage.initModality(NONE);
@@ -425,12 +563,41 @@ public class MainViewController extends AbstractViewController {
         }
     }
 
-    private void updateTableColumns(TableView<BookDTO> bookTableView) {
-        bookTableView.setItems(observableArrayList(
-            getDtoBooks().stream()
-                .sorted(Comparator.comparing(BookDTO::getName))
-                .toList()
-        ));
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void installCellFactory(TableColumn<BookDTO, ?> column) {
+        ((TableColumn) column).setCellFactory(c -> new TableCell<BookDTO, Object>() {
+            {
+                if (java.util.Set.of("imageColumn", "cycleNumberColumn", "cycleEndColumn", "readColumn", "pagesColumn").contains(column.getId()))
+                    getStyleClass().add("numeric-cell");
+            }
+            @Override protected void updateItem(Object value, boolean empty) {
+                super.updateItem(value, empty);
+                setText(null); setGraphic(null); setTooltip(null);
+                if (empty) return;
+                setAlignment(Pos.CENTER_LEFT);
+                if (java.util.Set.of("cycleNumberColumn", "cycleEndColumn", "readColumn", "pagesColumn").contains(column.getId()))
+                    setAlignment(Pos.CENTER);
+                if (value instanceof javafx.scene.image.ImageView image) {
+                    if (!compact) {
+                        BookDTO book = getTableRow().getItem();
+                        if (book != null && Boolean.TRUE.equals(book.getHasCoverImage())) {
+                            image.setFitWidth(24); image.setFitHeight(32); image.setPreserveRatio(true); setGraphic(image);
+                        } else setGraphic(new LineIcon("book"));
+                    }
+                } else if (value instanceof CheckBox check) {
+                    setAlignment(Pos.CENTER); setGraphic(check); check.setFocusTraversable(false); check.setMouseTransparent(true);
+                    setAccessibleText(check.isSelected() ? "Да" : "Нет");
+                } else {
+                    String text = value == null ? "—" : value.toString();
+                    if ("cycleNumberColumn".equals(column.getId())) text = text.replace("/", " из ");
+                    setText(text); setTooltip(new Tooltip(text));
+                }
+            }
+        });
+    }
+
+    private void updateTableColumns(TableView<BookDTO> table) {
+        if (genreFilter != null) { refreshGenres(); applyFilters(); }
     }
 
     /**
