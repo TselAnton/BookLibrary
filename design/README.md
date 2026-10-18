@@ -7,10 +7,12 @@ Status: approved sage direction and four window designs, accepted by the user on
 2. [Main window](windows/main.md).
 3. [Create and edit book](windows/book-form.md).
 4. [Book details](windows/book-details.md).
-5. [Asset catalog and Compose integration](../resource/asserts/README.md).
+5. [Shared SVG icons](../src/main/resources/com/tsel/home/project/booklibrary/icons/).
 6. [Machine-readable tokens](tokens.json).
 
 Approved visual references are copied into [references](references/). Preserve the originals in artifacts/backend-foundation/ui-design-approved-sage/. The PNGs are scaled mockups, not pixel-exact implementation plans. Written requirements resolve ambiguous generated details. Each future window must follow the shared system and gain its own specification before implementation.
+
+The [SVG gallery](references/svg-icons.svg) shows the application icon set generated from these references. Individual SVGs are bundled with the JavaFX application; the checkbox and combo skins use their paths directly and keep native control behavior.
 
 ## Scope
 These specifications guide the Compose Desktop implementation authorized on 2026-10-18. The backend remains independently usable. Search and filtering are deferred in the current implementation; their approved visual requirements remain here for the next stage. No new business defaults or validation semantics are introduced.

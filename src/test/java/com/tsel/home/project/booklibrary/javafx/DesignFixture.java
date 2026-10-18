@@ -43,6 +43,8 @@ final class DesignFixture {
         GenreRepository genres = SimpleApplicationContext.getBean(GenreRepository.class);
         BookRepository books = SimpleApplicationContext.getBean(BookRepository.class);
         UUID author = authors.save(new Author(null, "Фрэнк Герберт"));
+        UUID longAuthor = authors.save(new Author(null,
+            "Очень длинное имя автора для проверки ширины выпадающего списка и полного текста подсказки ".repeat(3)));
         UUID publisher = publishers.save(new Publisher(null, "АСТ"));
         UUID cycle = cycles.save(new Cycle(null, "Хроники Дюны", true, 6));
         UUID genre = genres.save(new Genre(null, "Фантастика"));
@@ -50,7 +52,7 @@ final class DesignFixture {
         String[] names = {"Дюна", "Мессия Дюны", "Марсианин", "Солярис", "Хоббит", "1984",
             "Очень длинное название книги для проверки обрезки кириллического текста в таблице"};
         for (int i = 0; i < names.length; i++) {
-            UUID id = books.save(Book.builder().name(names[i]).authorId(author).publisherId(publisher)
+            UUID id = books.save(Book.builder().name(names[i]).authorId(i == names.length - 1 ? longAuthor : author).publisherId(publisher)
                 .genreId(genre).cycleId(i < 2 ? cycle : null).numberInSeries(i < 2 ? i + 1 : null)
                 .pages(704 - i * 48).publicationYear(1965 + i).price(1250.50 + i)
                 .read(i == 4).hardCover(true).autograph(false)

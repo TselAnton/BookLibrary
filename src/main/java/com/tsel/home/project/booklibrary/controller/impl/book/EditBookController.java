@@ -124,7 +124,7 @@ public class EditBookController extends AbstractBookController {
         initComboBoxValue(genreComboBox, bookForEdit.getGenreId());
         initComboBoxValue(cycleComboBox, bookForEdit.getCycleId());
 
-        priceFieldInput.setText(bookForEdit.getPrice() != null ? String.valueOf(bookForEdit.getPrice()) : "");
+        priceFieldInput.setText(formatPrice(bookForEdit.getPrice()));
 
         if (bookForEdit.getCycleId() != null) {
             Cycle cycle = cycleRepository.getById(bookForEdit.getCycleId());
@@ -155,6 +155,13 @@ public class EditBookController extends AbstractBookController {
     @FXML
     public void editBook() {
         saveNewBook(bookForEdit.getId(), bookForEdit.getAudioBookSiteIds());
+    }
+
+    @Override
+    protected Double resolvePriceForSave(String price) {
+        // A display change must not round legacy fractional prices when editing unrelated fields.
+        return Objects.equals(price, formatPrice(bookForEdit.getPrice()))
+            ? bookForEdit.getPrice() : super.resolvePriceForSave(price);
     }
 
     @Override

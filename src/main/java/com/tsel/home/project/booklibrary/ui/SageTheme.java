@@ -14,6 +14,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public final class SageTheme {
+    private static final String STYLESHEET = SageTheme.class.getResource("/com/tsel/home/project/booklibrary/css/sage.css").toExternalForm();
     private static javafx.scene.image.Image windowIcon;
     private SageTheme() {}
 
@@ -31,7 +32,7 @@ public final class SageTheme {
     }
 
     public static void apply(Scene scene) {
-        scene.getStylesheets().add(SageTheme.class.getResource("/com/tsel/home/project/booklibrary/css/sage.css").toExternalForm());
+        scene.getStylesheets().add(STYLESHEET);
     }
 
     public static Button iconButton(String icon, String name, Runnable action) {
@@ -48,6 +49,7 @@ public final class SageTheme {
         apply(scene);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setTitle(title);
+        if (!resizable) scene.getRoot().getStyleClass().add("dialog-window");
         HBox header = (HBox) scene.lookup("#windowHeader");
         if (header == null) return;
         header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
@@ -71,7 +73,6 @@ public final class SageTheme {
             header.getChildren().add(maximize);
         }
         Button close = iconButton("close", "Закрыть", () -> requestClose(stage));
-        close.getStyleClass().add("caption-close");
         header.getChildren().add(close);
         double[] drag = new double[2];
         header.setOnMousePressed(e -> { drag[0] = e.getScreenX() - stage.getX(); drag[1] = e.getScreenY() - stage.getY(); });
@@ -104,6 +105,37 @@ public final class SageTheme {
             if (n instanceof ButtonBase) return true;
         }
         return false;
+    }
+
+    /** Keep long lookup values inside the form and expose their full text in a tooltip. */
+    public static <T> void constrainComboBox(ComboBox<T> combo) {
+        combo.setMinWidth(0);
+        combo.setCellFactory(list -> new ListCell<>() {
+            {
+                prefWidthProperty().bind(list.widthProperty().subtract(18));
+                setMaxWidth(USE_PREF_SIZE);
+            }
+            @Override protected void updateItem(T item, boolean empty) {
+                super.updateItem(item, empty);
+                String text = empty || item == null ? null : item.toString();
+                setText(text);
+                setTooltip(text == null ? null : new Tooltip(text));
+            }
+        });
+        combo.skinProperty().addListener((o, oldSkin, newSkin) -> constrainPopup(combo));
+        constrainPopup(combo);
+    }
+
+    private static void constrainPopup(ComboBox<?> combo) {
+        if (combo.getSkin() instanceof javafx.scene.control.skin.ComboBoxListViewSkin<?> skin
+            && skin.getPopupContent() instanceof Region popup) {
+            if (!popup.getStyleClass().contains("sage-combo-popup")) popup.getStyleClass().add("sage-combo-popup");
+            if (!popup.getStylesheets().contains(STYLESHEET)) popup.getStylesheets().add(STYLESHEET);
+            popup.setMinWidth(0);
+            popup.prefWidthProperty().bind(combo.widthProperty());
+            popup.maxWidthProperty().bind(combo.widthProperty());
+            if (popup instanceof ListView<?> list) list.setFixedCellSize(30);
+        }
     }
 
     public static void requestClose(Stage stage) {

@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="896" height="740" viewBox="0 0 896 740">
+<rect width="896" height="740" fill="#F3F6F2"/>
+<text x="24" y="38" font-family="Segoe UI, sans-serif" font-size="22" font-weight="600" fill="#20372C">SVG-иконки библиотеки</text>
+<rect x="24" y="62" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="100" y="72" width="48" height="48" viewBox="0 0 24 24">
+<path d="M12 5 C9.4 2.6 6.1 2 3 3 V19 C6.3 18 9.5 19 12 21 C14.5 19 17.7 18 21 19 V3 C17.9 2 14.6 2.6 12 5 Z M12 5 V21 M3 5 H1 V21 C5 20 9 21 12 23 C15 21 19 20 23 21 V5 H21" fill="none" stroke="#2F6B4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="124" y="142" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Книга</text>
+<text x="124" y="163" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">book.svg</text>
+<rect x="240" y="62" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="316" y="72" width="48" height="48" viewBox="0 0 24 24">
+<path d="M12 3 V21 M3 12 H21" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="340" y="142" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Добавить</text>
+<text x="340" y="163" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">plus.svg</text>
+<rect x="456" y="62" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="532" y="72" width="48" height="48" viewBox="0 0 24 24">
+<path d="M21 21 L16.3 16.3 M18.5 10.5 A8 8 0 1 1 2.5 10.5 A8 8 0 1 1 18.5 10.5" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="556" y="142" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Поиск</text>
+<text x="556" y="163" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">search.svg</text>
+<rect x="672" y="62" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="748" y="72" width="48" height="48" viewBox="0 0 24 24">
+<path d="M3 4 H21 L14 12 V20 L10 18 V12 Z" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="772" y="142" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Фильтры</text>
+<text x="772" y="163" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">filter.svg</text>
+<rect x="24" y="194" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="100" y="204" width="48" height="48" viewBox="0 0 24 24">
+<path d="M9 21 V3 H14 C21 3 21 13 14 13 H5 M5 17 H15" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="124" y="274" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Стоимость</text>
+<text x="124" y="295" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">ruble.svg</text>
+<rect x="240" y="194" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="316" y="204" width="48" height="48" viewBox="0 0 24 24">
+<path d="M12 2 L22 7.5 V17 L12 22 L2 17 V7.5 Z M2 7.5 L12 13 L22 7.5 M12 13 V22" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8.1 6.8 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14.1 7.3 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M4.6 12 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7.6 16 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14.6 16.5 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18.1 12 a.9 .9 0 1 0 1.8 0 a.9 .9 0 1 0 -1.8 0" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="340" y="274" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Случайная книга</text>
+<text x="340" y="295" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">dice.svg</text>
+<rect x="456" y="194" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="532" y="204" width="48" height="48" viewBox="0 0 24 24">
+<path d="M3 7 H21 V20 H3 Z M3 7 V4 H9 L12 7" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="556" y="274" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Выбрать файл</text>
+<text x="556" y="295" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">folder.svg</text>
+<rect x="672" y="194" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="748" y="204" width="48" height="48" viewBox="0 0 24 24">
+<path d="M5 5 L19 19 M19 5 L5 19" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="772" y="274" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Закрыть</text>
+<text x="772" y="295" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">close.svg</text>
+<rect x="24" y="326" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="100" y="336" width="48" height="48" viewBox="0 0 24 24">
+<path d="M5 12 H19" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="124" y="406" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Свернуть</text>
+<text x="124" y="427" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">minimize.svg</text>
+<rect x="240" y="326" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="316" y="336" width="48" height="48" viewBox="0 0 24 24">
+<path d="M6 4.5 H18 Q19.5 4.5 19.5 6 V18 Q19.5 19.5 18 19.5 H6 Q4.5 19.5 4.5 18 V6 Q4.5 4.5 6 4.5 Z" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="340" y="406" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Развернуть</text>
+<text x="340" y="427" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">maximize.svg</text>
+<rect x="456" y="326" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="532" y="336" width="48" height="48" viewBox="0 0 24 24">
+<path d="M8 8 V4 H20 V16 H16 M4 8 H16 V20 H4 Z" fill="none" stroke="#20372C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="556" y="406" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Восстановить</text>
+<text x="556" y="427" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">restore.svg</text>
+<rect x="672" y="326" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="748" y="336" width="48" height="48" viewBox="0 0 24 24">
+<path d="M6.3 8.3 Q7 7.6 7.7 8.3 L12 12.6 L16.3 8.3 Q17 7.6 17.7 8.3 Q18.4 9 17.7 9.7 L12.7 14.7 Q12 15.4 11.3 14.7 L6.3 9.7 Q5.6 9 6.3 8.3 Z" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="772" y="406" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Раскрыть</text>
+<text x="772" y="427" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">down.svg</text>
+<rect x="24" y="458" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="100" y="468" width="48" height="48" viewBox="0 0 24 24">
+<path d="M6.3 14.3 Q5.6 15 6.3 15.7 Q7 16.4 7.7 15.7 L12 11.4 L16.3 15.7 Q17 16.4 17.7 15.7 Q18.4 15 17.7 14.3 L12.7 9.3 Q12 8.6 11.3 9.3 Z" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="124" y="538" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Свернуть список</text>
+<text x="124" y="559" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">up.svg</text>
+<rect x="240" y="458" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<rect x="316" y="468" width="48" height="48" rx="6" fill="#2F6B4F"/>
+<svg x="316" y="468" width="48" height="48" viewBox="0 0 24 24">
+<path d="M6.3 10.3 Q7 9.6 7.7 10.3 L10.5 13.1 L16.3 7.3 Q17 6.6 17.7 7.3 Q18.4 8 17.7 8.7 L11.2 15.2 Q10.5 15.9 9.8 15.2 L6.3 11.7 Q5.6 11 6.3 10.3 Z" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="340" y="538" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Галочка</text>
+<text x="340" y="559" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">check.svg</text>
+<rect x="456" y="458" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="532" y="468" width="48" height="48" viewBox="0 0 24 24">
+<path d="M6 11 H18 V13 H6 Z" fill="#20372C" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="556" y="538" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Промежуточное состояние</text>
+<text x="556" y="559" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">check-indeterminate.svg</text>
+<rect x="672" y="458" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="748" y="468" width="48" height="48" viewBox="0 0 24 24">
+<path d="M7 3 H17 Q21 3 21 7 V17 Q21 21 17 21 H7 Q3 21 3 17 V7 Q3 3 7 3 Z" fill="#2F6B4F" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M6.3 10.3 Q7 9.6 7.7 10.3 L10.5 13.1 L16.3 7.3 Q17 6.6 17.7 7.3 Q18.4 8 17.7 8.7 L11.2 15.2 Q10.5 15.9 9.8 15.2 L6.3 11.7 Q5.6 11 6.3 10.3 Z" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="772" y="538" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Выбрано</text>
+<text x="772" y="559" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">checkbox-checked.svg</text>
+<rect x="24" y="590" width="200" height="116" rx="8" fill="#FFFFFF" stroke="#C4CFC7"/>
+<svg x="100" y="600" width="48" height="48" viewBox="0 0 24 24">
+<path d="M7 3 H17 Q21 3 21 7 V17 Q21 21 17 21 H7 Q3 21 3 17 V7 Q3 3 7 3 Z" fill="#FFFFFF" stroke="#C4CFC7" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<text x="124" y="670" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#20372C">Не выбрано</text>
+<text x="124" y="691" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#52665A">checkbox-unchecked.svg</text>
+</svg>

@@ -5,7 +5,7 @@
 с отслеживанием и аггрегацией имеющихся книг. 
 
 ### Сборка
-- JDK 17–21 (байткод Java 17), JavaFX, Maven
+- JDK 17, JavaFX 21.0.12 LTS, Maven
 - Maven: mvn clean package
 
 Запуск: `java -jar target/BookLibraryApp.jar` или `mvn javafx:run`.

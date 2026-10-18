@@ -24,7 +24,9 @@ The total budget is 56+12+490+40+64+13=675dp.
 | 13 | Обложка | Read-only path display plus folder-open browse action |
 | 14 | Стоимость * | Numeric field with ruble suffix |
 
-For row 12 use two 124dp fields and a 38dp separator area. For row 13 reserve 32dp for browse and 8dp gap. Full external cover path is available in tooltip and never relocated. Canonical chevron-up/down supply optional steppers and combo chevrons. Do not render two currency suffixes.
+For row 12 use two 124dp fields and a 38dp separator area. For row 13 reserve 30dp for browse and 8dp gap; the browse button and path field share the same 30dp height. Full external cover path is available in tooltip and never relocated. Canonical chevron-up/down supply optional steppers and combo chevrons. Do not render two currency suffixes.
+
+Revision accepted 2026-10-18: forms have a thin sage outer border to distinguish them from the owner window. Combo controls and their popups stay within the input column, with long suggestions ellipsized and available in full through tooltips. Price entry uses whole rubles and the canonical ruble vector in a separated suffix area. Existing fractional prices are rounded for display only; saving unrelated changes preserves the stored value. Selection shortcuts, including releasing Ctrl after Ctrl+A, must preserve the editor selection.
 
 ## Create
 Title Добавить книгу, primary Добавить, secondary Отмена. Initial focus is name. Author/publisher placeholder Выберите или введите; absent genre/cycle show Не выбран. Cover placeholder Файл не выбран. No selection means cycle-ended and position controls are disabled; create appropriate lookup data through services when the user supplies it. Do not invent new catalog defaults based on zeros/checked boxes in the mockup: initial domain defaults must follow existing service behavior or a separately accepted decision. Required fields must be entered rather than silently filled to bypass validation.

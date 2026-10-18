@@ -252,6 +252,8 @@ public abstract class AbstractBookController extends AbstractViewController {
      * Инициализация дефолтных полей контроллера
      */
     protected void initController() {
+        getPriceFieldInput().setTextFormatter(new javafx.scene.control.TextFormatter<>(change ->
+            change.getControlNewText().matches("[0-9]*") ? change : null));
         // Инициализация пикера обложек
         defaultFolder = new File(System.getProperty("user.dir"));
         fileChooser = new CustomFileChooser("Выбрать обложку книги", userSettingsRepository.getLastChosenCoverFile());
@@ -280,7 +282,16 @@ public abstract class AbstractBookController extends AbstractViewController {
         AutoCompleteComboBoxListener.wrapComboBox(getCycleComboBox());
         getCycleComboBox().getEditor().textProperty().addListener((o, a, b) -> updateCycleAvailability());
         updateCycleAvailability();
+        for (ComboBox<ComboBoxDTO> combo : List.of(getAuthorComboBox(), getPublisherComboBox(), getGenreComboBox(), getCycleComboBox()))
+            SageTheme.constrainComboBox(combo);
     }
+
+    protected String formatPrice(Double price) {
+        return price == null ? "" : java.math.BigDecimal.valueOf(price)
+            .setScale(0, java.math.RoundingMode.HALF_UP).toPlainString();
+    }
+
+    protected Double resolvePriceForSave(String price) { return stringToDouble(price); }
 
     private void updateCycleAvailability() {
         boolean absent = isBlank(getCycleComboBox().getEditor().getText());
@@ -443,7 +454,7 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .cycleId(newCycle != null ? newCycle.getId() : null)
                 .numberInSeries(newCycle != null ? stringToInteger(cycleBookNumber) : null)
                 .coverImgAbsolutePath(imagePath)
-                .price(stringToDouble(bookPrice))
+                .price(resolvePriceForSave(bookPrice))
                 .hardCover(hardCoverFlag)
                 .audioBookSiteIds(audioBookSiteIds)
                 .createdAt(resolveBookCreatedAt(oldBook))

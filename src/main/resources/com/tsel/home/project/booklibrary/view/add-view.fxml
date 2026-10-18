@@ -13,7 +13,7 @@
             </padding>
             <columnConstraints>
                 <ColumnConstraints minWidth="154" prefWidth="154"/>
-                <ColumnConstraints prefWidth="286" hgrow="ALWAYS"/>
+                <ColumnConstraints minWidth="0" prefWidth="286" maxWidth="286" hgrow="ALWAYS"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
@@ -32,15 +32,15 @@
                 <RowConstraints minHeight="35" prefHeight="35" maxHeight="35"/>
             </rowConstraints>
             <Label text="Название *" labelFor="$nameTextFieldInput" GridPane.rowIndex="0" styleClass="form-label"/>
-            <TextField fx:id="nameTextFieldInput" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <TextField minWidth="0" fx:id="nameTextFieldInput" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
             <Label text="Автор *" labelFor="$authorComboBox" GridPane.rowIndex="1" styleClass="form-label"/>
-            <ComboBox fx:id="authorComboBox" editable="true" promptText="Выберите или введите" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <ComboBox fx:id="authorComboBox" editable="true" promptText="Выберите или введите" minWidth="0" prefWidth="286" maxWidth="286" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
             <Label text="Издатель *" labelFor="$publisherComboBox" GridPane.rowIndex="2" styleClass="form-label"/>
-            <ComboBox fx:id="publisherComboBox" editable="true" promptText="Выберите или введите" maxWidth="Infinity" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <ComboBox fx:id="publisherComboBox" editable="true" promptText="Выберите или введите" minWidth="0" prefWidth="286" maxWidth="286" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             <Label text="Количество страниц *" labelFor="$pagesCountFieldInput" GridPane.rowIndex="3" styleClass="form-label"/>
-            <TextField fx:id="pagesCountFieldInput" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <TextField minWidth="0" fx:id="pagesCountFieldInput" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
             <Label text="Год издания *" labelFor="$publicationYearFieldInput" GridPane.rowIndex="4" styleClass="form-label"/>
-            <TextField fx:id="publicationYearFieldInput" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            <TextField minWidth="0" fx:id="publicationYearFieldInput" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
             <Label text="Твёрдая обложка" labelFor="$hardCoverCheckBox" GridPane.rowIndex="5" styleClass="form-label"/>
             <CheckBox fx:id="hardCoverCheckBox" selected="true" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
             <Label text="Прочитано" labelFor="$readCheckBox" GridPane.rowIndex="6" styleClass="form-label"/>
@@ -48,21 +48,21 @@
             <Label text="Автограф" labelFor="$autographCheckBox" GridPane.rowIndex="7" styleClass="form-label"/>
             <CheckBox fx:id="autographCheckBox" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
             <Label text="Жанр" labelFor="$genreComboBox" GridPane.rowIndex="8" styleClass="form-label"/>
-            <ComboBox fx:id="genreComboBox" editable="true" promptText="Не выбран" maxWidth="Infinity" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+            <ComboBox fx:id="genreComboBox" editable="true" promptText="Не выбран" minWidth="0" prefWidth="286" maxWidth="286" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
             <Label text="Цикл" labelFor="$cycleComboBox" GridPane.rowIndex="9" styleClass="form-label"/>
-            <ComboBox fx:id="cycleComboBox" editable="true" promptText="Не выбран" maxWidth="Infinity" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+            <ComboBox fx:id="cycleComboBox" editable="true" promptText="Не выбран" minWidth="0" prefWidth="286" maxWidth="286" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
             <Label text="Завершённый цикл" labelFor="$cycleEndedCheckBox" GridPane.rowIndex="10" styleClass="form-label"/>
             <CheckBox fx:id="cycleEndedCheckBox" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
             <Label text="Номер в цикле" labelFor="$numberInCycleFieldInput" GridPane.rowIndex="11" styleClass="form-label"/>
             <HBox alignment="CENTER_LEFT" GridPane.rowIndex="11" GridPane.columnIndex="1">
-                <TextField fx:id="numberInCycleFieldInput" prefWidth="124" accessibleText="Номер в цикле"/>
+                <TextField minWidth="0" fx:id="numberInCycleFieldInput" prefWidth="124" accessibleText="Номер в цикле"/>
                 <Label text="из" alignment="CENTER" minWidth="38"/>
-                <TextField fx:id="totalCountInCycleFieldInput" prefWidth="124" accessibleText="Количество книг в цикле"/>
+                <TextField minWidth="0" fx:id="totalCountInCycleFieldInput" prefWidth="124" accessibleText="Количество книг в цикле"/>
             </HBox>
             <Label text="Обложка" labelFor="$coverImagePathFieldInput" GridPane.rowIndex="12" styleClass="form-label"/>
-            <HBox spacing="8" GridPane.rowIndex="12" GridPane.columnIndex="1">
-                <TextField fx:id="coverImagePathFieldInput" editable="false" promptText="Файл не выбран" HBox.hgrow="ALWAYS"/>
-                <Button fx:id="selectCoverFileButton" onAction="#chooseBookCover" styleClass="icon-button" accessibleText="Выбрать обложку">
+            <HBox alignment="CENTER_LEFT" spacing="8" minWidth="0" GridPane.rowIndex="12" GridPane.columnIndex="1">
+                <TextField minWidth="0" fx:id="coverImagePathFieldInput" editable="false" promptText="Файл не выбран" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="selectCoverFileButton" onAction="#chooseBookCover" styleClass="icon-button, cover-browse" accessibleText="Выбрать обложку">
                     <graphic>
                         <LineIcon name="folder"/>
                     </graphic>
@@ -72,9 +72,9 @@
                 </Button>
             </HBox>
             <Label text="Стоимость *" labelFor="$priceFieldInput" GridPane.rowIndex="13" styleClass="form-label"/>
-            <HBox alignment="CENTER_LEFT" spacing="8" GridPane.rowIndex="13" GridPane.columnIndex="1">
-                <TextField fx:id="priceFieldInput" HBox.hgrow="ALWAYS"/>
-                <Label text="₽" minWidth="24"/>
+            <HBox alignment="CENTER_LEFT" styleClass="price-input" minWidth="0" GridPane.rowIndex="13" GridPane.columnIndex="1">
+                <TextField minWidth="0" fx:id="priceFieldInput" HBox.hgrow="ALWAYS"/>
+                <StackPane styleClass="currency-suffix"><LineIcon name="ruble"/></StackPane>
             </HBox>
         </GridPane>
         <VBox minHeight="40" prefHeight="40" styleClass="form-status">
