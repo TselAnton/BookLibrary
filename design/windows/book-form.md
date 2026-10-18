@@ -3,8 +3,9 @@
 References: ../references/02-create-book.png and ../references/03-edit-book.png. Base client size 484x675dp for both. Same positions, field order, column widths and spacing. No outer scrolling, tabs or accordion sections.
 
 ## Geometry
-Compact 56dp header with 28–32dp book-open icon and Добавить книгу or Изменить книгу; close control at right. Body gutters 16dp, label column 154dp, gap 12dp, input column 286dp (total 452dp). Labels can be left aligned as in the approved new reference; the original two-column order remains. Font 12–13sp. Fourteen rows at 35dp consume 490dp; 30dp controls vertically centered. Body top gap 12dp, note/status area 40dp, footer 64dp leave 13dp flexible slack within 675dp. Reserve status space instead of shifting bottom actions on error.
+Compact 56dp header with 28–32dp book-open icon and Добавить книгу or Изменить книгу; close control at right. Body gutters 16dp, label column 154dp, gap 12dp, input column 286dp (total 452dp). Labels can be left aligned as in the approved new reference; the original two-column order remains. Font 12–13sp. Fourteen rows at 35dp consume 490dp; 30dp controls vertically centered. Body top gap 12dp, status area 40dp, footer 64dp leave 13dp flexible slack within 675dp. Reserve status space instead of shifting bottom actions on error.
 The total budget is 56+12+490+40+64+13=675dp.
+Open create and edit forms 32dp above the book-details window, clamped to the monitor's usable bounds. Creation uses the last book-details position, or its default position if no details window has been opened.
 
 ## Exact field order
 | Row | Label | Control and meaning |
@@ -35,5 +36,5 @@ Title Добавить книгу, primary Добавить, secondary Отме�
 Title Изменить книгу, primary Сохранить, secondary Отмена. Populate actual stored fields and relations; preserve displayed casing and full values. Same field placement as create. Example Дюна values in the PNG are fictional. Keep original external cover path even when unavailable. Do not clear form state on failed save. Changes to shared cycle metadata must follow service semantics, never silently affect unrelated records outside the approved workflow.
 
 ## Footer and validation
-Note * Обязательные поля. Bottom actions primary left, cancel right on one baseline; no audiobook button. Six required fields: name, author, publisher, pages, publication year, price. Numeric zero is valid, negatives rejected. Optional genre/cycle remain optional. Cycle position has no upper bound against cycle size. Do not change duplicate casing rules. Existing backend owns all mutation validation.
+Required-field asterisks use red #B3261E and stay immediately after their labels in the existing positions. Do not show a separate required-fields note. Bottom actions primary left, cancel right on one baseline; no audiobook button. Six required fields: name, author, publisher, pages, publication year, price. Numeric zero is valid, negatives rejected. Optional genre/cycle remain optional. Cycle position has no upper bound against cycle size. Do not change duplicate casing rules. Existing backend owns all mutation validation.
 Field-specific errors use outline plus accessible error text and a reserved compact status line; longer explanations can use a tooltip or modal alert. Preserve all fourteen rows and bottom buttons within the base height. Enter submits once; Escape asks before discarding actual unsaved changes. Native file chooser remains native.

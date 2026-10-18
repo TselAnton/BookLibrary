@@ -290,7 +290,9 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     public void addBook() {
-        loadModalView("Добавить книгу", "view/add-view.fxml", 240, 10);
+        Stage mainStage = (Stage) mainAnchorPane.getScene().getWindow();
+        int offsetY = (int) Math.round(resolveCoordinate(Stage::getY, 150) - mainStage.getY()) - 32;
+        loadModalView("Добавить книгу", "view/add-view.fxml", 240, offsetY);
         updateTableColumns(bookTableView);
     }
 

@@ -56,7 +56,7 @@ public class BookInfoViewController extends AbstractViewController {
     @FXML public void closeWindow() { closeStage(mainAnchorPane); }
 
     @FXML public void editBook() {
-        loadModalView("Изменить книгу", "view/edit-view.fxml", 165, 0, bookForView.getId());
+        loadModalView("Изменить книгу", "view/edit-view.fxml", 165, -32, bookForView.getId());
         updateControllerState(bookForView.getId());
     }
 

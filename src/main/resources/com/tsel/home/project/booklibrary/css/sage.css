@@ -114,6 +114,7 @@
 .status-footer .label, .caption { -fx-font-size: 12px; -fx-text-fill: #52665A; }
 .dialog-footer { -fx-min-height: 64; -fx-pref-height: 64; -fx-max-height: 64; -fx-padding: 0 16; -fx-border-color: #DFE6E0 transparent transparent transparent; }
 .form-label { -fx-font-size: 12px; }
+.required-marker { -fx-fill: #B3261E; }
 .form-status { -fx-padding: 5 16 0 16; -fx-spacing: 2; }
 .error-message { -fx-font-size: 12px; -fx-text-fill: #B3261E; }
 .invalid { -fx-border-color: #B3261E; }

@@ -40,6 +40,8 @@ import java.util.function.Function;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.text.Text;
 import javafx.scene.control.Tooltip;
 import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
@@ -87,6 +89,15 @@ public abstract class AbstractBookController extends AbstractViewController {
             Node field = fields.get(row == null ? 0 : row);
             label.setLabelFor(field);
             field.setAccessibleText(label.getText().replace("*", ", обязательное поле"));
+            if (label.getText().endsWith("*")) {
+                Text marker = new Text("*");
+                marker.fontProperty().bind(label.fontProperty());
+                marker.getStyleClass().add("required-marker");
+                label.setText(label.getText().substring(0, label.getText().length() - 1));
+                label.setGraphic(marker);
+                label.setContentDisplay(ContentDisplay.RIGHT);
+                label.setGraphicTextGap(0);
+            }
             if (field instanceof CheckBox check) label.setOnMouseClicked(e -> {
                 if (!check.isDisabled()) { check.fire(); check.requestFocus(); }
             });

@@ -78,7 +78,6 @@
             </HBox>
         </GridPane>
         <VBox minHeight="40" prefHeight="40" styleClass="form-status">
-            <Label text="* Обязательные поля" styleClass="caption"/>
             <Label fx:id="validationStatus" styleClass="error-message" maxWidth="Infinity"/>
         </VBox>
         <Region VBox.vgrow="ALWAYS"/>

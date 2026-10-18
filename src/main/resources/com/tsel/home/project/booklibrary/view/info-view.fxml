@@ -16,7 +16,6 @@
                     <LineIcon fx:id="missingCover"/>
                     <ImageView fx:id="coverImage" fitWidth="244" fitHeight="370" preserveRatio="true"/>
                 </StackPane>
-                <Label text="Обложка" styleClass="caption"/>
             </VBox>
             <GridPane hgap="12" HBox.hgrow="ALWAYS">
                 <columnConstraints>
