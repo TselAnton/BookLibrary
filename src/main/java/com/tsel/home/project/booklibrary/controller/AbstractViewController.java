@@ -12,7 +12,9 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsReposit
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.WindowPlacement;
 import com.tsel.home.project.booklibrary.controller.impl.book.AbstractBookController;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ButtonBar;
 import java.net.URI;
@@ -23,6 +25,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 
@@ -123,13 +126,25 @@ public abstract class AbstractViewController {
 
             AbstractViewController controller = loader.getController();
             controller.initController(loader, this, initParameters);
-            if (controller instanceof AbstractBookController bookController) bookController.configureWindow(stage);
-            stage.setX(primaryStage.getX() + Math.max(0, (primaryStage.getWidth() - scene.getRoot().prefWidth(-1)) / 2));
-            javafx.geometry.Rectangle2D bounds = javafx.stage.Screen.getScreensForRectangle(
-                primaryStage.getX(), primaryStage.getY(), primaryStage.getWidth(), primaryStage.getHeight())
-                .stream().findFirst().orElse(javafx.stage.Screen.getPrimary()).getVisualBounds();
-            stage.setX(Math.max(bounds.getMinX(), Math.min(stage.getX(), bounds.getMaxX() - scene.getRoot().prefWidth(-1))));
-            stage.setY(Math.max(bounds.getMinY(), Math.min(stage.getY(), bounds.getMaxY() - scene.getRoot().prefHeight(-1))));
+            if (controller instanceof AbstractBookController bookController) {
+                bookController.configureWindow(stage);
+                WindowPlacement.positionRelativeToMainWindow(stage);
+            } else {
+                stage.setX(primaryStage.getX() + Math.max(0, (primaryStage.getWidth() - scene.getRoot().prefWidth(-1)) / 2));
+                Rectangle2D bounds = Screen.getScreensForRectangle(
+                    primaryStage.getX(),
+                    primaryStage.getY(),
+                    primaryStage.getWidth(),
+                    primaryStage.getHeight()
+                )
+                    .stream()
+                    .findFirst()
+                    .orElse(Screen.getPrimary())
+                    .getVisualBounds();
+
+                stage.setX(Math.max(bounds.getMinX(), Math.min(stage.getX(), bounds.getMaxX() - scene.getRoot().prefWidth(-1))));
+                stage.setY(Math.max(bounds.getMinY(), Math.min(stage.getY(), bounds.getMaxY() - scene.getRoot().prefHeight(-1))));
+            }
 
             log.info("Opening modal window {}", modalViewResourceFile);
             stage.showAndWait();

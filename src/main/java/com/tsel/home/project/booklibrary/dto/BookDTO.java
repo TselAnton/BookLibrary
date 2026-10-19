@@ -101,7 +101,8 @@ public class BookDTO {
             ImageProvider imageProvider = getBean(ImageProvider.class);
             ImageProvider.ImageHolder imageHolder = imageProvider.resolveSmallCover(book);
 
-            this.cover = new ImageView(imageHolder.image());
+            this.cover = new ImageView();
+            this.cover.imageProperty().bind(imageHolder.imageProperty());
             this.hasCoverImage = !imageHolder.isDefault();
             return this;
         }

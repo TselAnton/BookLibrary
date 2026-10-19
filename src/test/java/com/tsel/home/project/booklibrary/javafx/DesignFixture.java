@@ -30,6 +30,7 @@ final class DesignFixture {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     static void restore() {
+        SimpleApplicationContext.getBean(ImageProvider.class).close();
         previous.forEach((type, bean) -> SimpleApplicationContext.replaceBean((Class) type, () -> bean));
         previous.clear();
     }

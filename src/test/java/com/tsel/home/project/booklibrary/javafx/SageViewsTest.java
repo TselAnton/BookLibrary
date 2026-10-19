@@ -9,6 +9,7 @@ import com.tsel.home.project.booklibrary.controller.impl.book.NewBookController;
 import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.filter.condition.NumericOperation;
+import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
 import com.tsel.home.project.booklibrary.ui.LineIcon;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
@@ -40,6 +41,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -80,6 +82,7 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
                 ((Button) main.getScene().lookup("#resetFiltersButton")).fire();
                 assertFiltersWorkflow(main, table);
                 assertCatalogCacheLifecycle(main, table);
+                assertAsyncCoverFilters(main, table);
                 main.setWidth(812); layout(main);
                 assertTrue(main.getScene().getRoot().getStyleClass().contains("compact"));
                 assertTrue(table.getColumns().stream().allMatch(c -> c.getWidth() >= 20));
@@ -142,7 +145,9 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
                 detailStage.setScene(detailsScene); info.initController(details, null, id); detailStage.show(); layout(detailStage);
                 assertEquals(812, detailsScene.getWidth(), 1); assertEquals(600, detailsScene.getHeight(), 1);
                 assertEquals("Нет", ((Label) detailsScene.lookup("#readLabel")).getText());
-                assertTrue(detailsScene.lookup("#missingCover").isVisible());
+                ImageView cover = (ImageView) detailsScene.lookup("#coverImage");
+                assertNotNull(cover.getImage());
+                assertTrue(SimpleApplicationContext.getBean(ImageProvider.class).isPlaceholder(cover.getImage()));
                 assertInside(detailsScene, "#deleteBookButton", "#editBookButton", "#cycleEndedLabel");
                 Button delete = button(detailsScene, "#deleteBookButton");
                 Button close = button(detailsScene, "#closeBookButton");
@@ -203,6 +208,38 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
         });
         Platform.runLater(task);
         task.get(40, TimeUnit.SECONDS);
+    }
+
+    private static void assertAsyncCoverFilters(Stage main, TableView<?> table) {
+        Scene scene = main.getScene();
+        BookDTO book = (BookDTO) table.getItems().get(0);
+        ImageProvider provider = SimpleApplicationContext.getBean(ImageProvider.class);
+        ImageProvider.ImageHolder original = provider.resolveSmallCover(
+            SimpleApplicationContext.getBean(BookRepository.class).getById(book.getId())
+        );
+        button(scene, "#filtersButton").fire();
+        selectChoice(scene, "hasCoverImage", "Есть");
+        button(scene, "#applyFiltersButton").fire();
+        assertTrue(table.getItems().isEmpty());
+
+        // Publish a completed image through the same property used by the background loader.
+        book.getCover().imageProperty().unbind();
+        book.getCover().setImage(new WritableImage(2, 2));
+        settle(main, 180);
+        assertEquals(1, table.getItems().size(), "Loaded covers must reapply the active image filter");
+        assertSame(book, table.getItems().get(0));
+        button(scene, "#filtersButton").fire();
+        awaitFilterOptions(scene);
+        CheckBox present = scene.lookup("#filter-hasCoverImage").lookupAll(".filter-option").stream()
+            .map(CheckBox.class::cast).filter(choice -> "Есть".equals(choice.getText())).findFirst().orElseThrow();
+        assertEquals("(1)", ((Label) present.getGraphic()).getText(), "Cover counts must invalidate cached snapshots");
+        button(scene, "#cancelFiltersButton").fire();
+
+        book.getCover().imageProperty().bind(original.imageProperty());
+        settle(main, 180);
+        assertTrue(table.getItems().isEmpty());
+        button(scene, "#resetFiltersButton").fire();
+        assertEquals(7, table.getItems().size());
     }
 
     private static void assertCatalogCacheLifecycle(Stage main, TableView<?> table) throws Exception {
