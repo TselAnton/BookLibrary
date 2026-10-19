@@ -74,5 +74,10 @@ public class App {
                 log.error("Can't start main window", e);
             }
         }
+
+        @Override
+        public void stop() {
+            SimpleApplicationContext.getBean(ImageProvider.class).close();
+        }
     }
 }

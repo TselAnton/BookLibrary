@@ -22,6 +22,7 @@ import com.tsel.home.project.booklibrary.filter.FilterCatalog;
 import com.tsel.home.project.booklibrary.filter.model.FilterState;
 import com.tsel.home.project.booklibrary.ui.LineIcon;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.WindowPlacement;
 import com.tsel.home.project.booklibrary.ui.filter.FilterChips;
 import com.tsel.home.project.booklibrary.ui.filter.FilterDrawer;
 import com.tsel.home.project.booklibrary.ui.filter.editor.FilterEditorRegistry;
@@ -37,7 +38,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.ToDoubleFunction;
+import javafx.animation.PauseTransition;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -99,6 +100,7 @@ public class MainViewController extends AbstractViewController {
     }
 
     private final TableScroll tableScroll = getBean(TableScroll.class);
+    private final PauseTransition coverFilterRefresh = new PauseTransition(Duration.millis(100));
     private final FilterCatalog filterCatalog = new FilterCatalog(BookDTO.class);
     private final FilterState filterState = new FilterState();
 
@@ -184,7 +186,14 @@ public class MainViewController extends AbstractViewController {
         AnchorPane.setLeftAnchor(filterDrawer, 0.0);
         AnchorPane.setRightAnchor(filterDrawer, 0.0);
         mainAnchorPane.getChildren().add(filterDrawer);
-        stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> filterDrawer.dispose());
+        coverFilterRefresh.setOnFinished(event -> {
+            filterDrawer.invalidateOptions();
+            applyFilters();
+        });
+        stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+            coverFilterRefresh.stop();
+            filterDrawer.dispose();
+        });
         stage.widthProperty().addListener((o, a, b) -> updateCompact(b.doubleValue()));
         updateCompact(1252);
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
@@ -319,9 +328,7 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     public void addBook() {
-        Stage mainStage = (Stage) mainAnchorPane.getScene().getWindow();
-        int offsetY = (int) Math.round(resolveCoordinate(Stage::getY, 150) - mainStage.getY()) - 32;
-        loadModalView("Добавить книгу", "view/add-view.fxml", 240, offsetY);
+        loadModalView("Добавить книгу", "view/add-view.fxml", 0, 0);
         refreshCatalog();
     }
 
@@ -497,12 +504,6 @@ public class MainViewController extends AbstractViewController {
             .toList();
     }
 
-    private double resolveCoordinate(ToDoubleFunction<Stage> getStageCoordinate, double defaultCoordinate) {
-        return lastOpenedBookViewStage != null
-            ? getStageCoordinate.applyAsDouble(lastOpenedBookViewStage)
-            : defaultCoordinate;
-    }
-
     @SuppressWarnings("unchecked")
     private void initTableColumns(FXMLLoader loader, TableView<BookDTO> bookTableView) {
         TABLE_COLUMNS_SETTINGS.forEach((columnName, fieldName) -> {
@@ -563,14 +564,12 @@ public class MainViewController extends AbstractViewController {
             Stage primaryStage = (Stage) mainAnchorPane.getScene().getWindow();
             stage.initOwner(primaryStage);
 
-            stage.setX(resolveCoordinate(Stage::getX, 550));
-            stage.setY(resolveCoordinate(Stage::getY, 150));
-
             if (bookId != null) {
                 AbstractViewController controller = loader.getController();
                 controller.initController(loader, this, bookId);
             }
 
+            WindowPlacement.positionRelativeToMainWindow(stage);
             stage.show();
             lastOpenedBookViewStage = stage;
 
@@ -595,10 +594,10 @@ public class MainViewController extends AbstractViewController {
                     setAlignment(Pos.CENTER);
                 if (value instanceof javafx.scene.image.ImageView image) {
                     if (!compact) {
-                        BookDTO book = getTableRow().getItem();
-                        if (book != null && Boolean.TRUE.equals(book.getHasCoverImage())) {
-                            image.setFitWidth(24); image.setFitHeight(32); image.setPreserveRatio(true); setGraphic(image);
-                        } else setGraphic(new LineIcon("book"));
+                        image.setFitWidth(24);
+                        image.setFitHeight(32);
+                        image.setPreserveRatio(true);
+                        setGraphic(image);
                     }
                 } else if (value instanceof CheckBox check) {
                     setAlignment(Pos.CENTER); setGraphic(check); check.setFocusTraversable(false); check.setMouseTransparent(true);
@@ -619,6 +618,12 @@ public class MainViewController extends AbstractViewController {
     private void refreshCatalog() {
         if (filterDrawer != null) {
             catalogBooks = getDtoBooks();
+            List<BookDTO> currentBooks = catalogBooks;
+            currentBooks.forEach(book -> book.getCover().imageProperty().addListener((observable, previous, image) -> {
+                if (catalogBooks == currentBooks && imageProvider.isPlaceholder(previous) != imageProvider.isPlaceholder(image)) {
+                    coverFilterRefresh.playFromStart();
+                }
+            }));
             applyFilters();
         }
     }

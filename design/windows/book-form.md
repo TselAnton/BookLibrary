@@ -22,10 +22,10 @@ Open create and edit forms 32dp above the book-details window, clamped to the mo
 | 10 | Цикл | Editable optional cycle combo |
 | 11 | Завершённый цикл | Checkbox for selected cycle |
 | 12 | Номер в цикле | Position and cycle-size fields separated by из |
-| 13 | Обложка | Read-only path display plus folder-open browse action |
+| 13 | Обложка | Editable path plus folder-open browse action; clear the value to remove the cover |
 | 14 | Стоимость * | Numeric field with ruble suffix |
 
-For row 12 use two 124dp fields and a 38dp separator area. For row 13 reserve 30dp for browse and 8dp gap; the browse button and path field share the same 30dp height. Full external cover path is available in tooltip and never relocated. Canonical chevron-up/down supply optional steppers and combo chevrons. Do not render two currency suffixes.
+For row 12 use two 124dp fields and a 38dp separator area. For row 13 reserve 30dp for browse and 8dp gap; the browse button and path field share the same 30dp height. Full external cover path is available in tooltip and can be edited or cleared with standard text-field shortcuts such as Ctrl+A then Delete. Saving an empty value removes the cover association and displays the default cover; the external image file is retained. Canceling the form preserves the stored cover. Canonical chevron-up/down supply optional steppers and combo chevrons. Do not render two currency suffixes.
 
 Revision accepted 2026-10-18: forms have a thin sage outer border to distinguish them from the owner window. Combo controls and their popups stay within the input column, with long suggestions ellipsized and available in full through tooltips. Price entry uses whole rubles and the canonical ruble vector in a separated suffix area. Existing fractional prices are rounded for display only; saving unrelated changes preserves the stored value. Selection shortcuts, including releasing Ctrl after Ctrl+A, must preserve the editor selection.
 

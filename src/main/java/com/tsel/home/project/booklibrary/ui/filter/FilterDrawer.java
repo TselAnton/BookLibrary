@@ -274,6 +274,14 @@ public class FilterDrawer extends StackPane {
     }
 
     /**
+     * Помечает снимок каталога устаревшим после фонового обновления значений DTO.
+     * Следующий refreshOptions пересчитает варианты даже при прежнем списке строк.
+     */
+    public void invalidateOptions() {
+        sourceRows = null;
+    }
+
+    /**
      * Отменяет незавершённые запросы и освобождает фоновый кеш при закрытии главного окна.
      */
     public void dispose() {

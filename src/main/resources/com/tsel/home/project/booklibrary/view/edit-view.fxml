@@ -61,7 +61,7 @@
             </HBox>
             <Label text="Обложка" labelFor="$coverImagePathFieldInput" GridPane.rowIndex="12" styleClass="form-label"/>
             <HBox alignment="CENTER_LEFT" spacing="8" minWidth="0" GridPane.rowIndex="12" GridPane.columnIndex="1">
-                <TextField minWidth="0" fx:id="coverImagePathFieldInput" editable="false" promptText="Файл не выбран" HBox.hgrow="ALWAYS"/>
+                <TextField minWidth="0" fx:id="coverImagePathFieldInput" editable="true" promptText="Файл не выбран" HBox.hgrow="ALWAYS"/>
                 <Button fx:id="selectCoverFileButton" onAction="#chooseBookCover" styleClass="icon-button, cover-browse" accessibleText="Выбрать обложку">
                     <graphic>
                         <LineIcon name="folder"/>
