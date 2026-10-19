@@ -64,9 +64,9 @@
         </HBox>
         <HBox styleClass="dialog-footer" alignment="CENTER_LEFT" spacing="8">
             <Button fx:id="editBookButton" text="Изменить" styleClass="primary" onAction="#editBook"/>
-            <Button fx:id="deleteBookButton" text="Удалить" styleClass="danger" onAction="#deleteBook"/>
+            <Button fx:id="deleteBookButton" text="Удалить" onAction="#deleteBook"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Закрыть" onAction="#closeWindow"/>
+            <Button fx:id="closeBookButton" text="Закрыть" onAction="#closeWindow"/>
         </HBox>
     </VBox>
 </AnchorPane>

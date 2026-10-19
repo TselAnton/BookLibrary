@@ -4,7 +4,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.geometry.Insets?>
 <?import com.tsel.home.project.booklibrary.ui.LineIcon?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="mainAnchorPane" prefWidth="1252" prefHeight="700" fx:controller="com.tsel.home.project.booklibrary.controller.impl.MainViewController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="mainAnchorPane" prefWidth="1252" prefHeight="700" stylesheets="@../css/filters.css" fx:controller="com.tsel.home.project.booklibrary.controller.impl.MainViewController">
     <VBox AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
         <HBox fx:id="windowHeader" styleClass="window-header" minHeight="56" prefHeight="56" maxHeight="56"/>
         <MenuBar>
@@ -23,12 +23,12 @@
                 </Menu>
                 <Menu text="Вид">
                     <items>
-                        <MenuItem text="Обновить" onAction="#search"/>
+                        <MenuItem text="Обновить" onAction="#refreshBooks"/>
                     </items>
                 </Menu>
                 <Menu text="Справка">
                     <items>
-                        <MenuItem text="Команды поиска" onAction="#showSearchHelp"/>
+                        <MenuItem text="Фильтры" onAction="#toggleFilters"/>
                     </items>
                 </Menu>
             </menus>
@@ -39,10 +39,7 @@
                     <LineIcon name="plus"/>
                 </graphic>
             </Button>
-            <HBox styleClass="search-box" alignment="CENTER_LEFT" spacing="8" HBox.hgrow="ALWAYS">
-                <LineIcon name="search"/>
-                <TextField fx:id="searchQueryField" promptText="Название, автор или цикл…" onAction="#search" HBox.hgrow="ALWAYS"/>
-            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
             <Button fx:id="filtersButton" text="Фильтры" onAction="#toggleFilters">
                 <graphic>
                     <LineIcon name="filter"/>
@@ -59,14 +56,7 @@
                 </graphic>
             </Button>
         </HBox>
-        <HBox fx:id="activeFilters" visible="false" managed="false" spacing="8" alignment="CENTER_LEFT" minHeight="40" styleClass="toolbar"/>
-        <FlowPane fx:id="filterEditor" visible="false" managed="false" hgap="12" vgap="8" styleClass="filter-editor">
-            <Label text="Прочитано"/>
-            <ComboBox fx:id="readFilter" prefWidth="140"/>
-            <Label text="Жанр"/>
-            <ComboBox fx:id="genreFilter" prefWidth="180"/>
-            <Button text="Сбросить" onAction="#resetFilters" styleClass="text-button"/>
-        </FlowPane>
+        <VBox fx:id="activeFilterContainer"/>
         <VBox VBox.vgrow="ALWAYS" styleClass="table-container">
             <TableView fx:id="bookTableView" editable="false" onKeyPressed="#tableViewKeyPressed" onMouseClicked="#clickOnTable" onSort="#onSort" VBox.vgrow="ALWAYS">
                 <columns>

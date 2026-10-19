@@ -11,7 +11,6 @@ import com.tsel.home.project.booklibrary.helper.DateProvider;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.PropertyProvider;
 import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
-import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
 import javafx.scene.input.KeyCode;
@@ -52,7 +51,6 @@ public abstract class AbstractJavaFxTest {
         SimpleApplicationContext.initBean(BookRepository.class, () -> bookRepositoryV2);
 
         SimpleApplicationContext.initBean(ImageProvider.class, ImageProvider::new);
-        SimpleApplicationContext.initBean(SearchService.class, SearchService::new);
         SimpleApplicationContext.initBean(TableScroll.class, TableScroll::new);
         SimpleApplicationContext.initBean(DateProvider.class, () -> testDateProvider);
     }

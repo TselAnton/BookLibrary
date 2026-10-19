@@ -3,8 +3,10 @@ package com.tsel.home.project.booklibrary.dto;
 import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
 
 import com.tsel.home.project.booklibrary.dao.data.Book;
+import com.tsel.home.project.booklibrary.filter.annotation.FilterProperty;
+import com.tsel.home.project.booklibrary.filter.provider.impl.CycleStatusValueProvider;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
-import com.tsel.home.project.booklibrary.search.SearchField;
+import com.tsel.home.project.booklibrary.ui.BookPriceFormatter;
 import java.util.List;
 import java.util.UUID;
 import javafx.scene.control.CheckBox;
@@ -28,50 +30,64 @@ public class BookDTO {
 
     private UUID id;
 
-    @SearchField(description = "Поиск по названию")
+    @FilterProperty(label = "Название", order = 10, allowEmpty = false)
     private String name;
 
     private ImageView cover;
 
-    @SearchField(aliases = {"image", "картинка"}, description = "Поиск по наличию картинки для обложки")
+    @FilterProperty(label = "Изображение обложки", order = 120, allowEmpty = false)
     private Boolean hasCoverImage;
 
-    @SearchField(aliases = {"author", "автор"}, description = "Поиск по автору")
+    @FilterProperty(label = "Автор", order = 20, editor = "choices", allowEmpty = false)
     private String author;
 
-    @SearchField(aliases = {"publisher", "издатель"}, description = "Поиск по издателю")
+    @FilterProperty(label = "Издатель", order = 30, editor = "choices", allowEmpty = false)
     private String publisher;
 
-    @SearchField(aliases = {"year", "год"}, description = "Поиск по году публикации")
+    @FilterProperty(label = "Год издания", order = 50, allowEmpty = false)
     private Integer publicationYear;
 
-    @SearchField(description = "Поиск по названию цикла")
+    @FilterProperty(label = "Цикл", order = 100, editor = "choices", emptyLabel = "Без цикла")
     private String cycleName;
 
     private String cycleNumber;
 
-    @SearchField(aliases = {"cycle", "цикл"}, description = "Поиск по законченным циклам")
+    @FilterProperty(
+        label = "Завершённость цикла",
+        order = 110,
+        trueLabel = "Завершён",
+        falseLabel = "Продолжается",
+        emptyLabel = "Завершённость не указана",
+        notApplicableLabel = "Без цикла",
+        valueProvider = CycleStatusValueProvider.class
+    )
     private CheckBox cycleEnded;
 
-    @SearchField(aliases = {"genre", "жанр"}, description = "Поиск по названию жанра")
+    @FilterProperty(label = "Жанр", order = 90, editor = "choices", emptyLabel = "Без жанра")
     private String genre;
 
-    @SearchField(aliases = {"read", "прочитано"}, description = "Поиск по прочитанному")
+    @FilterProperty(
+        label = "Прочтение", order = 70,
+        trueLabel = "Прочитано", falseLabel = "Не прочитано", allowEmpty = false
+    )
     private CheckBox read;
 
-    @SearchField(aliases = {"sign", "автограф"}, description = "Поиск по наличию автографа")
+    @FilterProperty(label = "Автограф", order = 80, allowEmpty = false)
     private CheckBox autograph;
 
-    @SearchField(aliases = {"pages", "страницы"}, description = "Поиск по количеству страниц")
+    @FilterProperty(label = "Количество страниц", order = 40, allowEmpty = false)
     private Integer pages;
 
-    @SearchField(aliases = {"price", "цена"}, description = "Поиск по цене")
+    @FilterProperty(
+        label = "Стоимость", order = 130, unit = "руб.",
+        emptyLabel = BookPriceFormatter.PRICELESS, notEmptyLabel = "Стоимость указана"
+    )
     private Double price;
 
-    @SearchField(aliases = {"hard", "твердая"}, description = "Поиск по наличию твердой обложки")
+    @FilterProperty(label = "Твёрдая обложка", order = 60, allowEmpty = false)
     private CheckBox hardCover;
 
-    @SearchField(aliases = {"audiobook", "аудиокнига"}, description = "Поиск по наличию аудиокниги на любом сайте")
+    @FilterProperty(label = "Аудиокнига", visible = false)
     private CheckBox hasAnyAudioBookSite;
 
     private List<String> audiobookSites;

@@ -2,11 +2,11 @@ package com.tsel.home.project.booklibrary.provider;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.tsel.home.project.booklibrary.TestDateProvider;
 import com.tsel.home.project.booklibrary.TestFileRepository;
@@ -62,7 +62,7 @@ class StorageBackupArchiverTest {
         STORAGE_BACKUP_ARCHIVER.archiveStorages(tempDirectory, tempDirectory);
 
         File archive = getArchive(tempDirectory);
-        assertNotNull("Не найден архив", archive);
+        assertNotNull(archive, "Не найден архив");
 
         unzipArchiveFiles(tempDirectory, archive);
 
@@ -199,8 +199,8 @@ class StorageBackupArchiverTest {
         }
 
         assertEquals(
-            format("Контент файла '%s' и контент из аналогичного распакованного файла '%s' не совпадают", actualContent, unzippedContent),
-            actualContent, unzippedContent
+            actualContent, unzippedContent,
+            format("Контент файла '%s' и контент из аналогичного распакованного файла '%s' не совпадают", actualContent, unzippedContent)
         );
     }
 

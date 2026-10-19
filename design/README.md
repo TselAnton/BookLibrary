@@ -4,7 +4,7 @@ Status: approved sage direction and four window designs, accepted by the user on
 
 ## Read in order
 1. [Design system](design-system.md): shared visual, interaction and accessibility rules.
-2. [Main window](windows/main.md).
+2. [Main window](windows/main.md), including the [visual filters revision](windows/filters.md).
 3. [Create and edit book](windows/book-form.md).
 4. [Book details](windows/book-details.md).
 5. [Shared SVG icons](../src/main/resources/com/tsel/home/project/booklibrary/icons/).
@@ -15,7 +15,7 @@ Approved visual references are copied into [references](references/). Preserve t
 The [SVG gallery](references/svg-icons.svg) shows the application icon set generated from these references. Individual SVGs are bundled with the JavaFX application; the checkbox and combo skins use their paths directly and keep native control behavior.
 
 ## Scope
-These specifications guide the Compose Desktop implementation authorized on 2026-10-18. The backend remains independently usable. Search and filtering are deferred in the current implementation; their approved visual requirements remain here for the next stage. No new business defaults or validation semantics are introduced.
+These specifications guide the current JavaFX implementation. The backend remains independently usable. Book selection uses the visual filter drawer and applied tags described in the filter revision; the library search field and legacy command parser have been removed. No new business defaults are introduced.
 
 ## Resolved mockup discrepancies
 - Use the canonical book-open vector for every window, including the logo, rather than tracing different generated logos.

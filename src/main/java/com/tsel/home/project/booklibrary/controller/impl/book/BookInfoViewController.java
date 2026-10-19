@@ -2,9 +2,8 @@ package com.tsel.home.project.booklibrary.controller.impl.book;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dao.data.*;
+import com.tsel.home.project.booklibrary.ui.BookPriceFormatter;
 import com.tsel.home.project.booklibrary.ui.LineIcon;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.UUID;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +14,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import lombok.Getter;
 
+/**
+ * Отображает сохранённые данные книги и уведомляет родительский контроллер об изменениях.
+ * Стоимость форматируется по общему правилу, совпадающему с семантикой фильтров.
+ */
 @Getter
 public class BookInfoViewController extends AbstractViewController {
     @FXML private AnchorPane mainAnchorPane;
@@ -37,11 +40,17 @@ public class BookInfoViewController extends AbstractViewController {
     private Book bookForView;
     private AbstractViewController parentController;
 
+    /**
+     * Связывает карточку с родительским окном и загружает книгу по идентификатору.
+     */
     @Override public void initController(FXMLLoader loader, AbstractViewController parent, Object... parameters) {
         parentController = parent;
         updateControllerState((UUID) parameters[0]);
     }
 
+    /**
+     * Перечитывает книгу после редактирования и обновляет фильтры родительской библиотеки.
+     */
     @Override public void updateControllerState(UUID id) {
         bookForView = bookRepository.getById(id);
         if (bookForView == null) { closeWindow(); return; }
@@ -49,22 +58,35 @@ public class BookInfoViewController extends AbstractViewController {
         if (parentController != null) parentController.updateControllerState(id);
     }
 
+    /**
+     * Закрывает карточку по Escape без изменения данных.
+     */
     @FXML public void stageKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) { closeWindow(); event.consume(); }
     }
 
+    /**
+     * Закрывает карточку; родительское окно сохраняет свои применённые фильтры.
+     */
     @FXML public void closeWindow() { closeStage(mainAnchorPane); }
 
+    /**
+     * Открывает редактор книги и перечитывает сохранённые данные после его закрытия.
+     */
     @FXML public void editBook() {
         loadModalView("Изменить книгу", "view/edit-view.fxml", 165, -32, bookForView.getId());
         updateControllerState(bookForView.getId());
     }
 
+    /**
+     * Запрашивает подтверждение, удаляет книгу и уведомляет родителя для обновления таблицы и кеша.
+     */
     @FXML public void deleteBook() {
         if (!riseAlert(Alert.AlertType.CONFIRMATION, "Удаление книги", "Удалить «" + bookForView.getName() + "»?",
             "Книга будет безвозвратно удалена из библиотеки.").isOkAnswer()) return;
         try {
             bookRepository.delete(bookForView);
+            if (parentController != null) parentController.updateControllerState(bookForView.getId());
             closeWindow();
         } catch (RuntimeException e) {
             riseAlert(Alert.AlertType.ERROR, "Ошибка", "Не удалось удалить книгу", "Повторите попытку. Подробности доступны в журнале.");
@@ -84,9 +106,7 @@ public class BookInfoViewController extends AbstractViewController {
         setValue(hardCoverLabel, yesNo(bookForView.getHardCover()));
         setValue(readLabel, yesNo(bookForView.getRead()));
         setValue(autographLabel, yesNo(bookForView.getAutograph()));
-        NumberFormat price = NumberFormat.getNumberInstance(Locale.forLanguageTag("ru-RU"));
-        price.setMaximumFractionDigits(2);
-        setValue(priceLabel, bookForView.getPrice() == null ? null : price.format(bookForView.getPrice()) + " ₽");
+        setValue(priceLabel, BookPriceFormatter.format(bookForView.getPrice()));
         Cycle cycle = cycleRepository.getById(bookForView.getCycleId());
         setValue(cycleLabel, cycle == null ? null : cycle.getName() + " · " + bookForView.getNumberInSeries() + " из " + cycle.getBooksInCycle());
         setValue(cycleEndedLabel, cycle == null ? null : yesNo(cycle.getEnded()));
