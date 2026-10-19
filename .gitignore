@@ -884,6 +884,11 @@
 /test_data/logs/2026-10-18.log
 /test_data/logs/2026-10-19.log
 /test_data/logs/2026-10-20.log
+/test_data/backup/storage-archive-18-10-2026-22-39-37.zip
+/test_data/backup/storage-archive-18-10-2026-23-00-35.zip
+/test_data/backup/storage-archive-18-10-2026-23-02-41.zip
+/test_data/backup/storage-archive-18-10-2026-23-14-23.zip
+/test_data/backup/storage-archive-18-10-2026-23-24-19.zip
 /test_data/repository/audioBookSiteStorage.json
 /test_data/repository/authorStorage.json
 /test_data/repository/bookCycleStorage.json

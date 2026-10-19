@@ -16,11 +16,11 @@ import javafx.scene.control.CheckBox;
 
 public class BookConverter implements Converter<Book, BookDTO> {
 
-    private static final CycleRepository CYCLE_REPOSITORY = getBean(CycleRepository.class);
-    private static final AuthorRepository AUTHOR_REPOSITORY = getBean(AuthorRepository.class);
-    private static final PublisherRepository PUBLISHER_REPOSITORY = getBean(PublisherRepository.class);
-    private static final GenreRepository GENRE_REPOSITORY = getBean(GenreRepository.class);
-    private static final AudioBookSiteRepository AUDIO_BOOK_SITE_REPOSITORY = getBean(AudioBookSiteRepository.class);
+    private final CycleRepository cycleRepository = getBean(CycleRepository.class);
+    private final AuthorRepository authorRepository = getBean(AuthorRepository.class);
+    private final PublisherRepository publisherRepository = getBean(PublisherRepository.class);
+    private final GenreRepository genreRepository = getBean(GenreRepository.class);
+    private final AudioBookSiteRepository audioBookSiteRepository = getBean(AudioBookSiteRepository.class);
 
     @Override
     public BookDTO convert(Book book) {
@@ -28,8 +28,8 @@ public class BookConverter implements Converter<Book, BookDTO> {
         String cycleNumber = null;
         Boolean isCycleEnded = null;
 
-        if (book.getCycleId() != null && CYCLE_REPOSITORY.existById(book.getCycleId())) {
-            Cycle cycle = CYCLE_REPOSITORY.getById(book.getCycleId());
+        if (book.getCycleId() != null && cycleRepository.existById(book.getCycleId())) {
+            Cycle cycle = cycleRepository.getById(book.getCycleId());
             cycleName = cycle.getName();
             cycleNumber = format("%d/%d", book.getNumberInSeries(), cycle.getBooksInCycle());
             isCycleEnded = cycle.getEnded();
@@ -65,19 +65,19 @@ public class BookConverter implements Converter<Book, BookDTO> {
     }
 
     private String getAuthorName(Book book) {
-        return ofNullable(AUTHOR_REPOSITORY.getById(book.getAuthorId()))
+        return ofNullable(authorRepository.getById(book.getAuthorId()))
             .map(Author::getName)
             .orElse(null);
     }
 
     private String getPublisherName(Book book) {
-        return ofNullable(PUBLISHER_REPOSITORY.getById(book.getPublisherId()))
+        return ofNullable(publisherRepository.getById(book.getPublisherId()))
             .map(Publisher::getName)
             .orElse(null);
     }
 
     private String getGenreName(Book book) {
-        return ofNullable(GENRE_REPOSITORY.getById(book.getGenreId()))
+        return ofNullable(genreRepository.getById(book.getGenreId()))
             .map(Genre::getName)
             .orElse(null);
     }
@@ -86,7 +86,7 @@ public class BookConverter implements Converter<Book, BookDTO> {
         return ofNullable(book.getAudioBookSiteIds())
             .orElse(Collections.emptyList())
             .stream()
-            .map(AUDIO_BOOK_SITE_REPOSITORY::getById)
+            .map(audioBookSiteRepository::getById)
             .filter(Objects::nonNull)
             .map(AudioBookSite::getName)
             .toList();
