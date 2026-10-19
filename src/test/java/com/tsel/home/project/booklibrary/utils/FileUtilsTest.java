@@ -20,7 +20,7 @@ class FileUtilsTest {
 
     @Test
     void testCreateFile(@TempDir Path tempDir) {
-        Path filePath = tempDir.resolve("/test1/test2/test3-%s.txt".formatted(UUID.randomUUID()));
+        Path filePath = tempDir.resolve("test1/test2/test3-%s.txt".formatted(UUID.randomUUID()));
         assertFalse(Files.exists(filePath));
         assertTrue(FileUtils.isNotExists(filePath));
 
