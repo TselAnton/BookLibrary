@@ -16,7 +16,6 @@ import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.PropertyProvider;
 import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
 import com.tsel.home.project.booklibrary.helper.StorageBackupArchiver;
-import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.Timer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
@@ -52,7 +51,6 @@ public class App {
             SimpleApplicationContext.initBean(BookRepository.class, BookRepository::new);
 
             SimpleApplicationContext.initBean(ImageProvider.class, ImageProvider::new);
-            SimpleApplicationContext.initBean(SearchService.class, SearchService::new);
             SimpleApplicationContext.initBean(TableScroll.class, TableScroll::new);
             SimpleApplicationContext.initBean(DateProvider.class, DateProvider::new);
 
