@@ -24,7 +24,9 @@ import com.tsel.home.project.booklibrary.ui.AboutWindow;
 import com.tsel.home.project.booklibrary.ui.LineIcon;
 import com.tsel.home.project.booklibrary.ui.ReferenceEditorWindow;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.UpdateWindow;
 import com.tsel.home.project.booklibrary.ui.WindowPlacement;
+import com.tsel.home.project.booklibrary.update.GitHubReleaseClient;
 import com.tsel.home.project.booklibrary.ui.filter.FilterChips;
 import com.tsel.home.project.booklibrary.ui.filter.FilterDrawer;
 import com.tsel.home.project.booklibrary.ui.filter.editor.FilterEditorRegistry;
@@ -201,6 +203,11 @@ public class MainViewController extends AbstractViewController {
     @FXML
     public void showAbout() {
         AboutWindow.show(mainAnchorPane.getScene().getWindow());
+    }
+
+    @FXML
+    public void checkUpdates() {
+        new UpdateWindow(mainAnchorPane.getScene().getWindow(), new GitHubReleaseClient()).show();
     }
 
     @FXML

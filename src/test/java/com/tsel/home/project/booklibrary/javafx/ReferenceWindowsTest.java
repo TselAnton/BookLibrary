@@ -67,7 +67,7 @@ class ReferenceWindowsTest extends UnitJavaFXTest {
                 new MainViewController().startScene(main);
                 MenuBar bar = (MenuBar) main.getScene().lookup(".menu-bar");
                 assertEquals(List.of("Файлы", "Правка", "Справка"), bar.getMenus().stream().map(Menu::getText).toList());
-                assertTrue(bar.getMenus().get(2).getItems().get(0).isDisable());
+                assertFalse(bar.getMenus().get(2).getItems().get(0).isDisable());
                 assertEquals(3, getBean(AuthorRepository.class).getAll().size(), "Startup must retain unused entries");
 
                 for (int index = 0; index < 4; index++) {

@@ -16,11 +16,17 @@ import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.PropertyProvider;
 import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
 import com.tsel.home.project.booklibrary.helper.StorageBackupArchiver;
+import com.tsel.home.project.booklibrary.ui.StartupUpdateCheck;
+import com.tsel.home.project.booklibrary.update.ApplicationPaths;
+import com.tsel.home.project.booklibrary.update.GitHubReleaseClient;
+import com.tsel.home.project.booklibrary.update.UpdateStartup;
+import com.tsel.home.project.booklibrary.update.shared.InstallationLock;
 import com.tsel.home.project.booklibrary.utils.Timer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import javax.swing.JOptionPane;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -35,8 +41,27 @@ public class App {
         private static final Path BACKUP_PATH = buildPathFromCurrentDir("backup");
 
         public static void main(String[] args) {
-            initApplicationContext();
-            launch(args);
+            try {
+                if (!UpdateStartup.allowLaunch()) {
+                    return;
+                }
+                InstallationLock lock = InstallationLock.acquire(ApplicationPaths.dataDirectory());
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        lock.close();
+                    } catch (Exception e) {
+                        log.error("Can't release application lock", e);
+                    }
+                }, "booklibrary-instance-lock"));
+                if (!UpdateStartup.allowLaunch(true)) {
+                    return;
+                }
+                initApplicationContext();
+                launch(args);
+            } catch (Exception e) {
+                log.error("Can't start application", e);
+                JOptionPane.showMessageDialog(null, e.getMessage(), "BookLibrary — ошибка запуска", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
         private static void initApplicationContext() {
@@ -69,6 +94,7 @@ public class App {
             try {
                 MainViewController mainViewController = new MainViewController();
                 mainViewController.startScene(primaryStage);
+                StartupUpdateCheck.start(primaryStage, new GitHubReleaseClient());
 
             } catch (Exception e) {
                 log.error("Can't start main window", e);

@@ -27,7 +27,7 @@
                 </Menu>
                 <Menu text="Справка">
                     <items>
-                        <MenuItem text="Проверить обновления" disable="true"/>
+                        <MenuItem text="Проверить обновления" onAction="#checkUpdates"/>
                         <MenuItem text="О программе" onAction="#showAbout"/>
                     </items>
                 </Menu>

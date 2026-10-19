@@ -1,0 +1,36 @@
+name: Publish release from selected branch
+
+on:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: booklibrary-release
+    cancel-in-progress: false
+
+jobs:
+    release:
+        runs-on: windows-2022
+        timeout-minutes: 30
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v7.0.1
+              with:
+                  fetch-depth: 0
+            - uses: actions/setup-java@v6.1.0
+              with:
+                  distribution: temurin
+                  java-version: '17'
+                  cache: maven
+            - name: Build, verify and publish
+              shell: pwsh
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  RELEASE_BRANCH: ${{ github.ref_name }}
+                  RELEASE_COMMIT: ${{ github.sha }}
+                  RELEASE_RUN: ${{ github.run_number }}
+                  RELEASE_REPOSITORY: ${{ github.repository }}
+              run: ./build/release.ps1 -Branch $env:RELEASE_BRANCH -Commit $env:RELEASE_COMMIT -RunNumber $env:RELEASE_RUN -Repository $env:RELEASE_REPOSITORY

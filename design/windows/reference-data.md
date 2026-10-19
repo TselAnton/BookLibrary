@@ -4,7 +4,7 @@ The list-and-card layout was agreed with the user on 2026-10-20. The user chose 
 
 ## Application menus
 
-Keep only Файлы, Правка and Справка. Файлы contains Экспортировать данные, Открыть директорию and Выход. Creation remains on the toolbar and Ctrl+N. Правка opens the cycles, authors, genres and publishers editors. Справка contains the disabled Проверить обновления placeholder and О программе.
+Keep only Файлы, Правка and Справка. Файлы contains Экспортировать данные, Открыть директорию and Выход. Creation remains on the toolbar and Ctrl+N. Правка opens the cycles, authors, genres and publishers editors. Справка contains Проверить обновления and О программе. The update dialog and installation behavior are specified in [the update protocol](../update-protocol.md).
 
 Export uses the native folder picker and writes a uniquely named ZIP containing every JSON file under the running application's repository directory, preserving relative subdirectories and UTF-8 contents. Non-JSON files and symbolic links are excluded. Export runs in the background, disables its menu action until finished, and reports the saved path or failure. It does not use backup retention or prune exported archives. Open directory uses the JAR's parent directory; development runs use the working directory.
 
