@@ -1,7 +1,5 @@
 package com.tsel.home.project.booklibrary.dao.repository.impl;
 
-import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.getBean;
-
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
@@ -10,7 +8,6 @@ import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepository;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 @FileStorageName("bookStorage.json")
 public class BookRepository extends AbstractFileRepository<UUID, Book> {
@@ -21,30 +18,6 @@ public class BookRepository extends AbstractFileRepository<UUID, Book> {
 
     public BookRepository() {
         super(Book.class, new UUIDIdentifierGenerator(), DEFAULT_REPOSITORY_PATH);
-    }
-
-    @Override
-    public void delete(Book entity) {
-        super.delete(entity);
-
-        if (isLatestValue(book -> Objects.equals(book.getAuthorId(), entity.getAuthorId()))) {
-            getBean(AuthorRepository.class).deleteById(entity.getAuthorId());
-        }
-        if (isLatestValue(book -> Objects.equals(book.getPublisherId(), entity.getPublisherId()))) {
-            getBean(PublisherRepository.class).deleteById(entity.getPublisherId());
-        }
-        if (isLatestValue(book -> Objects.equals(book.getCycleId(), entity.getCycleId()))) {
-            getBean(CycleRepository.class).deleteById(entity.getCycleId());
-        }
-        if (isLatestValue(book -> Objects.equals(book.getGenreId(), entity.getGenreId()))) {
-            getBean(GenreRepository.class).deleteById(entity.getGenreId());
-        }
-    }
-
-    private boolean isLatestValue(Predicate<Book> checkPredicate) {
-        return this.getRepositoryMap().values()
-            .stream()
-            .noneMatch(checkPredicate);
     }
 
     @Override
