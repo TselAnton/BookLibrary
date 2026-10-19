@@ -3,6 +3,7 @@ package com.tsel.home.project.booklibrary.javafx;
 import com.tsel.home.project.booklibrary.controller.impl.MainViewController;
 import com.tsel.home.project.booklibrary.controller.impl.book.*;
 import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
+import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
 import java.nio.file.Path;
@@ -13,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.junit.jupiter.api.Test;
@@ -105,7 +107,9 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
                 detailStage.setScene(detailsScene); info.initController(details, null, id); detailStage.show(); layout(detailStage);
                 assertEquals(812, detailsScene.getWidth(), 1); assertEquals(600, detailsScene.getHeight(), 1);
                 assertEquals("Нет", ((Label) detailsScene.lookup("#readLabel")).getText());
-                assertTrue(detailsScene.lookup("#missingCover").isVisible());
+                ImageView cover = (ImageView) detailsScene.lookup("#coverImage");
+                assertNotNull(cover.getImage());
+                assertTrue(SimpleApplicationContext.getBean(ImageProvider.class).isPlaceholder(cover.getImage()));
                 assertInside(detailsScene, "#deleteBookButton", "#editBookButton", "#cycleEndedLabel");
 
                 FXMLLoader edit = loader("edit-view.fxml");

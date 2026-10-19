@@ -3,7 +3,7 @@
 Reference: ../references/04-book-details.png. Base client area 812x600dp; no scrolling. Compact sage header 56dp, book-open icon, Карточка книги and close. No subtitle, application menu or audiobook action.
 
 ## Layout
-16dp outer gutters; 20dp gap between left cover and right metadata. Left column 244dp, right 516dp (16+244+20+516+16=812). Content begins 16dp below header. Cover fits inside 244x370dp preserving original aspect ratio; never crop/stretch. No caption below the cover. Missing/unreadable external cover uses centered book-open on a neutral sage surface; metadata remains usable.
+16dp outer gutters; 20dp gap between left cover and right metadata. Left column 244dp, right 516dp (16+244+20+516+16=812). Content begins 16dp below header. Cover fits inside 244x370dp preserving original aspect ratio; never crop/stretch. No caption below the cover. Loading, missing and unreadable external covers use `img/default-book-cover.png`, the same ivory crossed-out book on dark sage as the table. The image loads in the background and replaces the placeholder automatically; metadata remains usable throughout loading.
 
 Metadata has twelve ordered rows at 34dp (408dp). Labels are muted secondary text, values dark. Use a 190dp label column, 12dp gap and 314dp values. Name value may be 18sp semibold; other values 13sp. Long values use available space, ellipsis with full-value tooltip when needed; no outer scrolling. Dividers are thin and subdued.
 

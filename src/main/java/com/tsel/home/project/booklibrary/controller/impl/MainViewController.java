@@ -19,13 +19,11 @@ import com.tsel.home.project.booklibrary.dao.data.Book;
 import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.search.SearchService;
+import com.tsel.home.project.booklibrary.ui.LineIcon;
+import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.WindowPlacement;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
-import com.tsel.home.project.booklibrary.ui.SageTheme;
-import com.tsel.home.project.booklibrary.ui.LineIcon;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.geometry.Pos;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -36,13 +34,17 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.ToDoubleFunction;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -54,6 +56,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -290,9 +295,7 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     public void addBook() {
-        Stage mainStage = (Stage) mainAnchorPane.getScene().getWindow();
-        int offsetY = (int) Math.round(resolveCoordinate(Stage::getY, 150) - mainStage.getY()) - 32;
-        loadModalView("Добавить книгу", "view/add-view.fxml", 240, offsetY);
+        loadModalView("Добавить книгу", "view/add-view.fxml", 0, 0);
         updateTableColumns(bookTableView);
     }
 
@@ -483,12 +486,6 @@ public class MainViewController extends AbstractViewController {
             .toList();
     }
 
-    private double resolveCoordinate(ToDoubleFunction<Stage> getStageCoordinate, double defaultCoordinate) {
-        return lastOpenedBookViewStage != null
-            ? getStageCoordinate.applyAsDouble(lastOpenedBookViewStage)
-            : defaultCoordinate;
-    }
-
     @SuppressWarnings("unchecked")
     private void initTableColumns(FXMLLoader loader, TableView<BookDTO> bookTableView) {
         TABLE_COLUMNS_SETTINGS.forEach((columnName, fieldName) -> {
@@ -549,14 +546,12 @@ public class MainViewController extends AbstractViewController {
             Stage primaryStage = (Stage) mainAnchorPane.getScene().getWindow();
             stage.initOwner(primaryStage);
 
-            stage.setX(resolveCoordinate(Stage::getX, 550));
-            stage.setY(resolveCoordinate(Stage::getY, 150));
-
             if (bookId != null) {
                 AbstractViewController controller = loader.getController();
                 controller.initController(loader, this, bookId);
             }
 
+            WindowPlacement.positionRelativeToMainWindow(stage);
             stage.show();
             lastOpenedBookViewStage = stage;
 
@@ -581,10 +576,10 @@ public class MainViewController extends AbstractViewController {
                     setAlignment(Pos.CENTER);
                 if (value instanceof javafx.scene.image.ImageView image) {
                     if (!compact) {
-                        BookDTO book = getTableRow().getItem();
-                        if (book != null && Boolean.TRUE.equals(book.getHasCoverImage())) {
-                            image.setFitWidth(24); image.setFitHeight(32); image.setPreserveRatio(true); setGraphic(image);
-                        } else setGraphic(new LineIcon("book"));
+                        image.setFitWidth(24);
+                        image.setFitHeight(32);
+                        image.setPreserveRatio(true);
+                        setGraphic(image);
                     }
                 } else if (value instanceof CheckBox check) {
                     setAlignment(Pos.CENTER); setGraphic(check); check.setFocusTraversable(false); check.setMouseTransparent(true);

@@ -166,6 +166,7 @@ public class EditBookController extends AbstractBookController {
 
     @Override
     protected void doAfterSave(Book savedBook) {
+        imageProvider.deleteImagesFromCache(savedBook);
         // Пытаемся обновить изменённую книгу в MainController
         mainController.updateControllerState(savedBook.getId());
     }

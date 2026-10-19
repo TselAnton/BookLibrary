@@ -2,7 +2,6 @@ package com.tsel.home.project.booklibrary.controller.impl.book;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dao.data.*;
-import com.tsel.home.project.booklibrary.ui.LineIcon;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.UUID;
@@ -33,7 +32,6 @@ public class BookInfoViewController extends AbstractViewController {
     @FXML private Label cycleLabel;
     @FXML private Label cycleEndedLabel;
     @FXML private ImageView coverImage;
-    @FXML private LineIcon missingCover;
     private Book bookForView;
     private AbstractViewController parentController;
 
@@ -90,11 +88,7 @@ public class BookInfoViewController extends AbstractViewController {
         Cycle cycle = cycleRepository.getById(bookForView.getCycleId());
         setValue(cycleLabel, cycle == null ? null : cycle.getName() + " · " + bookForView.getNumberInSeries() + " из " + cycle.getBooksInCycle());
         setValue(cycleEndedLabel, cycle == null ? null : yesNo(cycle.getEnded()));
-        imageProvider.deleteImagesFromCache(bookForView);
-        javafx.scene.image.Image image = imageProvider.resolveCover(bookForView);
-        boolean missing = imageProvider.isPlaceholder(image);
-        coverImage.setImage(missing ? null : image);
-        missingCover.setVisible(missing);
+        coverImage.imageProperty().bind(imageProvider.resolveCover(bookForView).imageProperty());
     }
 
     private String yesNo(Boolean value) { return Boolean.TRUE.equals(value) ? "Да" : "Нет"; }

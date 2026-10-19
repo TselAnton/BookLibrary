@@ -1,0 +1,5 @@
+Asset: src/main/resources/com/tsel/home/project/booklibrary/img/default-book-cover.png
+Generator: built-in image_gen tool
+User direction: dark sage and ivory crossed-out book, minimal details, readable as a thumbnail.
+
+Use case: stylized-concept. Asset type: default book cover thumbnail for a light sage desktop library app. Create a completely flat, minimalist portrait 2:3 cover, edge to edge, no scene, no 3D book mockup. Solid deep muted forest-sage background (#40594A), distinctly darker than the app's pale sage background. One large centered warm ivory (#F4F1E7) pictogram of an open book crossed by a single broad diagonal slash, communicating unavailable book cover. Use thick clean rounded strokes and a bold simple silhouette, occupy about 70 percent of cover width. Exactly two solid colors, crisp smooth geometry. Must be immediately readable at 24 by 32 pixels. No leaves, botanical details, page lines, illustration, texture, grain, gradients, shading, shadows, borders, text, lettering, title, author, logos or watermark. A quiet functional placeholder matching a restrained modern sage UI. Opaque background.

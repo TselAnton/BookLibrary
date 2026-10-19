@@ -8,6 +8,7 @@ import static java.util.Optional.ofNullable;
 import com.tsel.home.project.booklibrary.dao.data.*;
 import com.tsel.home.project.booklibrary.dao.repository.impl.*;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
+import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +35,7 @@ public class BookConverter implements Converter<Book, BookDTO> {
             isCycleEnded = cycle.getEnded();
         }
 
-        return BookDTO.builder()
+        BookDTO dto = BookDTO.builder()
             .id(book.getId())
             .name(book.getName())
             .author(getAuthorName(book))
@@ -53,6 +54,14 @@ public class BookConverter implements Converter<Book, BookDTO> {
             .audiobookSites(getAudioBookSiteNames(book))
             .hasAnyAudioBookSite(getCheckBox(isNotEmpty(book.getAudioBookSiteIds())))
             .build();
+
+        ImageProvider imageProvider = getBean(ImageProvider.class);
+        dto.getCover()
+            .imageProperty()
+            .addListener((observable, previous, image) ->
+                dto.setHasCoverImage(!imageProvider.isPlaceholder(image))
+            );
+        return dto;
     }
 
     private String getAuthorName(Book book) {

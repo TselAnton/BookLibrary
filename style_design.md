@@ -184,6 +184,8 @@ public record ImageHolder(Image image, boolean isDefault) {}
 
 Вложенные классы получают дополнительный уровень отступа. Примеры: `App.JavaFXRunner`, `BookDTO.BookDTOBuilder`, `MyGson.GsonExclusionStrategy`. Пустые тестовые вложенные репозитории записываются в одну строку с `{}`.
 
+Нестатический вложенный класс оформляется с теми же отступами: `public final class ImageHolder` внутри `ImageProvider`. Модификатор `static` отсутствует, когда экземпляр использует состояние внешнего объекта; `ImageHolder` получает общую обложку из `defaultImg`.
+
 Анонимный класс с содержательным телом оформляется многострочно (`MainViewController.loadBookViewWindow`):
 
 ```java
@@ -215,6 +217,8 @@ private Map<K, E> repositoryMapSnapshot;
 ```
 
 Связанные неаннотированные поля могут идти подряд: `id` и `name` в небольших DTO, зависимости в `AbstractViewController`. Аннотированные предметные поля и FXML-поля обычно разделяются одной пустой строкой. Это не означает, что нужно вставлять пустую строку между любыми двумя полями.
+
+`volatile` располагается после модификатора доступа и перед типом. Пример флага отмены фоновой загрузки в `ImageProvider.ImageHolder`: `private volatile boolean cancelled;`.
 
 Если initializer переносится после `=`, первая строка выражения получает ещё 4 пробела:
 
@@ -508,6 +512,8 @@ try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileRepositoryPat
 
 Переменные исключений называются `e` или `ex`, без единого требования выбрать одно из них. Используются выбрасывание собственного исключения, оборачивание с исходной причиной, повторный `throw ex` и возврат запасного значения после перехвата. Это разные существующие действия; стиль их записи не определяет, какое поведение необходимо новому методу.
 
+При перехвате нескольких типов в одном `catch` разделять их оператором `|` с пробелами: `catch (IOException | IllegalArgumentException e)` в `ImageProvider.loadCover`.
+
 Длинный конструктор исключения переносится как обычный вызов (`FileUtils.createFile`):
 
 ```java
@@ -518,6 +524,17 @@ throw new IllegalStateException(
 ```
 
 Тела `ConstraintException` и `NotNullConstraintException` содержат конструктор с `super(...)`, оформленный многострочным телом, даже если это единственное действие. `@SneakyThrows` используется в тестовых файловых утилитах и одном тесте архивирования, каждая аннотация на отдельной строке.
+
+`finally` продолжает строку закрывающей скобки `try` или `catch`. Пример из `BookWindowPlacementTest.checkModalWindow`: окно закрывается и при исключении из проверки.
+
+```java
+try {
+    assertSame(owner, modal.getOwner());
+    assertPlacement(modal, main, bounds);
+} finally {
+    modal.hide();
+}
+```
 
 ## 11. Дженерики, коллекции и функциональный код
 
@@ -835,7 +852,7 @@ open module com.tsel.home.project.booklibrary {
 | Нет завершающего перевода строки | `AutoCompleteComboBoxListener`, `CustomCheckBoxTableCell`, `FileRepositoryProviderTest`, `StorageBackupArchiverTest`, `SearchServiceTest`, `FileUtilsTest` | Новые файлы завершать переводом строки |
 | Смешанные отступы FXML и CSS | Разметка представлений, hover-правила кнопок | Учитывать локальную разметку; новый самостоятельный CSS: 4 |
 
-В текущих исходниках не обнаружены: локальные именованные классы; instance initializer; классический `switch` с `case ...:`; `do/while`; `try/finally` и multi-catch; `yield`; `synchronized`-блоки; Java `assert`; sealed-типы; text blocks; объявления членов с `volatile`, `transient` или `native`. Для этих форм нельзя описывать отдельное правило как уже существующее в BookLibrary. Если они понадобятся, применять установленные общие отступы, пробелы и скобки, а специфическое правило дополнять по реально добавленному коду.
+В текущих исходниках не обнаружены: локальные именованные классы; instance initializer; классический `switch` с `case ...:`; `do/while`; multi-catch; `yield`; `synchronized`-блоки; Java `assert`; sealed-типы; text blocks; объявления членов с `volatile`, `transient` или `native`. Для этих форм нельзя описывать отдельное правило как уже существующее в BookLibrary. Если они понадобятся, применять установленные общие отступы, пробелы и скобки, а специфическое правило дополнять по реально добавленному коду.
 
 Версия языка в `pom.xml` — Java 17. Форматирование не служит основанием вводить конструкции другой версии языка.
 
