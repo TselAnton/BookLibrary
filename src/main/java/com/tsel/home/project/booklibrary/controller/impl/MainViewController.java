@@ -14,32 +14,39 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
-import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
-import com.tsel.home.project.booklibrary.dao.data.Book;
-import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
 import com.tsel.home.project.booklibrary.filter.FilterCatalog;
 import com.tsel.home.project.booklibrary.filter.model.FilterState;
+import com.tsel.home.project.booklibrary.helper.DataExporter;
+import com.tsel.home.project.booklibrary.service.ReferenceService;
+import com.tsel.home.project.booklibrary.service.ReferenceType;
+import com.tsel.home.project.booklibrary.ui.AboutWindow;
 import com.tsel.home.project.booklibrary.ui.LineIcon;
+import com.tsel.home.project.booklibrary.ui.ReferenceEditorWindow;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.UpdateWindow;
 import com.tsel.home.project.booklibrary.ui.WindowPlacement;
+import com.tsel.home.project.booklibrary.update.GitHubReleaseClient;
 import com.tsel.home.project.booklibrary.ui.filter.FilterChips;
 import com.tsel.home.project.booklibrary.ui.filter.FilterDrawer;
 import com.tsel.home.project.booklibrary.ui.filter.editor.FilterEditorRegistry;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
+import java.awt.Desktop;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import javafx.animation.PauseTransition;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -48,6 +55,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -62,6 +70,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -134,6 +143,97 @@ public class MainViewController extends AbstractViewController {
     private FilterDrawer filterDrawer;
     private List<BookDTO> catalogBooks = List.of();
     private boolean compact;
+    private boolean exporting;
+
+    @FXML
+    private MenuItem exportDataItem;
+
+    @FXML
+    public void exportData() {
+        if (exporting) {
+            return;
+        }
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Папка для экспорта данных");
+        File destination = chooser.showDialog(mainAnchorPane.getScene().getWindow());
+        if (destination == null) {
+            return;
+        }
+        exporting = true;
+        exportDataItem.setDisable(true);
+        resultStatus.setText("Создание архива данных…");
+        Task<Path> task = new Task<>() {
+            @Override
+            protected Path call() throws Exception {
+                return new DataExporter().export(
+                    com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepository.DEFAULT_REPOSITORY_PATH,
+                    destination.toPath()
+                );
+            }
+        };
+        task.setOnSucceeded(event -> {
+            exporting = false;
+            exportDataItem.setDisable(false);
+            updateStatus();
+            riseAlert(AlertType.INFORMATION, "Экспорт данных", "Архив сохранён", task.getValue().toString());
+        });
+        task.setOnFailed(event -> {
+            exporting = false;
+            exportDataItem.setDisable(false);
+            updateStatus();
+            log.error("Data export failed", task.getException());
+            riseAlert(AlertType.ERROR, "Экспорт данных", "Не удалось создать архив", task.getException().getMessage());
+        });
+        Thread worker = new Thread(task, "booklibrary-export");
+        worker.start();
+    }
+
+    @FXML
+    public void openApplicationDirectory() {
+        try {
+            Path location = Path.of(com.tsel.home.project.booklibrary.App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            Path directory = Files.isRegularFile(location) ? location.getParent() : Path.of("").toAbsolutePath();
+            Desktop.getDesktop().open(directory.toFile());
+        } catch (Exception e) {
+            log.error("Can't open application directory", e);
+            riseAlert(AlertType.ERROR, "Открыть директорию", "Не удалось открыть папку программы", e.getMessage());
+        }
+    }
+
+    @FXML
+    public void showAbout() {
+        AboutWindow.show(mainAnchorPane.getScene().getWindow());
+    }
+
+    @FXML
+    public void checkUpdates() {
+        new UpdateWindow(mainAnchorPane.getScene().getWindow(), new GitHubReleaseClient()).show();
+    }
+
+    @FXML
+    public void editCycles() {
+        openReferenceEditor(ReferenceType.CYCLES);
+    }
+
+    @FXML
+    public void editAuthors() {
+        openReferenceEditor(ReferenceType.AUTHORS);
+    }
+
+    @FXML
+    public void editGenres() {
+        openReferenceEditor(ReferenceType.GENRES);
+    }
+
+    @FXML
+    public void editPublishers() {
+        openReferenceEditor(ReferenceType.PUBLISHERS);
+    }
+
+    private void openReferenceEditor(ReferenceType type) {
+        ReferenceService service = new ReferenceService(bookRepository, authorRepository, cycleRepository, genreRepository, publisherRepository);
+        new ReferenceEditorWindow(mainAnchorPane.getScene().getWindow(), type, service, this::refreshCatalog).show();
+    }
 
 
     /**
@@ -142,7 +242,6 @@ public class MainViewController extends AbstractViewController {
      */
     public void startScene(Stage stage) {
         try {
-            cleanUpRepositoryData();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(RESOURCE_PATH + "view/main-view.fxml"));
             Scene scene = new Scene(loader.load());
             MainViewController controller = loader.getController();
@@ -628,38 +727,4 @@ public class MainViewController extends AbstractViewController {
         }
     }
 
-    /**
-     * Чистка из репозиториев всех записей, не связанных с book
-     */
-    private void cleanUpRepositoryData() {
-        try {
-            Set<UUID> usedCycleIds = new HashSet<>();
-            Set<UUID> usedGenreIds = new HashSet<>();
-            Set<UUID> usedAuthorIds = new HashSet<>();
-            Set<UUID> usedPublisherIds = new HashSet<>();
-
-            for (Book book : bookRepository.getAll()) {
-                if (book.getCycleId() != null) usedCycleIds.add(book.getCycleId());
-                if (book.getGenreId() != null) usedGenreIds.add(book.getGenreId());
-                if (book.getAuthorId() != null) usedAuthorIds.add(book.getAuthorId());
-                if (book.getPublisherId() != null) usedPublisherIds.add(book.getPublisherId());
-            }
-
-            cleanUpRepository(cycleRepository, usedCycleIds);
-            cleanUpRepository(genreRepository, usedGenreIds);
-            cleanUpRepository(authorRepository, usedAuthorIds);
-            cleanUpRepository(publisherRepository, usedPublisherIds);
-
-        } catch (Exception e) {
-            log.error("Exception while cleaning repository data", e);
-        }
-    }
-
-    private <T extends BaseEntity<UUID>, R extends FileRepository<UUID, T>> void cleanUpRepository(R repository, Set<UUID> userIdSet) {
-        repository.getAll()
-            .stream()
-            .map(BaseEntity::getId)
-            .filter(id -> !userIdSet.contains(id))
-            .forEach(repository::deleteById);
-    }
 }

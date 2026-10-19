@@ -500,8 +500,12 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
         button(scene, "#applyFiltersButton").fire();
         assertEquals(1, table.getItems().size());
         assertEquals("Дюна", ((BookDTO) table.getItems().get(0)).getName());
-        ((MenuBar) scene.lookup(".menu-bar")).getMenus().get(2).getItems().get(0).fire();
-        assertEquals(1, table.getItems().size(), "Refresh must preserve the applied filters");
+        ((MenuBar) scene.lookup(".menu-bar")).getMenus().get(1).getItems().get(2).fire();
+        Stage genreEditor = shownStage("Редактировать жанры");
+        text(genreEditor.getScene(), "#referenceName").appendText(" (правка)");
+        button(genreEditor.getScene(), "#saveReferenceButton").fire();
+        genreEditor.close();
+        assertEquals(1, table.getItems().size(), "Editing references must preserve the applied filters");
         button(scene, "#resetFiltersButton").fire();
         assertEquals(7, table.getItems().size());
         button(scene, "#filtersButton").fire();

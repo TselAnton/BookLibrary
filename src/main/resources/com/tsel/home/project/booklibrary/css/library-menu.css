@@ -1,0 +1,91 @@
+.about-name {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.about-dedication {
+    -fx-text-fill: #B45B76;
+    -fx-padding: 14 0 0 0;
+}
+
+.reference-section-title {
+    -fx-font-weight: bold;
+    -fx-padding: 8 0 0 0;
+}
+
+.reference-status {
+    -fx-padding: 2 16;
+    -fx-font-size: 12px;
+    -fx-text-fill: #52665A;
+}
+
+.reference-status.error-message {
+    -fx-text-fill: #B3261E;
+}
+
+.reference-books {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C4CFC7;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 1;
+}
+
+.reference-books:focused {
+    -fx-border-color: #2F6B4F;
+}
+
+.reference-property-table {
+    -fx-fixed-cell-size: 46;
+}
+
+.reference-property-table .table-cell {
+    -fx-padding: 6 8;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.reference-property-table .table-cell .check-box {
+    -fx-padding: 0 4;
+}
+
+.reference-property-table .table-row-cell:focused {
+    -fx-border-color: transparent transparent #DFE6E0 transparent;
+}
+
+.reference-read-only {
+    -fx-background-color: #EEF1EE;
+    -fx-text-fill: #52665A;
+}
+
+.reference-book-link, .reference-book-link:visited {
+    -fx-text-fill: #2F6B4F;
+    -fx-underline: true;
+    -fx-padding: 2 4;
+    -fx-border-color: transparent;
+    -fx-border-style: solid;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+}
+
+.reference-book-link:hover {
+    -fx-text-fill: #214F3A;
+}
+
+.reference-book-link:focused {
+    -fx-border-color: #2F6B4F;
+}
+
+.reference-delete {
+    -fx-text-fill: #B3261E;
+    -fx-border-color: #B3261E;
+}
+
+.reference-delete:hover {
+    -fx-background-color: #FCEAE8;
+    -fx-border-color: #B3261E;
+}
+
+.reference-delete:disabled {
+    -fx-text-fill: #64756A;
+    -fx-border-color: #C4CFC7;
+}

@@ -9,6 +9,8 @@ Status: approved sage direction and four window designs, accepted by the user on
 4. [Book details](windows/book-details.md).
 5. [Shared SVG icons](../src/main/resources/com/tsel/home/project/booklibrary/icons/).
 6. [Machine-readable tokens](tokens.json).
+7. [Menus, reference editors and About](windows/reference-data.md).
+8. [Release and update protocol](update-protocol.md).
 
 Approved visual references are copied into [references](references/). Preserve the originals in artifacts/backend-foundation/ui-design-approved-sage/. The PNGs are scaled mockups, not pixel-exact implementation plans. Written requirements resolve ambiguous generated details. Each future window must follow the shared system and gain its own specification before implementation.
 

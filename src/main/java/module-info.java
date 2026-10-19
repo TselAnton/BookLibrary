@@ -4,6 +4,8 @@ open module com.tsel.home.project.booklibrary {
     requires javafx.fxml;
     requires javafx.base;
     requires java.xml;
+    requires java.desktop;
+    requires java.net.http;
 
     requires org.apache.logging.log4j;
 

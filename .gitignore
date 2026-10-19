@@ -14,6 +14,10 @@
 /my-library-publishers-storage.txt
 /my-library-user-settings-storage.txt
 /.properties
+/.booklibrary.lock
+/.booklibrary-update.pending
+/.booklibrary-data.properties
+/.booklibrary-update-result.properties
 /test_data/Обложки для книг/Фанфики/order of the phoenix rajel art.jpg
 /test_data/Обложки для книг/Фанфики/Remain Nameless  Оставайся безымянным.jpg
 /test_data/Обложки для книг/Фанфики/Sweetly broken.jpeg

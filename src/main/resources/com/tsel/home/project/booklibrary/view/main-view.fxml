@@ -9,26 +9,26 @@
         <HBox fx:id="windowHeader" styleClass="window-header" minHeight="56" prefHeight="56" maxHeight="56"/>
         <MenuBar>
             <menus>
-                <Menu text="Файл">
+                <Menu text="Файлы">
                     <items>
-                        <MenuItem text="Добавить книгу" onAction="#addBook"/>
+                        <MenuItem fx:id="exportDataItem" text="Экспортировать данные" onAction="#exportData"/>
+                        <MenuItem text="Открыть директорию проекта" onAction="#openApplicationDirectory"/>
                         <SeparatorMenuItem/>
                         <MenuItem text="Выход" onAction="#exitApplication"/>
                     </items>
                 </Menu>
                 <Menu text="Правка">
                     <items>
-                        <MenuItem text="Открыть выбранную книгу" onAction="#openSelectedBook"/>
-                    </items>
-                </Menu>
-                <Menu text="Вид">
-                    <items>
-                        <MenuItem text="Обновить" onAction="#refreshBooks"/>
+                        <MenuItem text="Редактировать циклы" onAction="#editCycles"/>
+                        <MenuItem text="Редактировать авторов" onAction="#editAuthors"/>
+                        <MenuItem text="Редактировать жанры" onAction="#editGenres"/>
+                        <MenuItem text="Редактировать публицистов" onAction="#editPublishers"/>
                     </items>
                 </Menu>
                 <Menu text="Справка">
                     <items>
-                        <MenuItem text="Фильтры" onAction="#toggleFilters"/>
+                        <MenuItem text="Проверить обновления" onAction="#checkUpdates"/>
+                        <MenuItem text="О программе" onAction="#showAbout"/>
                     </items>
                 </Menu>
             </menus>
