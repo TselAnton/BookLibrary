@@ -396,7 +396,7 @@ public class MainViewController extends AbstractViewController {
         updateStatus();
         VBox empty = new VBox(8);
         empty.setAlignment(Pos.CENTER);
-        empty.getChildren().add(new Label(all.isEmpty() ? "Нет книг" : "Ничего не найдено"));
+        empty.getChildren().add(new Label(all.isEmpty() ? "Ещё ничего не прочитано" : "Ничего не найдено"));
         Button action = new Button(all.isEmpty() ? "Добавить книгу" : "Сбросить");
         action.setOnAction(event -> {
             if (all.isEmpty()) {

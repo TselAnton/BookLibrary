@@ -74,7 +74,7 @@
             </TableView>
         </VBox>
         <HBox minHeight="28" prefHeight="28" alignment="CENTER_LEFT" styleClass="status-footer">
-            <Label fx:id="resultStatus" text="Нет книг"/>
+            <Label fx:id="resultStatus" text="Ещё ничего не прочитано"/>
         </HBox>
     </VBox>
 </AnchorPane>
