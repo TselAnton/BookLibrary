@@ -2,11 +2,11 @@ package com.tsel.home.project.booklibrary.provider;
 
 import static com.tsel.home.project.booklibrary.TestFileUtils.readFileContent;
 import static com.tsel.home.project.booklibrary.TestFileUtils.writeFileContent;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.Gson;
 import com.tsel.home.project.booklibrary.TestEntity;
@@ -110,7 +110,7 @@ class FileRepositoryProviderTest {
         fileRepositoryProvider.overwriteStorageFile(newTestEntitiesList);
 
         assertTrue(Files.exists(tempDir.resolve(REPOSITORY_FILE)));
-        assertNotNull(fileContent, readFileContent(tempDir.resolve(REPOSITORY_FILE)));
+        assertNotNull(readFileContent(tempDir.resolve(REPOSITORY_FILE)), fileContent);
     }
 
     @Test

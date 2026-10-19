@@ -1,34 +1,67 @@
 package com.tsel.home.project.booklibrary.javafx;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.tsel.home.project.booklibrary.controller.impl.MainViewController;
-import com.tsel.home.project.booklibrary.controller.impl.book.*;
+import com.tsel.home.project.booklibrary.controller.impl.book.BookInfoViewController;
+import com.tsel.home.project.booklibrary.controller.impl.book.EditBookController;
+import com.tsel.home.project.booklibrary.controller.impl.book.NewBookController;
 import com.tsel.home.project.booklibrary.dao.repository.impl.BookRepository;
+import com.tsel.home.project.booklibrary.dto.BookDTO;
+import com.tsel.home.project.booklibrary.filter.condition.NumericOperation;
 import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
+import com.tsel.home.project.booklibrary.ui.LineIcon;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.filter.FilterChips;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import static org.junit.jupiter.api.Assertions.*;
 
 class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
     private static final String RESOURCE = "/com/tsel/home/project/booklibrary/view/";
 
     @Test void realWindowsAndCatalogWorkflow(@TempDir Path directory) throws Exception {
         DesignFixture.initialize(directory);
+        String reducedMotion = System.getProperty("booklibrary.reducedMotion");
+        System.setProperty("booklibrary.reducedMotion", "true");
         FutureTask<Void> task = new FutureTask<>(() -> {
             try {
                 UUID id = DesignFixture.populate();
                 Stage main = new Stage();
                 new MainViewController().startScene(main);
+                awaitFilterOptions(main.getScene());
                 layout(main);
                 assertCaptionHighlights(main.getScene());
                 assertEquals(1252, main.getScene().getWidth(), 1);
@@ -38,11 +71,15 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
                 assertFalse(main.getScene().lookup("#filterEditor").isManaged());
                 ((Button) main.getScene().lookup("#filtersButton")).fire();
                 assertTrue(main.getScene().lookup("#filterEditor").isManaged());
-                @SuppressWarnings("unchecked") ComboBox<String> filter = (ComboBox<String>) main.getScene().lookup("#readFilter");
-                filter.setValue("Прочитано");
+                CheckBox filter = (CheckBox) main.getScene().lookup("#filter-read-option-0");
+                filter.fire();
+                assertEquals(7, table.getItems().size(), "Draft filters must not change the table");
+                ((Button) main.getScene().lookup("#applyFiltersButton")).fire();
                 assertEquals(1, table.getItems().size());
                 assertTrue(main.getScene().lookup("#activeFilters").isManaged());
-                filter.setValue("Все");
+                ((Button) main.getScene().lookup("#resetFiltersButton")).fire();
+                assertFiltersWorkflow(main, table);
+                assertCatalogCacheLifecycle(main, table);
                 main.setWidth(812); layout(main);
                 assertTrue(main.getScene().getRoot().getStyleClass().contains("compact"));
                 assertTrue(table.getColumns().stream().allMatch(c -> c.getWidth() >= 20));
@@ -107,6 +144,12 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
                 assertEquals("Нет", ((Label) detailsScene.lookup("#readLabel")).getText());
                 assertTrue(detailsScene.lookup("#missingCover").isVisible());
                 assertInside(detailsScene, "#deleteBookButton", "#editBookButton", "#cycleEndedLabel");
+                Button delete = button(detailsScene, "#deleteBookButton");
+                Button close = button(detailsScene, "#closeBookButton");
+                assertEquals(close.getTextFill(), delete.getTextFill());
+                assertEquals(close.getBackground().getFills(), delete.getBackground().getFills());
+                assertEquals(close.getBorder().getStrokes(), delete.getBorder().getStrokes());
+                capture(detailsScene, "filters-book-details");
 
                 FXMLLoader edit = loader("edit-view.fxml");
                 Scene editScene = new Scene(edit.load());
@@ -150,11 +193,393 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
             } finally {
                 for (Window w : java.util.List.copyOf(Window.getWindows())) w.hide();
                 DesignFixture.restore();
+                if (reducedMotion == null) {
+                    System.clearProperty("booklibrary.reducedMotion");
+                } else {
+                    System.setProperty("booklibrary.reducedMotion", reducedMotion);
+                }
             }
             return null;
         });
         Platform.runLater(task);
         task.get(40, TimeUnit.SECONDS);
+    }
+
+    private static void assertCatalogCacheLifecycle(Stage main, TableView<?> table) throws Exception {
+        Scene scene = main.getScene();
+        button(scene, "#filtersButton").fire();
+        text(scene, "#filter-name-value").setText("Кеш:");
+        button(scene, "#applyFiltersButton").fire();
+        assertTrue(table.getItems().isEmpty());
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Platform.runLater(() -> {
+            try {
+                Stage form = shownStage("Добавить книгу");
+                Scene add = form.getScene();
+                text(add, "#nameTextFieldInput").setText("Кеш: новая книга");
+                ((ComboBox<?>) add.lookup("#authorComboBox")).getEditor().setText("Кеш-автор");
+                ((ComboBox<?>) add.lookup("#publisherComboBox")).getEditor().setText("Кеш-издатель");
+                text(add, "#pagesCountFieldInput").setText("10");
+                text(add, "#publicationYearFieldInput").setText("2024");
+                text(add, "#priceFieldInput").setText("0");
+                button(add, "#saveBookButton").fire();
+            } catch (Throwable error) {
+                failure.set(error);
+                List.copyOf(Window.getWindows()).stream().filter(window -> window != main).forEach(Window::hide);
+            }
+        });
+        button(scene, "#addBookButton").fire();
+        assertNull(failure.get());
+        assertEquals(1, table.getItems().size(), "Creating a matching book must reapply the active filters");
+        assertCachedAuthor(scene, "Кеш-автор", 1);
+        table.getSelectionModel().selectFirst();
+        table.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+        Stage details = shownStage("Карточка книги");
+        assertEquals("Подарок", ((Label) details.getScene().lookup("#priceLabel")).getText());
+        Platform.runLater(() -> {
+            try {
+                Scene edit = shownStage("Изменить книгу").getScene();
+                text(edit, "#nameTextFieldInput").setText("Кеш: изменённая книга");
+                ((ComboBox<?>) edit.lookup("#authorComboBox")).getEditor().setText("Кеш-автор изменённый");
+                text(edit, "#priceFieldInput").setText("250");
+                button(edit, "#saveBookButton").fire();
+            } catch (Throwable error) {
+                failure.set(error);
+                List.copyOf(Window.getWindows()).stream()
+                    .filter(window -> window != main && window != details).forEach(Window::hide);
+            }
+        });
+        button(details.getScene(), "#editBookButton").fire();
+        assertNull(failure.get());
+        assertEquals("Кеш: изменённая книга", ((BookDTO) table.getItems().get(0)).getName());
+        assertEquals("250 ₽", ((Label) details.getScene().lookup("#priceLabel")).getText());
+        assertCachedAuthor(scene, "Кеш-автор изменённый", 1);
+        Platform.runLater(() -> {
+            DialogPane pane = (DialogPane) shownStage("Удаление книги").getScene().lookup(".dialog-pane");
+            ButtonType accept = pane.getButtonTypes().stream()
+                .filter(type -> type.getButtonData() == ButtonBar.ButtonData.OK_DONE).findFirst().orElseThrow();
+            ((Button) pane.lookupButton(accept)).fire();
+        });
+        button(details.getScene(), "#deleteBookButton").fire();
+        assertFalse(details.isShowing());
+        assertTrue(table.getItems().isEmpty(), "Deleting a matching book must reapply the active filters");
+        button(scene, "#filtersButton").fire();
+        awaitFilterOptions(scene);
+        assertFalse(scene.lookup("#filter-author").lookupAll(".filter-option").stream()
+            .map(CheckBox.class::cast).anyMatch(choice -> choice.getText().startsWith("Кеш-автор")),
+            "Deleted and replaced authors must disappear from the warmed option domain");
+        button(scene, "#cancelFiltersButton").fire();
+        button(scene, "#resetFiltersButton").fire();
+        assertEquals(7, table.getItems().size());
+    }
+
+    private static Stage shownStage(String title) {
+        return Window.getWindows().stream().filter(window -> window instanceof Stage stage
+            && stage.isShowing() && title.equals(stage.getTitle())).map(Stage.class::cast).findFirst().orElseThrow();
+    }
+
+    private static void assertCachedAuthor(Scene scene, String author, long count) {
+        button(scene, "#filtersButton").fire();
+        awaitFilterOptions(scene);
+        CheckBox choice = scene.lookup("#filter-author").lookupAll(".filter-option").stream()
+            .map(CheckBox.class::cast).filter(value -> author.equals(value.getText())).findFirst().orElseThrow();
+        assertEquals("(" + count + ")", ((Label) choice.getGraphic()).getText());
+        button(scene, "#cancelFiltersButton").fire();
+    }
+
+    private static void assertFiltersWorkflow(Stage main, TableView<?> table) throws Exception {
+        Scene scene = main.getScene();
+        button(scene, "#filtersButton").fire();
+        layout(main);
+        assertNull(scene.lookup("#filter-hasAnyAudioBookSite"));
+        assertEquals(13, scene.getRoot().lookupAll(".filter-section").size());
+        for (String field : List.of("pages", "publicationYear")) {
+            ComboBox<?> operations = (ComboBox<?>) scene.lookup("#filter-" + field + "-operation");
+            assertFalse(operations.getItems().contains(NumericOperation.EMPTY));
+            assertFalse(operations.getItems().contains(NumericOperation.NOT_EMPTY));
+            assertEquals(7, operations.getItems().size());
+        }
+        for (String field : List.of("hardCover", "read", "autograph")) {
+            assertEquals(2, scene.lookup("#filter-" + field).lookupAll(".filter-option").size());
+        }
+        ScrollPane scroll = (ScrollPane) scene.lookup("#filterScroll");
+        assertTrue(scroll.getContent().getBoundsInLocal().getHeight() > scroll.getViewportBounds().getHeight());
+        double footerY = scene.lookup("#filterFooter").localToScene(0, 0).getY();
+        scroll.setVvalue(1);
+        layout(main);
+        assertEquals(footerY, scene.lookup("#filterFooter").localToScene(0, 0).getY(), 0.1);
+        assertInside(scene, "#applyFiltersButton", "#cancelFiltersButton");
+        Button applyButton = button(scene, "#applyFiltersButton");
+        applyButton.requestFocus();
+        applyButton.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.TAB, false, false, false, false));
+        assertSame(scene.lookup("#closeFiltersButton"), scene.getFocusOwner(), "Tab stays inside the drawer");
+        scene.getFocusOwner().fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.TAB, true, false, false, false));
+        assertSame(applyButton, scene.getFocusOwner(), "Shift+Tab stays inside the drawer");
+        CheckBox unread = (CheckBox) scene.lookup("#filter-read-option-1");
+        unread.fire();
+        awaitFilterOptions(scene);
+        assertEquals("(1)", ((Label) ((CheckBox) scene.lookup("#filter-read-option-0")).getGraphic()).getText());
+        assertEquals("(6)", ((Label) unread.getGraphic()).getText());
+        assertEquals(7, table.getItems().size());
+        button(scene, "#cancelFiltersButton").fire();
+        button(scene, "#filtersButton").fire();
+        assertFalse(scene.lookup("#filterLoading").isVisible(), "Reopening a warmed filter panel must reuse cached options");
+        assertFalse(((CheckBox) scene.lookup("#filter-read-option-1")).isSelected());
+        text(scene, "#filter-publicationYear-first").setText("2020");
+        text(scene, "#filter-publicationYear-second").setText("2000");
+        button(scene, "#applyFiltersButton").fire();
+        assertTrue(scene.lookup("#filterEditor").isVisible());
+        assertFalse(((Label) scene.lookup("#filterError")).getText().isBlank());
+        assertEquals(7, table.getItems().size());
+        text(scene, "#filter-publicationYear-first").setText("1965");
+        text(scene, "#filter-publicationYear-second").setText("1966");
+        button(scene, "#applyFiltersButton").fire();
+        assertEquals(2, table.getItems().size());
+        ((Button) scene.lookup("#chip-publicationYear").lookup(".chip-close")).fire();
+        assertEquals(7, table.getItems().size());
+
+        button(scene, "#filtersButton").fire();
+        @SuppressWarnings("unchecked")
+        ComboBox<NumericOperation> priceOperation = (ComboBox<NumericOperation>) scene.lookup("#filter-price-operation");
+        priceOperation.setValue(NumericOperation.EQUALS);
+        text(scene, "#filter-price-first").setText("1250,5");
+        button(scene, "#applyFiltersButton").fire();
+        assertEquals(1, table.getItems().size());
+        button(scene, "#resetFiltersButton").fire();
+
+        button(scene, "#filtersButton").fire();
+        assertEquals("Бесценно", priceOperation.getConverter().toString(NumericOperation.EMPTY));
+        assertEquals("Стоимость указана", priceOperation.getConverter().toString(NumericOperation.NOT_EMPTY));
+        priceOperation.setValue(NumericOperation.EMPTY);
+        button(scene, "#applyFiltersButton").fire();
+        assertEquals(1, table.getItems().size());
+        assertEquals("1984", ((BookDTO) table.getItems().get(0)).getName());
+        assertTrue(((Label) scene.lookup("#chip-price").lookup(".label")).getText().contains("Бесценно"));
+        button(scene, "#filtersButton").fire();
+        priceOperation.setValue(NumericOperation.NOT_EMPTY);
+        button(scene, "#applyFiltersButton").fire();
+        assertEquals(6, table.getItems().size());
+        button(scene, "#resetFiltersButton").fire();
+
+        button(scene, "#filtersButton").fire();
+        for (Node heading : scene.getRoot().lookupAll(".filter-heading")) {
+            if (!List.of("filter-read-heading", "filter-autograph-heading", "filter-hardCover-heading").contains(heading.getId())) {
+                ((Button) heading).fire();
+            }
+        }
+        scroll.setVvalue(0.55);
+        layout(main);
+        capture(scene, "filters-boolean");
+        button(scene, "#cancelFiltersButton").fire();
+        button(scene, "#filtersButton").fire();
+        for (String field : List.of("name", "author", "publisher", "pages", "publicationYear", "genre", "cycleName", "cycleEnded", "hasCoverImage", "price")) {
+            button(scene, "#filter-" + field + "-heading").fire();
+        }
+        text(scene, "#filter-name-value").setText("Дюн");
+        selectChoice(scene, "author", "Фрэнк Герберт");
+        selectChoice(scene, "publisher", "АСТ");
+        text(scene, "#filter-pages-first").setText("0");
+        text(scene, "#filter-pages-second").setText("1000");
+        text(scene, "#filter-publicationYear-first").setText("1900");
+        text(scene, "#filter-publicationYear-second").setText("2100");
+        selectChoice(scene, "read", "Не прочитано");
+        selectChoice(scene, "autograph", "Нет");
+        selectChoice(scene, "hardCover", "Есть");
+        selectChoice(scene, "genre", "Фантастика");
+        selectChoice(scene, "cycleName", "Хроники Дюны");
+        selectChoice(scene, "cycleEnded", "Завершён");
+        selectChoice(scene, "hasCoverImage", "Нет");
+        text(scene, "#filter-price-first").setText("0");
+        text(scene, "#filter-price-second").setText("9999");
+        button(scene, "#applyFiltersButton").fire();
+        assertEquals(2, table.getItems().size());
+        main.setWidth(812);
+        settle(main);
+        assertEquals(812, scene.getWidth(), 1);
+        FilterChips chips = (FilterChips) scene.lookup("#activeFilters");
+        assertTrue(button(scene, "#expandFiltersButton").isVisible());
+        assertFalse(chips.isExpanded());
+        Node cachedNameEditor = scene.lookup("#filter-name");
+        Button expandTags = button(scene, "#expandFiltersButton");
+        assertTrue(expandTags.getText() == null || expandTags.getText().isEmpty());
+        assertEquals(0, expandTags.getGraphic().getRotate(), 0.1);
+        assertTrue(expandTags.getGraphic() instanceof LineIcon);
+        Label hiddenCount = (Label) scene.lookup("#hiddenFiltersCount");
+        assertTrue(hiddenCount.isVisible());
+        long hiddenTags = scene.getRoot().lookupAll(".filter-chip").stream().filter(node -> !node.isVisible()).count();
+        assertEquals(Long.toString(hiddenTags), hiddenCount.getText());
+        assertTagActionsDoNotOverlap(main);
+        double collapsedHeight = chips.getHeight();
+        capture(scene, "filters-tags-collapsed");
+        button(scene, "#expandFiltersButton").fire();
+        layout(main);
+        assertTrue(chips.isExpanded());
+        assertEquals(180, expandTags.getGraphic().getRotate(), 0.1);
+        assertFalse(hiddenCount.isVisible());
+        assertTagActionsDoNotOverlap(main);
+        assertEquals(button(scene, "#resetFiltersButton").localToScene(0, 0).getY(), expandTags.localToScene(0, 0).getY(), 1);
+        assertTrue(chips.getHeight() > collapsedHeight);
+        capture(scene, "filters-tags-expanded");
+        table.getSelectionModel().select(0);
+        table.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+        Stage details = (Stage) Window.getWindows().stream()
+            .filter(window -> window instanceof Stage stage && "Карточка книги".equals(stage.getTitle()))
+            .findFirst().orElseThrow();
+        assertTrue(chips.isExpanded());
+        AtomicReference<Throwable> editFailure = new AtomicReference<>();
+        Platform.runLater(() -> {
+            try {
+                Stage edit = (Stage) Window.getWindows().stream()
+                    .filter(window -> window instanceof Stage stage && "Изменить книгу".equals(stage.getTitle()))
+                    .findFirst().orElseThrow();
+                text(edit.getScene(), "#pagesCountFieldInput").setText("2000");
+                button(edit.getScene(), "#saveBookButton").fire();
+            } catch (Throwable e) {
+                editFailure.set(e);
+                List.copyOf(Window.getWindows()).stream().filter(window -> window != main && window != details).forEach(Window::hide);
+            }
+        });
+        button(details.getScene(), "#editBookButton").fire();
+        assertNull(editFailure.get(), "Editing the book through its window must succeed");
+        assertEquals(1, table.getItems().size(), "Existing filters must be reapplied after editing");
+        details.hide();
+        layout(main);
+        assertTrue(chips.isExpanded(), "Closing details/edit must preserve expanded tags");
+        button(scene, "#filtersButton").fire();
+        assertSame(cachedNameEditor, scene.lookup("#filter-name"), "Opening filters must reuse existing editors");
+        ((ComboBox<?>) scene.lookup("#filter-pages-operation")).show();
+        scene.lookup("#filter-pages").fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE, false, false, false, false));
+        assertTrue(scene.lookup("#filterEditor").isVisible(), "First Escape closes the combo popup");
+        scene.lookup("#filter-pages").fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE, false, false, false, false));
+        assertFalse(scene.lookup("#filterEditor").isVisible());
+        assertTrue(chips.isExpanded());
+        button(scene, "#resetFiltersButton").fire();
+        assertNull(scene.lookup("#searchQueryField"), "The library must only use visual filters");
+        assertEquals(7, table.getItems().size());
+        scene.getRoot().fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.F, false, true, false, false));
+        assertTrue(scene.lookup("#filterEditor").isVisible(), "Ctrl+F must open the filter drawer");
+        text(scene, "#filter-name-value").setText("Дюна");
+        selectChoice(scene, "read", "Не прочитано");
+        button(scene, "#applyFiltersButton").fire();
+        assertEquals(1, table.getItems().size());
+        assertEquals("Дюна", ((BookDTO) table.getItems().get(0)).getName());
+        ((MenuBar) scene.lookup(".menu-bar")).getMenus().get(2).getItems().get(0).fire();
+        assertEquals(1, table.getItems().size(), "Refresh must preserve the applied filters");
+        button(scene, "#resetFiltersButton").fire();
+        assertEquals(7, table.getItems().size());
+        button(scene, "#filtersButton").fire();
+        CheckBox longAuthor = scene.lookup("#filter-author").lookupAll(".filter-option").stream()
+            .map(CheckBox.class::cast)
+            .filter(choice -> choice.getText().startsWith("Очень длинное"))
+            .findFirst().orElseThrow();
+        longAuthor.fire();
+        button(scene, "#applyFiltersButton").fire();
+        layout(main);
+        Node chip = scene.lookup("#chip-author");
+        Label label = (Label) chip.lookup(".label");
+        assertTrue(label.getHeight() >= label.prefHeight(label.getWidth()) - 1, "A long tag must show its complete wrapped text");
+        assertInside(scene, "#chip-author");
+        assertTrue(chip.lookup(".chip-close").localToScene(chip.lookup(".chip-close").getBoundsInLocal()).getMaxX() <= scene.getWidth());
+        capture(scene, "filters-long-tag");
+        button(scene, "#resetFiltersButton").fire();
+        System.setProperty("booklibrary.reducedMotion", "false");
+        button(scene, "#filtersButton").fire();
+        assertTrue(scene.lookup("#filterPanel").getTranslateX() > 0);
+        settle(main, 180);
+        assertEquals(0, scene.lookup("#filterPanel").getTranslateX(), 0.1);
+        button(scene, "#cancelFiltersButton").fire();
+        settle(main, 180);
+        assertFalse(scene.lookup("#filterEditor").isVisible());
+        System.setProperty("booklibrary.reducedMotion", "true");
+    }
+
+    private static void settle(Stage stage) {
+        settle(stage, 80);
+    }
+
+    private static void settle(Stage stage, double milliseconds) {
+        Object key = new Object();
+        PauseTransition pause = new PauseTransition(Duration.millis(milliseconds));
+        pause.setOnFinished(event -> Platform.exitNestedEventLoop(key, null));
+        pause.play();
+        Platform.enterNestedEventLoop(key);
+        layout(stage);
+    }
+
+    private static Button button(Scene scene, String selector) {
+        if (selector.startsWith("#filter-")) {
+            awaitFilterOptions(scene);
+        }
+        Node node = scene.lookup(selector);
+        assertNotNull(node, selector);
+        return (Button) node;
+    }
+
+    private static TextField text(Scene scene, String selector) {
+        awaitFilterOptions(scene);
+        Node node = scene.lookup(selector);
+        assertNotNull(node, selector);
+        return (TextField) node;
+    }
+
+    private static void selectChoice(Scene scene, String field, String label) {
+        awaitFilterOptions(scene);
+        CheckBox choice = scene.lookup("#filter-" + field).lookupAll(".filter-option").stream()
+            .map(CheckBox.class::cast)
+            .filter(checkBox -> label.equals(checkBox.getText()))
+            .findFirst().orElseThrow();
+        choice.fire();
+    }
+
+    private static void awaitFilterOptions(Scene scene) {
+        Node loading = scene.lookup("#filterLoading");
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        while (loading != null && loading.isVisible()) {
+            assertTrue(System.nanoTime() < deadline, "Filter values must finish preparing");
+            settle((Stage) scene.getWindow(), 10);
+        }
+    }
+
+    private static void assertTagActionsDoNotOverlap(Stage main) {
+        Scene scene = main.getScene();
+        for (int width : new int[]{900, 1050, 1252, 1000, 840, 812}) {
+            main.setWidth(width);
+            settle(main, 40);
+            Node reset = scene.lookup("#resetFiltersButton");
+            Node expand = scene.lookup("#expandFiltersButton");
+            Node count = scene.lookup("#hiddenFiltersCount");
+            double resetLeft = reset.localToScene(reset.getBoundsInLocal()).getMinX();
+            assertTrue(expand.localToScene(expand.getBoundsInLocal()).getMaxX() + 4 <= resetLeft,
+                "Expand action must not overlap reset at width " + width);
+            if (count.isVisible()) {
+                assertTrue(count.localToScene(count.getBoundsInLocal()).getMaxX() + 4 <= resetLeft,
+                    "Hidden tag count must not overlap reset at width " + width);
+            }
+            assertTrue(reset.localToScene(reset.getBoundsInLocal()).getMaxX() <= scene.getWidth());
+        }
+    }
+
+    private static void capture(Scene scene, String name) throws Exception {
+        if (!Boolean.getBoolean("booklibrary.captureFilters")) {
+            return;
+        }
+        WritableImage image = scene.getRoot().snapshot(null, null);
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        Path output = Path.of("target", name + ".ppm");
+        try (OutputStream stream = Files.newOutputStream(output)) {
+            stream.write(("P6\n" + width + " " + height + "\n255\n").getBytes(StandardCharsets.US_ASCII));
+            byte[] row = new byte[width * 3];
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int pixel = image.getPixelReader().getArgb(x, y);
+                    row[x * 3] = (byte) (pixel >> 16);
+                    row[x * 3 + 1] = (byte) (pixel >> 8);
+                    row[x * 3 + 2] = (byte) pixel;
+                }
+                stream.write(row);
+            }
+        }
     }
 
     private static FXMLLoader loader(String file) { return new FXMLLoader(SageViewsTest.class.getResource(RESOURCE + file)); }

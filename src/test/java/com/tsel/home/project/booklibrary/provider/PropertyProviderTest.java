@@ -4,10 +4,10 @@ import static com.tsel.home.project.booklibrary.TestFileUtils.readFileContent;
 import static com.tsel.home.project.booklibrary.TestFileUtils.writeFileContent;
 import static com.tsel.home.project.booklibrary.helper.PropertyProvider.MAX_ARCHIVED_BACKUPS;
 import static com.tsel.home.project.booklibrary.helper.PropertyProvider.PROPERTY_FILE_PATH;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.tsel.home.project.booklibrary.helper.PropertyProvider;
 import java.nio.file.Files;

@@ -1,0 +1,161 @@
+.filter-backdrop {
+    -fx-background-color: #20372C;
+    -fx-opacity: 0.13;
+}
+
+.filter-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent transparent #C4CFC7;
+    -fx-border-width: 1;
+}
+
+.filter-header {
+    -fx-padding: 12 16;
+    -fx-min-height: 56;
+    -fx-border-color: transparent transparent #DFE6E0 transparent;
+}
+
+.filter-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+}
+
+.filter-scroll, .filter-scroll > .viewport {
+    -fx-background-color: #FFFFFF;
+    -fx-background-insets: 0;
+}
+
+.filter-scroll {
+    -fx-padding: 0;
+}
+
+.filter-fields {
+    -fx-padding: 0 16;
+    -fx-fill-width: true;
+}
+
+.filter-section {
+    -fx-padding: 12 0;
+    -fx-border-color: transparent transparent #DFE6E0 transparent;
+}
+
+.filter-heading, .filter-heading:focused {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 4 0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-weight: 600;
+    -fx-wrap-text: true;
+}
+
+.filter-heading:hover {
+    -fx-background-color: #EEF4EF;
+}
+
+.filter-heading:focus-visible {
+    -fx-border-color: #2F6B4F;
+}
+
+.filter-heading LineIcon {
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
+}
+
+.filter-option {
+    -fx-min-height: 32;
+    -fx-padding: 4 0;
+    -fx-label-padding: 0 0 0 8;
+}
+
+.filter-option-count {
+    -fx-font-size: 12px;
+    -fx-text-fill: #52665A;
+}
+
+.filter-group-label {
+    -fx-padding: 12 0 0 0;
+    -fx-font-weight: 600;
+    -fx-text-fill: #52665A;
+}
+
+.filter-footer {
+    -fx-padding: 8 16 12 16;
+    -fx-border-color: #C4CFC7 transparent transparent transparent;
+}
+
+.filter-fields .invalid {
+    -fx-border-color: #B3261E;
+    -fx-border-radius: 6;
+}
+
+.active-filter-strip {
+    -fx-padding: 7 16;
+}
+
+.filter-chip {
+    -fx-background-color: #E8F0E9;
+    -fx-border-color: #C4CFC7;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 0 4 0 8;
+}
+
+.filter-chip .label {
+    -fx-font-size: 12px;
+}
+
+.filter-chip .chip-close, .filter-chip .chip-close:focused {
+    -fx-min-width: 24;
+    -fx-pref-width: 24;
+    -fx-max-width: 24;
+    -fx-min-height: 24;
+    -fx-pref-height: 24;
+    -fx-max-height: 24;
+    -fx-padding: 2;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.filter-chip .chip-close:focused {
+    -fx-border-color: #2F6B4F;
+}
+
+.chip-close LineIcon {
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+}
+
+.filter-tag-action, .filter-tag-action:focused {
+    -fx-min-height: 26;
+    -fx-padding: 3 6;
+    -fx-font-size: 12px;
+}
+
+.filter-choice-toggle, .filter-choice-toggle:focused {
+    -fx-min-height: 28;
+    -fx-padding: 2 4;
+    -fx-font-size: 12px;
+}
+
+.filter-tags-toggle, .filter-tags-toggle:focused {
+    -fx-min-width: 26;
+    -fx-pref-width: 26;
+    -fx-max-width: 26;
+    -fx-min-height: 26;
+    -fx-pref-height: 26;
+    -fx-max-height: 26;
+    -fx-padding: 2;
+}
+
+.filter-hidden-count {
+    -fx-min-width: 22;
+    -fx-pref-width: 22;
+    -fx-min-height: 22;
+    -fx-pref-height: 22;
+    -fx-alignment: CENTER;
+    -fx-background-color: #2F6B4F;
+    -fx-background-radius: 11;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}

@@ -3,7 +3,6 @@ package com.tsel.home.project.booklibrary.javafx;
 import com.tsel.home.project.booklibrary.dao.data.*;
 import com.tsel.home.project.booklibrary.dao.repository.impl.*;
 import com.tsel.home.project.booklibrary.helper.*;
-import com.tsel.home.project.booklibrary.search.SearchService;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -14,7 +13,7 @@ final class DesignFixture {
     static void initialize(Path directory) {
         for (Class<?> type : java.util.List.of(PropertyProvider.class, AudioBookSiteRepository.class, AuthorRepository.class,
             PublisherRepository.class, CycleRepository.class, GenreRepository.class, UserSettingsRepository.class,
-            BookRepository.class, ImageProvider.class, SearchService.class, TableScroll.class, DateProvider.class))
+            BookRepository.class, ImageProvider.class, TableScroll.class, DateProvider.class))
             previous.put(type, SimpleApplicationContext.getBean(type));
         SimpleApplicationContext.replaceBean(PropertyProvider.class, () -> new PropertyProvider(directory));
         SimpleApplicationContext.replaceBean(AudioBookSiteRepository.class, () -> new AudioBookSiteRepository(directory));
@@ -25,7 +24,6 @@ final class DesignFixture {
         SimpleApplicationContext.replaceBean(UserSettingsRepository.class, () -> new UserSettingsRepository(directory));
         SimpleApplicationContext.replaceBean(BookRepository.class, () -> new BookRepository(directory));
         SimpleApplicationContext.replaceBean(ImageProvider.class, ImageProvider::new);
-        SimpleApplicationContext.replaceBean(SearchService.class, SearchService::new);
         SimpleApplicationContext.replaceBean(TableScroll.class, TableScroll::new);
         SimpleApplicationContext.replaceBean(DateProvider.class, DateProvider::new);
     }
@@ -54,7 +52,7 @@ final class DesignFixture {
         for (int i = 0; i < names.length; i++) {
             UUID id = books.save(Book.builder().name(names[i]).authorId(i == names.length - 1 ? longAuthor : author).publisherId(publisher)
                 .genreId(genre).cycleId(i < 2 ? cycle : null).numberInSeries(i < 2 ? i + 1 : null)
-                .pages(704 - i * 48).publicationYear(1965 + i).price(1250.50 + i)
+                .pages(704 - i * 48).publicationYear(1965 + i).price(i == 5 ? null : i == 6 ? 0.0 : 1250.50 + i)
                 .read(i == 4).hardCover(true).autograph(false)
                 .coverImgAbsolutePath("Z:/missing-cover.png").build());
             if (first == null) first = id;
