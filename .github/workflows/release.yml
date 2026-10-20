@@ -2,6 +2,11 @@ name: Publish release from selected branch
 
 on:
     workflow_dispatch:
+        inputs:
+            run_tests:
+                description: Run tests before publishing
+                type: boolean
+                default: false
 
 permissions:
     contents: read
@@ -33,4 +38,5 @@ jobs:
                   RELEASE_COMMIT: ${{ github.sha }}
                   RELEASE_RUN: ${{ github.run_number }}
                   RELEASE_REPOSITORY: ${{ github.repository }}
-              run: ./build/release.ps1 -Branch $env:RELEASE_BRANCH -Commit $env:RELEASE_COMMIT -RunNumber $env:RELEASE_RUN -Repository $env:RELEASE_REPOSITORY
+                  RELEASE_RUN_TESTS: ${{ inputs.run_tests }}
+              run: ./build/release.ps1 -Branch $env:RELEASE_BRANCH -Commit $env:RELEASE_COMMIT -RunNumber $env:RELEASE_RUN -Repository $env:RELEASE_REPOSITORY -RunTests:($env:RELEASE_RUN_TESTS -eq 'true')

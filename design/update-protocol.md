@@ -1,10 +1,12 @@
 # Release and update protocol
 
-The published baseline is [4.1.0](https://github.com/TselAnton/BookLibrary/releases/tag/v4.1.0), built from main without an updater. Development continues as `5.0.0-SNAPSHOT`. Stable 5.0.0 must wait until development is complete. Installing 5.0.0 over the legacy baseline requires a one-time manual JAR replacement; subsequent update-capable versions can use the in-app flow.
+The published baseline is [4.1.0](https://github.com/TselAnton/BookLibrary/releases/tag/v4.1.0), built from main without an updater. The current Maven revision is `5.0.0`. Installing 5.0.0 over the legacy baseline requires a one-time manual JAR replacement; subsequent update-capable versions can use the in-app flow.
 
 ## Release job
 
-`.github/workflows/release.yml` is manually dispatched from the selected branch. `build/release.ps1` reads the Maven version, checks the exact commit, runs `clean verify` on Windows x64 / Java 17, and prepares an unsigned fat JAR. Main publishes stable versions; other branches publish unique `-preview.<run>.<commit>` versions and never become latest. A main SNAPSHOT is rejected before any release is created. The new POM uses Maven's revision property. The legacy baseline also works with its fixed 4.1.0 POM.
+`.github/workflows/release.yml` is manually dispatched from the selected branch. `build/release.ps1` reads the Maven version, checks the exact commit, runs `clean verify` on Windows x64 / Java 17, and prepares an unsigned fat JAR. Release builds skip test execution by default with `-DskipTests=true`, while still compiling tests and checking the embedded helper. Enable `Run tests before publishing` in the dispatch form or pass `-RunTests` to the script to run all tests and stop publication on failure. Automatic builds and tests on push and pull requests are disabled; run tests locally with `mvn test`. Main publishes stable versions; other branches publish unique `-preview.<run>.<commit>` versions and never become latest. A main SNAPSHOT is rejected before any release is created. The new POM uses Maven's revision property. The legacy baseline also works with its fixed 4.1.0 POM.
+
+The script logs the selected branch, commit, POM version and resulting tag before building. With revision `5.0.0`, main creates `v5.0.0`. Existing tags shown during checkout, such as `[new tag] v4.1.0 -> v4.1.0`, are fetched history and do not select the new release version. Use a new workflow dispatch after pushing changes; rerunning an earlier run uses its original commit.
 
 Publication is staged: push a new version tag, create a draft, upload every asset, then publish. Existing tags and releases are never overwritten. Failed uploads leave an unpublished draft; retry requires explicit cleanup of the draft/tag, or a new version. The job uses GITHUB_TOKEN with contents:write; no token is bundled in the application. The workflow must exist in main before it can be dispatched from GitHub's UI.
 

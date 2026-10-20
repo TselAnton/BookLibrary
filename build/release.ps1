@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string] $Commit,
     [Parameter(Mandatory)][ValidatePattern('^[0-9]+$')][string] $RunNumber,
     [string] $Repository = 'TselAnton/BookLibrary',
-    [switch] $BuildOnly
+    [switch] $BuildOnly,
+    [switch] $RunTests
 )
 
 $ErrorActionPreference = 'Stop'
@@ -28,6 +29,7 @@ if ($stable -and $projectVersion.EndsWith('-SNAPSHOT')) {
 $baseVersion = $projectVersion -replace '-SNAPSHOT$', ''
 $releaseVersion = if ($stable) { $baseVersion } else { "$baseVersion-preview.$RunNumber.$($Commit.Substring(0, 8))" }
 $releaseTag = "v$releaseVersion"
+Write-Output "Preparing release $releaseTag from branch $Branch at commit $Commit (POM version: $projectVersion)."
 if (-not $BuildOnly) {
     gh release view $releaseTag --repo $Repository *> $null
     if ($LASTEXITCODE -eq 0) {
@@ -41,7 +43,10 @@ if (-not $BuildOnly) {
         throw 'Could not check remote release tags.'
     }
 }
-mvn --batch-mode --no-transfer-progress "-Drevision=$releaseVersion" '-Dbooklibrary.platform=windows-x86_64' clean verify
+$buildArguments = @('--batch-mode', '--no-transfer-progress', "-Drevision=$releaseVersion",
+    '-Dbooklibrary.platform=windows-x86_64', "-DskipTests=$(-not $RunTests.IsPresent)".ToLowerInvariant(), 'clean', 'verify')
+Write-Output "Run tests: $($RunTests.IsPresent)."
+& mvn @buildArguments
 if ($LASTEXITCODE -ne 0) {
     throw 'Build or tests failed. No release has been created.'
 }
