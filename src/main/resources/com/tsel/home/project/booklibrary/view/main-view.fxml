@@ -12,7 +12,7 @@
                 <Menu text="Файлы">
                     <items>
                         <MenuItem fx:id="exportDataItem" text="Экспортировать данные" onAction="#exportData"/>
-                        <MenuItem text="Открыть директорию проекта" onAction="#openApplicationDirectory"/>
+                        <MenuItem text="Открыть расположение программы" onAction="#openApplicationDirectory"/>
                         <SeparatorMenuItem/>
                         <MenuItem text="Выход" onAction="#exitApplication"/>
                     </items>
@@ -23,6 +23,7 @@
                         <MenuItem text="Правка авторов" onAction="#editAuthors"/>
                         <MenuItem text="Правка жанров" onAction="#editGenres"/>
                         <MenuItem text="Правка публицистов" onAction="#editPublishers"/>
+                        <MenuItem text="Правка книг" onAction="#editBookProperties"/>
                     </items>
                 </Menu>
                 <Menu text="Справка">

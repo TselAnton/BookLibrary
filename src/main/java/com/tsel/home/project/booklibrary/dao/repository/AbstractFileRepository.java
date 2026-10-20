@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.time.Clock;
+import java.util.function.BiConsumer;
 import java.util.*;
 import java.util.Map.Entry;
 import javax.annotation.Nullable;
@@ -74,6 +75,10 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
 
     @Override
     public K save(E entity) {
+        return save(entity, this::prepareSave);
+    }
+
+    protected K save(E entity, BiConsumer<E, E> preparation) {
         boolean ownTransaction = !isTransactionOpen;
         if (ownTransaction) {
             beginTransaction();
@@ -86,7 +91,7 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
             if (schema != null) {
                 candidate = GSON.fromJson(schema.normalize(GSON.toJsonTree(candidate).getAsJsonObject(), storageClock()), entityClass);
             }
-            prepareSave(candidate, copy(repositoryMap.get(entity.getId())));
+            preparation.accept(candidate, copy(repositoryMap.get(entity.getId())));
             checkConstrains(candidate);
             repositoryMap.put(candidate.getId(), candidate);
             if (ownTransaction) {

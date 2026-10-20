@@ -26,6 +26,7 @@ import com.tsel.home.project.booklibrary.ui.BookPriceFormatter;
 import com.tsel.home.project.booklibrary.ui.LineIcon;
 import com.tsel.home.project.booklibrary.ui.RandomBookAnimation;
 import com.tsel.home.project.booklibrary.ui.ReferenceEditorWindow;
+import com.tsel.home.project.booklibrary.ui.BookEditorWindow;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
 import com.tsel.home.project.booklibrary.ui.UpdateWindow;
 import com.tsel.home.project.booklibrary.ui.WindowPlacement;
@@ -238,6 +239,11 @@ public class MainViewController extends AbstractViewController {
     @FXML
     public void editPublishers() {
         openReferenceEditor(ReferenceType.PUBLISHERS);
+    }
+
+    @FXML
+    public void editBookProperties() {
+        new BookEditorWindow(mainAnchorPane.getScene().getWindow(), this, this::refreshCatalog).show();
     }
 
     private void openReferenceEditor(ReferenceType type) {

@@ -109,7 +109,7 @@ public abstract class AbstractBookController extends AbstractViewController {
         for (ComboBox<ComboBoxDTO> c : List.of(getAuthorComboBox(), getPublisherComboBox(), getGenreComboBox(), getCycleComboBox()))
             values.add(Objects.toString(c.getEditor().getText(), ""));
         for (CheckBox c : List.of(getReadCheckBox(), getAutographCheckBox(), getHardCoverCheckBox(), getCycleEndedCheckBox()))
-            values.add(Boolean.toString(c.isSelected()));
+            values.add(c.isIndeterminate() ? "null" : Boolean.toString(c.isSelected()));
         return values;
     }
 
@@ -394,8 +394,8 @@ public abstract class AbstractBookController extends AbstractViewController {
         String bookPagesCount = getInputText(getPagesCountFieldInput());
         String bookPublishYear = getInputText(getPublicationYearFieldInput());
         String bookPrice = getInputText(getPriceFieldInput());
-        boolean readBookFlag = isChecked(getReadCheckBox());
-        boolean hardCoverFlag = isChecked(getHardCoverCheckBox());
+        Boolean readBookFlag = nullableChecked(getReadCheckBox());
+        Boolean hardCoverFlag = nullableChecked(getHardCoverCheckBox());
 
         ComboBoxDTO author = getSelectedComboBox(getAuthorComboBox(), AuthorDTO::new);
         ComboBoxDTO publisher = getSelectedComboBox(getPublisherComboBox(), PublisherDTO::new);
@@ -432,7 +432,7 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .pages(stringToInteger(bookPagesCount))
                 .publicationYear(stringToInteger(bookPublishYear))
                 .read(readBookFlag)
-                .autograph(isChecked(getAutographCheckBox()))
+                .autograph(nullableChecked(getAutographCheckBox()))
                 .cycleId(newCycle != null ? newCycle.getId() : null)
                 .numberInSeries(newCycle != null ? stringToInteger(cycleBookNumber) : null)
                 .coverImgAbsolutePath(imagePath)
@@ -494,6 +494,10 @@ public abstract class AbstractBookController extends AbstractViewController {
     private String getInputText(TextField textField) {
         String textFieldText = textField.getText();
         return isNotBlank(textFieldText) ? textFieldText.trim() : null;
+    }
+
+    protected Boolean nullableChecked(CheckBox checkBox) {
+        return checkBox.isSelected();
     }
 
     private boolean isChecked(CheckBox checkBox) {

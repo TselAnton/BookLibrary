@@ -111,7 +111,7 @@ public class EditBookController extends AbstractBookController {
         this.mainController = parentController;
 
         nameTextFieldInput.setText(bookForEdit.getName());
-        pagesCountFieldInput.setText(String.valueOf(bookForEdit.getPages()));
+        pagesCountFieldInput.setText(Objects.toString(bookForEdit.getPages(), ""));
         publicationYearFieldInput.setText(String.valueOf(bookForEdit.getPublicationYear()));
         coverImagePathFieldInput.setText(bookForEdit.getCoverImgAbsolutePath());
 
@@ -155,6 +155,14 @@ public class EditBookController extends AbstractBookController {
     @FXML
     public void editBook() {
         saveNewBook(bookForEdit.getId(), bookForEdit.getAudioBookSiteIds());
+    }
+
+    @Override
+    protected Boolean nullableChecked(CheckBox checkBox) {
+        Boolean original = checkBox == readCheckBox ? bookForEdit.getRead()
+            : checkBox == autographCheckBox ? bookForEdit.getAutograph() : bookForEdit.getHardCover();
+        // Preserve legacy null when the displayed flag was not changed.
+        return checkBox.isSelected() == TRUE.equals(original) ? original : Boolean.valueOf(checkBox.isSelected());
     }
 
     @Override

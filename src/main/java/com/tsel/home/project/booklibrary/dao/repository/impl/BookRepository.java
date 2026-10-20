@@ -9,6 +9,7 @@ import com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepository;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @FileStorageName("bookStorage.json")
@@ -27,6 +28,33 @@ public class BookRepository extends AbstractFileRepository<UUID, Book> {
 
     public BookRepository() {
         this(DEFAULT_REPOSITORY_PATH);
+    }
+
+    /** Явная корректировка дат существующей книги; обычный save сохраняет автоматические правила. */
+    public UUID saveWithDates(Book book, Set<String> editedDates) {
+        Set<String> dates = Set.copyOf(editedDates);
+        if (!Set.of("createdAt", "updatedAt", "readUpdatedAt").containsAll(dates)) {
+            throw new IllegalArgumentException("Неизвестное поле даты");
+        }
+        if (book.getId() == null || !existById(book.getId())) {
+            throw new IllegalArgumentException("Книга больше не существует");
+        }
+        if (dates.contains("createdAt") && book.getCreatedAt() == null
+            || dates.contains("updatedAt") && book.getUpdatedAt() == null) {
+            throw new IllegalArgumentException("Даты создания и обновления обязательны");
+        }
+        return save(book, (candidate, previous) -> {
+            prepareSave(candidate, previous);
+            if (dates.contains("createdAt")) {
+                candidate.setCreatedAt(book.getCreatedAt());
+            }
+            if (dates.contains("updatedAt")) {
+                candidate.setUpdatedAt(book.getUpdatedAt());
+            }
+            if (dates.contains("readUpdatedAt")) {
+                candidate.setReadUpdatedAt(book.getReadUpdatedAt());
+            }
+        });
     }
 
     @Override

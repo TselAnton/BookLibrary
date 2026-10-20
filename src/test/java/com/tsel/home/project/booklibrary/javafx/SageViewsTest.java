@@ -512,7 +512,7 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
         assertEquals(1, table.getItems().size());
         assertEquals("Дюна", ((BookDTO) table.getItems().get(0)).getName());
         ((MenuBar) scene.lookup(".menu-bar")).getMenus().get(1).getItems().get(2).fire();
-        Stage genreEditor = shownStage("Редактировать жанры");
+        Stage genreEditor = shownStage(com.tsel.home.project.booklibrary.service.ReferenceType.GENRES.getTitle());
         text(genreEditor.getScene(), "#referenceName").appendText(" (правка)");
         button(genreEditor.getScene(), "#saveReferenceButton").fire();
         genreEditor.close();
