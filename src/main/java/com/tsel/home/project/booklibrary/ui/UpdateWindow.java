@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -34,6 +35,7 @@ public final class UpdateWindow {
     private final GitHubReleaseClient client;
     private final Label status = new Label();
     private final TextArea notes = new TextArea();
+    private final TitledPane releaseNotes = new TitledPane("Что нового", notes);
     private final ProgressBar progress = new ProgressBar();
     private final Button action = new Button("Проверить ещё раз");
     private final Button close = new Button("Закрыть");
@@ -56,19 +58,30 @@ public final class UpdateWindow {
         header.setMinHeight(48);
         status.setId("updateStatus");
         status.setWrapText(true);
-        status.setMinHeight(60);
+        status.setMinHeight(Region.USE_PREF_SIZE);
+        status.textProperty().addListener((observable, previous, text) -> resizeToContent());
         Label version = new Label("Текущая версия: " + AppVersion.current());
         version.getStyleClass().add("caption");
         progress.setId("updateProgress");
         progress.setMaxWidth(Double.MAX_VALUE);
+        progress.setProgress(0);
         notes.setId("updateNotes");
         notes.setEditable(false);
         notes.setWrapText(true);
         notes.setAccessibleText("Изменения в новой версии");
-        VBox.setVgrow(notes, Priority.ALWAYS);
-        VBox content = new VBox(12, version, status, progress, notes);
+        notes.setPrefHeight(160);
+        notes.setMinHeight(160);
+        notes.setMaxHeight(160);
+        releaseNotes.setId("updateReleaseNotes");
+        releaseNotes.getStyleClass().add("update-release-notes");
+        releaseNotes.setExpanded(false);
+        releaseNotes.setAnimated(false);
+        releaseNotes.setVisible(false);
+        releaseNotes.managedProperty().bind(releaseNotes.visibleProperty());
+        releaseNotes.expandedProperty().addListener((observable, previous, expanded) -> resizeToContent());
+        releaseNotes.visibleProperty().addListener((observable, previous, visible) -> resizeToContent());
+        VBox content = new VBox(12, version, status, progress, releaseNotes);
         content.setPadding(new Insets(16));
-        VBox.setVgrow(content, Priority.ALWAYS);
         action.setId("updateActionButton");
         action.getStyleClass().add("primary");
         close.setCancelButton(true);
@@ -79,7 +92,7 @@ public final class UpdateWindow {
         footer.setAlignment(Pos.CENTER_RIGHT);
         footer.getStyleClass().add("dialog-footer");
         VBox root = new VBox(header, content, footer);
-        root.setPrefSize(560, 400);
+        root.setPrefWidth(520);
         Scene scene = new Scene(root);
         SageTheme.install(stage, scene, "Проверить обновления", false);
         stage.setScene(scene);
@@ -103,16 +116,16 @@ public final class UpdateWindow {
     }
 
     public Stage show() {
+        check();
         WindowPlacement.positionRelativeToMainWindow(stage);
         stage.show();
-        check();
         return stage;
     }
 
     public Stage show(GitHubReleaseClient.Release available) {
+        showRelease(available);
         WindowPlacement.positionRelativeToMainWindow(stage);
         stage.show();
-        showRelease(available);
         return stage;
     }
 
@@ -122,7 +135,7 @@ public final class UpdateWindow {
     }
 
     private void check() {
-        notes.clear();
+        setReleaseNotes("");
         status.setText("Проверяем стабильные релизы GitHub…");
         Task<GitHubReleaseClient.Release> task = new Task<>() {
             @Override
@@ -139,12 +152,12 @@ public final class UpdateWindow {
 
     private void showRelease(GitHubReleaseClient.Release available) {
         release = available;
+        setReleaseNotes(release == null ? "" : release.notes());
         if (release == null) {
             status.setText("Новых стабильных версий нет.");
             action.setText("Проверить ещё раз");
             action.setOnAction(event -> check());
         } else {
-            notes.setText(release.notes());
             status.setText("Доступна версия " + release.version() + ". Размер: " + (release.size() / 1024 / 1024) + " МБ.");
             action.setText("Скачать обновление");
             action.setOnAction(event -> download());
@@ -153,6 +166,21 @@ public final class UpdateWindow {
                 action.setDisable(true);
             }
         }
+    }
+
+    private void setReleaseNotes(String text) {
+        notes.setText(text == null ? "" : text);
+        releaseNotes.setExpanded(false);
+        releaseNotes.setVisible(!notes.getText().isBlank());
+    }
+
+    private void resizeToContent() {
+        Platform.runLater(() -> {
+            if (stage.isShowing()) {
+                stage.getScene().getRoot().applyCss();
+                stage.sizeToScene();
+            }
+        });
     }
 
     private void download() {

@@ -155,6 +155,33 @@
     -fx-border-color: rgba(47, 107, 79, 0.24);
 }
 
+.update-release-notes {
+    -fx-text-fill: #20372C;
+}
+
+.update-release-notes > .title {
+    -fx-background-color: #E8F0E9;
+    -fx-background-insets: 0;
+    -fx-background-radius: 6;
+    -fx-padding: 8 10;
+    -fx-cursor: hand;
+}
+
+.update-release-notes > .title:hover, .update-release-notes:focused > .title {
+    -fx-background-color: #DFE6E0;
+}
+
+.update-release-notes > .title > .arrow-button > .arrow {
+    -fx-background-color: #2F6B4F;
+}
+
+.update-release-notes > .content {
+    -fx-background-color: transparent;
+    -fx-border-color: #C4CFC7;
+    -fx-border-width: 0 1 1 1;
+    -fx-padding: 8;
+}
+
 .message-dialog {
     -fx-background-color: #F3F6F2;
     -fx-padding: 0;
