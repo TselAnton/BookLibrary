@@ -8,10 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.tsel.home.project.booklibrary.UnitJavaFXTest;
 import com.tsel.home.project.booklibrary.dao.data.Book;
+import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -22,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -29,6 +33,83 @@ class ImageProviderTest extends UnitJavaFXTest {
 
     private static final String RED_IMAGE = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAASSURBVBhXY/jPwPAfhKEMhv8AR8oH+ax4QrwAAAAASUVORK5CYII=";
     private static final String BLUE_IMAGE = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAASSURBVBhXY2Bg+P8fgsHE//8AP9IH+WMJIRIAAAAASUVORK5CYII=";
+
+    @Test
+    void shouldPublishVisibleCoverBeforeQueuedBackgroundCovers(@TempDir Path directory) throws Exception {
+        CoverLoadExecutor executor = new CoverLoadExecutor(1);
+        CountDownLatch releaseLoader = blockLoader(executor);
+        try (ImageProvider provider = new ImageProvider(executor)) {
+            Path source = writeImage(directory, "red.png", RED_IMAGE);
+            Book first = book(source);
+            Book visible = book(source);
+            List<UUID> completed = new ArrayList<>();
+            List<ImageProvider.ImageHolder> holders = onFx(() -> {
+                ImageProvider.ImageHolder background = provider.resolveSmallCover(first);
+                ImageProvider.ImageHolder foreground = provider.resolveSmallCover(visible);
+                background.loadingProperty().addListener((observable, previous, loading) -> completed.add(first.getId()));
+                foreground.loadingProperty().addListener((observable, previous, loading) -> completed.add(visible.getId()));
+                provider.prioritizeSmallCovers(Set.of(visible.getId()));
+                assertSame(foreground, provider.resolveSmallCover(visible));
+                return List.of(background, foreground);
+            });
+            releaseLoader.countDown();
+            awaitLoaded(holders.get(0));
+            awaitLoaded(holders.get(1));
+            assertEquals(List.of(visible.getId(), first.getId()), onFx(() -> List.copyOf(completed)));
+        } finally {
+            releaseLoader.countDown();
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void shouldLoadDetailsSynchronouslyWhileThumbnailQueueIsBlocked(@TempDir Path directory) throws Exception {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        CountDownLatch releaseLoader = blockLoader(executor);
+        try (ImageProvider provider = new ImageProvider(executor)) {
+            Path source = directory.resolve("large.png");
+            ImageIO.write(new BufferedImage(600, 900, BufferedImage.TYPE_INT_RGB), "png", source.toFile());
+            Book book = book(source);
+            ImageProvider.ImageHolder thumbnail = onFx(() -> provider.resolveSmallCover(book));
+            ImageProvider.ImageHolder details = onFx(() -> {
+                ImageProvider.ImageHolder loaded = provider.resolveCover(book);
+                assertFalse(loaded.isLoading());
+                assertFalse(loaded.isDefault());
+                assertTrue(loaded.image().getWidth() > 24);
+                assertTrue(thumbnail.isLoading());
+                assertSame(loaded, provider.resolveCover(book));
+                return loaded;
+            });
+            releaseLoader.countDown();
+            awaitLoaded(thumbnail);
+            onFx(() -> {
+                assertTrue(thumbnail.image().getWidth() <= 24);
+                assertTrue(thumbnail.image().getHeight() <= 32);
+                assertNotSame(thumbnail.image(), details.image());
+                provider.deleteImagesFromCache(book);
+                assertNotSame(details, provider.resolveCover(book));
+                return null;
+            });
+        } finally {
+            releaseLoader.countDown();
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void shouldRetryFailedDetailsLoadWhenFileBecomesAvailable(@TempDir Path directory) throws Exception {
+        try (ImageProvider provider = new ImageProvider(Executors.newSingleThreadExecutor())) {
+            Book book = book(directory.resolve("later.png"));
+            onFx(() -> {
+                ImageProvider.ImageHolder missing = provider.resolveCover(book);
+                assertTrue(missing.isDefault());
+                assertFalse(missing.isLoading());
+                return null;
+            });
+            writeImage(directory, "later.png", RED_IMAGE);
+            assertFalse(onFx(() -> provider.resolveCover(book).isDefault()));
+        }
+    }
 
     @Test
     void shouldReturnPlaceholderWithoutWaitingAndReplaceEveryBoundView(@TempDir Path directory) throws Exception {

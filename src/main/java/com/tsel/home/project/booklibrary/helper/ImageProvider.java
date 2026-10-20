@@ -6,16 +6,18 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import com.tsel.home.project.booklibrary.dao.data.Book;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -34,13 +36,10 @@ public final class ImageProvider implements AutoCloseable {
     private final Image cachedIcon;
     private final Image defaultImg;
     private final ImageHolder defaultCover;
+    private Set<UUID> visibleCoverIds = Set.of();
 
     public ImageProvider() {
-        this(Executors.newFixedThreadPool(2, action -> {
-            Thread thread = new Thread(action, "book-cover-loader");
-            thread.setDaemon(true);
-            return thread;
-        }));
+        this(new CoverLoadExecutor(Math.min(4, Runtime.getRuntime().availableProcessors())));
     }
 
     ImageProvider(ExecutorService coverExecutor) {
@@ -65,12 +64,49 @@ public final class ImageProvider implements AutoCloseable {
         return image == defaultImg;
     }
 
+    /**
+     * Синхронно загружает обложку карточки в отдельный кеш памяти.
+     * Вызывается в потоке JavaFX и не ожидает очереди миниатюр.
+     * Неудачное чтение повторяется при следующем открытии карточки.
+     */
     public ImageHolder resolveCover(Book book) {
-        return resolveCover(book, cachedImages, 488, 740);
+        String sourcePath = book.getCoverImgAbsolutePath();
+        if (!isNotBlank(sourcePath)) {
+            cancel(cachedImages.remove(book.getId()));
+            return defaultCover;
+        }
+        return cachedImages.compute(book.getId(), (id, previous) -> {
+            if (previous != null && Objects.equals(previous.sourcePath, sourcePath) && !previous.isDefault()) {
+                return previous;
+            }
+            cancel(previous);
+            ImageHolder holder = new ImageHolder(sourcePath);
+            holder.image.set(loadCover(sourcePath, 488, 740));
+            holder.loading.set(false);
+            return holder;
+        });
     }
 
     public ImageHolder resolveSmallCover(Book book) {
-        return resolveCover(book, cachedSmallImages, 24, 32);
+        return resolveSmallCoverAsync(book);
+    }
+
+    /**
+     * Обновляет приоритет ожидающих миниатюр по снимку видимых строк.
+     * Вызывается в потоке JavaFX после раскладки таблицы; файлы здесь не читаются.
+     */
+    public void prioritizeSmallCovers(Set<UUID> visibleIds) {
+        visibleCoverIds = Set.copyOf(visibleIds);
+        if (coverExecutor instanceof CoverLoadExecutor executor) {
+            Set<Future<?>> tasks = new HashSet<>();
+            for (UUID id : visibleCoverIds) {
+                ImageHolder holder = cachedSmallImages.get(id);
+                if (holder != null && holder.loadingTask != null) {
+                    tasks.add(holder.loadingTask);
+                }
+            }
+            executor.prioritize(tasks);
+        }
     }
 
     public void deleteImagesFromCache(Book book) {
@@ -87,22 +123,22 @@ public final class ImageProvider implements AutoCloseable {
         cachedSmallImages.clear();
     }
 
-    private ImageHolder resolveCover(Book book, Map<UUID, ImageHolder> cache, double width, double height) {
+    private ImageHolder resolveSmallCoverAsync(Book book) {
         String sourcePath = book.getCoverImgAbsolutePath();
         if (!isNotBlank(sourcePath)) {
-            cancel(cache.remove(book.getId()));
+            cancel(cachedSmallImages.remove(book.getId()));
             return defaultCover;
         }
 
-        return cache.compute(book.getId(), (id, previous) -> {
+        return cachedSmallImages.compute(book.getId(), (id, previous) -> {
             if (previous != null && Objects.equals(previous.sourcePath, sourcePath)) {
                 return previous;
             }
 
             cancel(previous);
             ImageHolder holder = new ImageHolder(sourcePath);
-            holder.loadingTask = coverExecutor.submit(() -> {
-                Image image = loadCover(sourcePath, width, height);
+            Runnable load = () -> {
+                Image image = loadCover(sourcePath, 24, 32);
                 if (!Thread.currentThread().isInterrupted() && !holder.cancelled) {
                     Platform.runLater(() -> {
                         if (!holder.cancelled) {
@@ -111,13 +147,16 @@ public final class ImageProvider implements AutoCloseable {
                         }
                     });
                 }
-            });
+            };
+            holder.loadingTask = coverExecutor instanceof CoverLoadExecutor executor
+                ? executor.submitCover(load, visibleCoverIds.contains(id))
+                : coverExecutor.submit(load);
             return holder;
         });
     }
 
     private Image loadCover(String sourcePath, double width, double height) {
-        try (InputStream inputStream = Files.newInputStream(Paths.get(sourcePath))) {
+        try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(sourcePath)))) {
             Image image = new Image(inputStream, width, height, true, true);
             return image.isError() ? defaultImg : image;
         } catch (IOException | IllegalArgumentException e) {

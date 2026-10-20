@@ -1195,3 +1195,27 @@ face(3, "random-book-face-left", new Affine(46.0 / 64, 0, -46, 24.0 / 64, 52.0 /
 вложенный цикл JavaFX: Platform.runLater ставит Platform.exitNestedEventLoop после
 восстановления, а Platform.enterNestedEventLoop ожидает этот callback без блокировки
 потока интерфейса. Ключ цикла — отдельный локальный Object.
+
+## 30. Приоритетная очередь обложек и наблюдение за таблицей
+
+Вложенная задача с результатом оформляется как обычный generic-класс с явными
+параметрами `FutureTask<T>` и `Comparable<CoverTask<?>>`. Фабрика задач переопределяется
+отдельным методом с `@Override`; пример из `helper/CoverLoadExecutor.java`:
+
+```java
+@Override
+protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
+    return new CoverTask<>(callable, false);
+}
+```
+
+Счётчик порядка — поле явного типа `AtomicLong`. Ключ сравнения задачи изменяется
+только после её удаления из `PriorityBlockingQueue`, с обычным условным блоком.
+Это сохраняет порядок кучи без создания дублирующих задач чтения.
+
+Наблюдатель раскладки хранит `Runnable` и `ChangeListener<Scene>` в отдельных полях.
+Регистрация через `addPostLayoutPulseListener` имеет парное снятие через
+`removePostLayoutPulseListener` при смене сцены и в `close()`.
+Пример — `ui/VisibleCoverPriority.java`. В UI-тесте одноразовый слушатель записывается
+анонимным `Runnable`, снимает себя через `this` и завершает вложенный цикл JavaFX
+через `Platform.runLater`, после окончания текущего pulse.

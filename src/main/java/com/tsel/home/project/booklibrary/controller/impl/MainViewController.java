@@ -29,6 +29,7 @@ import com.tsel.home.project.booklibrary.ui.ReferenceEditorWindow;
 import com.tsel.home.project.booklibrary.ui.BookEditorWindow;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
 import com.tsel.home.project.booklibrary.ui.UpdateWindow;
+import com.tsel.home.project.booklibrary.ui.VisibleCoverPriority;
 import com.tsel.home.project.booklibrary.ui.WindowPlacement;
 import com.tsel.home.project.booklibrary.update.GitHubReleaseClient;
 import com.tsel.home.project.booklibrary.ui.filter.FilterChips;
@@ -277,6 +278,7 @@ public class MainViewController extends AbstractViewController {
         stage.setMinWidth(812);
         stage.setMinHeight(700);
         initTableColumns(loader, bookTableView);
+        VisibleCoverPriority coverPriority = new VisibleCoverPriority(bookTableView, imageProvider::prioritizeSmallCovers);
         bookTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         bookTableView.addEventFilter(ScrollEvent.SCROLL, event -> {
             if (event.isControlDown()) { updateTableScale(event, bookTableView); event.consume(); }
@@ -308,6 +310,7 @@ public class MainViewController extends AbstractViewController {
             applyFilters();
         });
         stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+            coverPriority.close();
             coverFilterRefresh.stop();
             randomBookAnimation.stop();
             filterDrawer.dispose();
