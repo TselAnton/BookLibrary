@@ -43,8 +43,9 @@ if (-not $BuildOnly) {
         throw 'Could not check remote release tags.'
     }
 }
+$skipTests = if ($RunTests) { 'false' } else { 'true' }
 $buildArguments = @('--batch-mode', '--no-transfer-progress', "-Drevision=$releaseVersion",
-    '-Dbooklibrary.platform=windows-x86_64', "-DskipTests=$(-not $RunTests.IsPresent)".ToLowerInvariant(), 'clean', 'verify')
+    '-Dbooklibrary.platform=windows-x86_64', "-DskipTests=$skipTests", 'clean', 'verify')
 Write-Output "Run tests: $($RunTests.IsPresent)."
 & mvn @buildArguments
 if ($LASTEXITCODE -ne 0) {
