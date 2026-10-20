@@ -107,7 +107,7 @@ public final class SageTheme {
         return false;
     }
 
-    /** Keep long lookup values inside the form and expose their full text in a tooltip. */
+    /** Keep long lookup values inside the form. */
     public static <T> void constrainComboBox(ComboBox<T> combo) {
         combo.setMinWidth(0);
         combo.setCellFactory(list -> new ListCell<>() {
@@ -119,7 +119,6 @@ public final class SageTheme {
                 super.updateItem(item, empty);
                 String text = empty || item == null ? null : item.toString();
                 setText(text);
-                setTooltip(text == null ? null : new Tooltip(text));
             }
         });
         combo.skinProperty().addListener((o, oldSkin, newSkin) -> constrainPopup(combo));

@@ -16,7 +16,7 @@ All geometry is logical dp, text is sp. Use design/tokens.json as the numeric so
 - Row hover, keyboard focus and persistent selection must be visually distinguishable. Selection is not only a change in checkbox value.
 
 ## Typography
-Use Segoe UI on Windows with a system sans-serif fallback. Do not bundle proprietary fonts. Main title 22sp semibold; dialog title 20sp semibold; controls/body/table 13sp; form labels 12–13sp; status/caption 12sp. Avoid mathematical Unicode bold and English decorative headings. Long names may ellipsize in table cells with a full-text tooltip; editing fields preserve the full value. Dialog values use the available width and do not overflow.
+Use Segoe UI on Windows with a system sans-serif fallback. Do not bundle proprietary fonts. Main title 22sp semibold; dialog title 20sp semibold; controls/body/table 13sp; form labels 12–13sp; status/caption 12sp. Avoid mathematical Unicode bold and English decorative headings. Long names may ellipsize in table cells without a value tooltip; editing fields preserve the full value. Dialog values use the available width and do not overflow.
 
 ## Components
 - Primary button: green filled, white text, 32dp minimum height. One primary action per action group.
@@ -38,8 +38,13 @@ Main is a fixed outer Column: header, application menu, toolbar, active chips, f
 Avoid animated window resizing. Filter editor may expand over 120–160ms; respect reduced motion.
 
 ## Accessibility and interaction
-Tab order follows visible order. Enter triggers the primary form action unless a combo popup or IME consumes it; Escape closes a popup first, then cancels/closes the dialog. Unsaved edits require a discard choice; deletion requires confirmation with the book name. Avoid destructive default focus. Ctrl+F opens the filter drawer, Ctrl+N opens creation, Enter on a selected row opens details. Menus support keyboard traversal and visible focus. All icon-only controls have accessible names. Do not encode read/ended states only through color.
+Tab order follows visible order. Enter triggers the primary form action unless a combo popup or IME consumes it; Escape closes a popup first, then cancels/closes the dialog. Unsaved edits require a discard choice; deletion requires confirmation with the book name. Avoid destructive default focus. Ctrl+F focuses the library search, Ctrl+N opens creation, Enter on a selected row opens details. Menus support keyboard traversal and visible focus. All icon-only controls have accessible names. Do not encode read/ended states only through color.
 Empty tables show a concise message and a relevant action; no-results provides Сбросить. Failures preserve typed values and show a localized message; technical codes belong in diagnostics. A missing cover uses the book outline placeholder, not an error dialog.
 
 ## Acceptance before shipping UI
 Check the four base sizes, compact main width, high DPI, keyboard-only navigation, Cyrillic and long names, missing covers, empty/no-results tables, expanded/collapsed filters, validation messages and all bottom actions. Verify no new whole-window scrollbar. These checks are pending until Compose UI exists.
+
+## Messages and confirmations
+Use `SageDialogs` for all JavaFX information, warning, error and confirmation messages. Share the sage header, custom close control, 1dp outer border, 520dp preferred width, wrapped text, and separated footer actions. Long content scrolls inside a bounded area while the buttons remain visible. Confirmations focus Отмена by default; caption close and Escape also cancel. Startup and the independent updater use the JDK-only `StartupDialogs` with the same palette, typography and action placement. Native file/folder selection keeps the OS design.
+
+Do not show hover popups that repeat field, cell, list-option or book values in any window. Action descriptions and accessibility names remain available.

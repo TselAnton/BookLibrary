@@ -823,6 +823,7 @@ open module com.tsel.home.project.booklibrary {
 - Имена классов строчными словами через дефис: `.search-help-button`, `.disabled-check-box`.
 - Псевдоклассы примыкают без пробела: `.search-button:hover`, `.check-box:disabled`, `.table-row-cell:odd`, `.table-row-cell:focused`.
 - Используются JavaFX-свойства `-fx-*` и собственные looked-up значения `-icon-paint`, `-size`; ссылки на них пишутся как значения без кавычек.
+- Для полупрозрачных цветов использовать `rgba` с пробелами после запятых: `-fx-border-color: rgba(47, 107, 79, 0.18);` — пример обводки `.search-clear:hover` в `sage.css`.
 - Пути `url("../img/sign-icon.png")` используют двойные кавычки. Цвета в CSS-файлах записаны шестизначным HEX с заглавными буквами; FXML также содержит строчные HEX, их регистр не менять автоматически.
 - Длинные строковые значения `-fx-shape` остаются одной строкой. Перед ними в кнопочных стилях есть пустая строка, отделяющая геометрию от остальных настроек.
 
@@ -1117,3 +1118,19 @@ YAML workflow используют отступ 4 пробела на урове
 Новые YAML workflow используют отступ 4 пробела на уровень. Переменные GitHub передаются в шаг PowerShell через env, а не вставляются в исполняемый код. Пример — .github/workflows/release.yml, шаг Build, verify and publish.
 
 Скрипт build/release.ps1 использует отступ 4 пробела; независимые вызовы Git и Maven проверяют LASTEXITCODE. Многострочные списки аргументов оформляются массивом PowerShell; записи метаданных создаются через UTF8Encoding без BOM.
+
+## 26. Поиск и диалоги сообщений
+
+Быстрый текстовый поиск размещён в `filter/BookSearch.java`; он объединяется с визуальными фильтрами. Новый код использует обычные цепочки Stream и явные импорты по общим правилам. Поле поиска и встроенная кнопка очистки оформлены в `main-view.fxml` через `StackPane`; размеры и состояния задаются отдельными CSS-правилами в `sage.css` с отступом 4 пробела.
+
+JavaFX-сообщения создаются общей фабрикой `ui/SageDialogs.java`. Для самостоятельного помощника и сообщений до запуска JavaFX используется `update/shared/StartupDialogs.java`, зависящий только от JDK. Анонимные реализации Swing `Icon`, `MouseAdapter` и `AbstractAction` оформляются по общим правилам анонимных классов: каждый метод с отдельным `@Override`, тело с отступом 4 пробела. Swing-интерфейс создаётся в `Runnable`, выполняемом через `SwingUtilities.invokeAndWait`; при перехвате `InterruptedException` восстанавливается флаг прерывания.
+
+Пример переопределения отрисовки из `StartupDialogs`: сигнатура остаётся в одной строке, аннотация занимает отдельную строку, вызовы рисования оформляются как обычные Java-вызовы.
+
+```java
+@Override
+protected void paintThumb(Graphics graphics, JComponent component, Rectangle bounds) {
+    graphics.setColor(BORDER);
+    graphics.fillRoundRect(bounds.x + 2, bounds.y, bounds.width - 4, bounds.height, 8, 8);
+}
+```

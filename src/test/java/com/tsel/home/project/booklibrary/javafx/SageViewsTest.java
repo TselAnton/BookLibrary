@@ -3,6 +3,7 @@ package com.tsel.home.project.booklibrary.javafx;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.tsel.home.project.booklibrary.controller.impl.MainViewController;
+import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.controller.impl.book.BookInfoViewController;
 import com.tsel.home.project.booklibrary.controller.impl.book.EditBookController;
 import com.tsel.home.project.booklibrary.controller.impl.book.NewBookController;
@@ -12,6 +13,7 @@ import com.tsel.home.project.booklibrary.filter.condition.NumericOperation;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
 import com.tsel.home.project.booklibrary.ui.LineIcon;
+import com.tsel.home.project.booklibrary.ui.SageDialogs;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
 import com.tsel.home.project.booklibrary.ui.filter.FilterChips;
 import java.io.OutputStream;
@@ -29,6 +31,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -46,6 +49,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import org.junit.jupiter.api.Test;
@@ -70,6 +74,9 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
                 TableView<?> table = (TableView<?>) main.getScene().lookup("#bookTableView");
                 assertEquals(10, table.getColumns().size());
                 assertEquals(7, table.getItems().size());
+                assertSearchWorkflow(main, table);
+                assertDialogs(main);
+                assertAudioDialogs(main);
                 assertFalse(main.getScene().lookup("#filterEditor").isManaged());
                 ((Button) main.getScene().lookup("#filtersButton")).fire();
                 assertTrue(main.getScene().lookup("#filterEditor").isManaged());
@@ -106,6 +113,7 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
                 assertEquals(7, SimpleApplicationContext.getBean(BookRepository.class).getAll().size());
                 assertInside(formScene, "#saveBookButton", "#exitButton", "#priceFieldInput", "#coverImagePathFieldInput");
                 assertFormControls(formScene, create.getSelectCoverFileButton(), create.getCoverImagePathFieldInput());
+                assertNull(create.getCoverImagePathFieldInput().getTooltip());
                 create.getAuthorComboBox().show();
                 assertPopupWidth(create.getAuthorComboBox());
                 create.stageKeyPressed(new javafx.scene.input.KeyEvent(javafx.scene.input.KeyEvent.KEY_PRESSED,
@@ -145,6 +153,8 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
                 detailStage.setScene(detailsScene); info.initController(details, null, id); detailStage.show(); layout(detailStage);
                 assertEquals(812, detailsScene.getWidth(), 1); assertEquals(600, detailsScene.getHeight(), 1);
                 assertEquals("Нет", ((Label) detailsScene.lookup("#readLabel")).getText());
+                assertTrue(detailsScene.getRoot().lookupAll(".label").stream()
+                    .map(Label.class::cast).allMatch(label -> label.getTooltip() == null));
                 ImageView cover = (ImageView) detailsScene.lookup("#coverImage");
                 assertNotNull(cover.getImage());
                 assertTrue(SimpleApplicationContext.getBean(ImageProvider.class).isPlaceholder(cover.getImage()));
@@ -491,10 +501,11 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
         assertFalse(scene.lookup("#filterEditor").isVisible());
         assertTrue(chips.isExpanded());
         button(scene, "#resetFiltersButton").fire();
-        assertNull(scene.lookup("#searchQueryField"), "The library must only use visual filters");
+        assertNotNull(scene.lookup("#searchQueryField"));
         assertEquals(7, table.getItems().size());
         scene.getRoot().fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.F, false, true, false, false));
-        assertTrue(scene.lookup("#filterEditor").isVisible(), "Ctrl+F must open the filter drawer");
+        assertSame(scene.lookup("#searchQueryField"), scene.getFocusOwner(), "Ctrl+F must focus search");
+        button(scene, "#filtersButton").fire();
         text(scene, "#filter-name-value").setText("Дюна");
         selectChoice(scene, "read", "Не прочитано");
         button(scene, "#applyFiltersButton").fire();
@@ -536,6 +547,106 @@ class SageViewsTest extends com.tsel.home.project.booklibrary.UnitJavaFXTest {
 
     private static void settle(Stage stage) {
         settle(stage, 80);
+    }
+
+    private static void assertSearchWorkflow(Stage main, TableView<?> table) throws Exception {
+        Scene scene = main.getScene();
+        TextField search = text(scene, "#searchQueryField");
+        Button clear = button(scene, "#clearSearchButton");
+        assertFalse(clear.isVisible());
+        search.setText("  ДЮН  ");
+        assertEquals(2, table.getItems().size());
+        assertTrue(clear.isVisible());
+        button(scene, "#filtersButton").fire();
+        selectChoice(scene, "read", "Не прочитано");
+        button(scene, "#applyFiltersButton").fire();
+        assertEquals(2, table.getItems().size());
+        search.setText("несуществующая книга");
+        assertEquals(0, table.getItems().size());
+        clear.fire();
+        assertEquals(6, table.getItems().size(), "Clearing search must preserve applied filters");
+        assertFalse(clear.isVisible());
+        assertSame(search, scene.getFocusOwner());
+        button(scene, "#resetFiltersButton").fire();
+        assertEquals(7, table.getItems().size());
+        main.setWidth(812);
+        settle(main);
+        search.setText("Герберт");
+        layout(main);
+        assertInside(scene, "#searchQueryField", "#clearSearchButton", "#filtersButton", "#randomBookButton");
+        assertTrue(search.getWidth() >= 160);
+        capture(scene, "search-compact");
+        clear.fire();
+        main.setWidth(1252);
+        settle(main);
+        layout(main);
+        assertTrue(scene.getRoot().lookupAll(".table-cell").stream()
+            .map(javafx.scene.control.TableCell.class::cast).allMatch(cell -> cell.getTooltip() == null));
+        capture(scene, "search-main");
+    }
+
+    private static void assertDialogs(Stage owner) throws Exception {
+        ButtonType accept = new ButtonType("Продолжить", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        for (Alert.AlertType type : List.of(Alert.AlertType.CONFIRMATION, Alert.AlertType.ERROR,
+            Alert.AlertType.WARNING, Alert.AlertType.INFORMATION)) {
+            String details = type == Alert.AlertType.ERROR ? "Очень длинное сообщение об ошибке. ".repeat(100) : "Дополнительные сведения.";
+            Alert dialog = SageDialogs.create(owner, type, "Проверка сообщения", "Удалить «Зелёная миля»?", details,
+                type == Alert.AlertType.CONFIRMATION ? new ButtonType[] {accept, cancel} : new ButtonType[] {accept});
+            try {
+                dialog.show();
+                Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+                layout(stage);
+                assertSame(owner, stage.getOwner());
+                assertEquals(StageStyle.UNDECORATED, stage.getStyle());
+                assertEquals(1, stage.getScene().getRoot().lookupAll("#windowHeader").size());
+                assertTrue(stage.getHeight() < 520, "Long messages must scroll within a compact dialog");
+                for (ButtonType buttonType : dialog.getButtonTypes()) {
+                    Node button = dialog.getDialogPane().lookupButton(buttonType);
+                    assertTrue(button.localToScene(button.getBoundsInLocal()).getMaxY() <= stage.getScene().getHeight());
+                }
+                capture(stage.getScene(), "dialog-" + type.name().toLowerCase(java.util.Locale.ROOT));
+                if (type == Alert.AlertType.CONFIRMATION) {
+                    assertTrue(((Button) dialog.getDialogPane().lookupButton(cancel)).isDefaultButton());
+                    assertFalse(((Button) dialog.getDialogPane().lookupButton(accept)).isDefaultButton());
+                    Button close = (Button) stage.getScene().lookup("#windowHeader").lookupAll(".icon-button").iterator().next();
+                    close.fire();
+                    assertEquals(cancel, dialog.getResult(), "The caption close action must cancel");
+                } else {
+                    ((Button) dialog.getDialogPane().lookupButton(accept)).fire();
+                    assertEquals(accept, dialog.getResult());
+                }
+            } finally {
+                dialog.close();
+            }
+        }
+    }
+
+    private static void assertAudioDialogs(Stage owner) throws Exception {
+        for (String file : List.of("audio-book-sites-view.fxml", "audio-book-sites-connections-view.fxml",
+            "audio-book-sites-connections-edit-view.fxml")) {
+            FXMLLoader loader = loader(file);
+            Scene scene = new Scene(loader.load());
+            Stage stage = new Stage();
+            stage.initOwner(owner);
+            SageTheme.install(stage, scene, "Сайты аудиокниг", false);
+            stage.setScene(scene);
+            try {
+                AbstractViewController controller = loader.getController();
+                controller.initController(loader, null, new java.util.ArrayList<UUID>());
+                stage.show();
+                layout(stage);
+                assertEquals(StageStyle.UNDECORATED, stage.getStyle());
+                assertNotNull(scene.lookup("#windowHeader .icon-button"));
+                assertInside(scene, "#audioBookSiteTable");
+                for (Node node : scene.getRoot().lookupAll(".button")) {
+                    assertTrue(node.localToScene(node.getBoundsInLocal()).getMaxY() <= scene.getHeight());
+                }
+                capture(scene, file.replace(".fxml", ""));
+            } finally {
+                stage.hide();
+            }
+        }
     }
 
     private static void settle(Stage stage, double milliseconds) {

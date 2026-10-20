@@ -1,6 +1,7 @@
 package com.tsel.home.project.booklibrary.update;
 
 import com.tsel.home.project.booklibrary.update.shared.InstallationLock;
+import com.tsel.home.project.booklibrary.update.shared.StartupDialogs;
 import com.tsel.home.project.booklibrary.update.shared.UpdateFiles;
 import com.tsel.home.project.booklibrary.update.shared.UpdatePlan;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
-import javax.swing.JOptionPane;
 
 public final class UpdateStartup {
 
@@ -39,8 +39,7 @@ public final class UpdateStartup {
             boolean running = ProcessHandle.of(pid).filter(process -> process.info().startInstant()
                 .map(started::equals).orElse(false)).isPresent();
             if (running) {
-                JOptionPane.showMessageDialog(null, "Обновление ещё выполняется. Дождитесь сообщения помощника и запустите приложение снова.",
-                    "BookLibrary", JOptionPane.INFORMATION_MESSAGE);
+                StartupDialogs.message("BookLibrary", "Обновление ещё выполняется. Дождитесь сообщения помощника и запустите приложение снова.");
             } else {
                 if (lockHeld) {
                     resume(plan, planFile);
@@ -56,11 +55,11 @@ public final class UpdateStartup {
     }
 
     private static void resume(UpdatePlan plan, Path planFile) throws IOException, InterruptedException {
-        int answer = JOptionPane.showConfirmDialog(null,
+        boolean accepted = StartupDialogs.confirm("BookLibrary — восстановление обновления",
             "Предыдущее обновление не завершено. Продолжить установку?\nРезервная папка: " + plan.backup()
                 + "\nДля ручного восстановления верните application.jar из этой папки на место программы.",
-            "BookLibrary — восстановление обновления", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (answer == JOptionPane.YES_OPTION) {
+            "Продолжить установку");
+        if (accepted) {
             UpdatePlan resumed = new UpdatePlan(plan.target(), plan.source(), plan.dataDirectory(), plan.backup(), plan.version(),
                 plan.platform(), plan.sha256(), plan.originalSha256(), ProcessHandle.current().pid(),
                 ProcessHandle.current().info().startInstant().orElseThrow().toEpochMilli());

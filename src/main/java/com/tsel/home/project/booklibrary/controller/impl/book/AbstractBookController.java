@@ -42,7 +42,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.text.Text;
-import javafx.scene.control.Tooltip;
 import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
@@ -76,9 +75,6 @@ public abstract class AbstractBookController extends AbstractViewController {
             initialValues = formValues();
             Platform.runLater(() -> getNameTextFieldInput().requestFocus());
         });
-        Tooltip path = new Tooltip();
-        path.textProperty().bind(getCoverImagePathFieldInput().textProperty());
-        getCoverImagePathFieldInput().setTooltip(path);
         List<Node> fields = List.of(getNameTextFieldInput(), getAuthorComboBox(), getPublisherComboBox(),
             getPagesCountFieldInput(), getPublicationYearFieldInput(), getHardCoverCheckBox(), getReadCheckBox(),
             getAutographCheckBox(), getGenreComboBox(), getCycleComboBox(), getCycleEndedCheckBox(),
@@ -160,7 +156,7 @@ public abstract class AbstractBookController extends AbstractViewController {
             }
         }
         Label status = (Label) getMainAnchorPane().lookup("#validationStatus");
-        if (status != null) { status.setText(message == null ? "" : message); status.setTooltip(message == null ? null : new Tooltip(message)); }
+        if (status != null) { status.setText(message == null ? "" : message); }
         if (invalid != null) {
             invalid.getStyleClass().add("invalid"); invalid.setAccessibleHelp(message); invalid.requestFocus(); return false;
         }

@@ -116,6 +116,5 @@ public class BookInfoViewController extends AbstractViewController {
     private void setValue(Label label, Object value) {
         String text = value == null ? "—" : value.toString();
         label.setText(text);
-        label.setTooltip(new Tooltip(text));
     }
 }

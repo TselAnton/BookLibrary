@@ -11,6 +11,7 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
+import com.tsel.home.project.booklibrary.ui.SageDialogs;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
 import com.tsel.home.project.booklibrary.ui.WindowPlacement;
 import com.tsel.home.project.booklibrary.controller.impl.book.AbstractBookController;
@@ -58,24 +59,15 @@ public abstract class AbstractViewController {
      * @return Результат вызова
      */
     protected ButtonAnswer riseAlert(Alert.AlertType alertType, String title, String warnMsg, String explanationMsg) {
-        Alert warnAlert = new Alert(alertType);
-        warnAlert.setTitle(title);
-        warnAlert.setHeaderText(warnMsg);
-        warnAlert.setContentText(explanationMsg);
-        if (getMainAnchorPane() != null && getMainAnchorPane().getScene() != null)
-            warnAlert.initOwner(getMainAnchorPane().getScene().getWindow());
-        SageTheme.apply(warnAlert.getDialogPane().getScene());
-        warnAlert.setOnShown(event -> ((Stage) warnAlert.getDialogPane().getScene().getWindow())
-            .getIcons().setAll(imageProvider.getWindowIcon()));
         ButtonType accept = new ButtonType(alertType == Alert.AlertType.CONFIRMATION ? "Продолжить" : "Понятно", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
-        warnAlert.getButtonTypes().setAll(accept);
-        if (alertType == Alert.AlertType.CONFIRMATION) {
-            warnAlert.getButtonTypes().add(cancel);
-            ((javafx.scene.control.Button) warnAlert.getDialogPane().lookupButton(accept)).setDefaultButton(false);
-            ((javafx.scene.control.Button) warnAlert.getDialogPane().lookupButton(cancel)).setDefaultButton(true);
-            javafx.application.Platform.runLater(() -> warnAlert.getDialogPane().lookupButton(cancel).requestFocus());
-        }
+        javafx.stage.Window owner = getMainAnchorPane() == null || getMainAnchorPane().getScene() == null
+            ? null
+            : getMainAnchorPane().getScene().getWindow();
+        Alert warnAlert = SageDialogs.create(
+            owner, alertType, title, warnMsg, explanationMsg,
+            alertType == Alert.AlertType.CONFIRMATION ? new ButtonType[] {accept, cancel} : new ButtonType[] {accept}
+        );
 
         log.info("Raised alert {} with message '{}'", alertType, explanationMsg);
         return new ButtonAnswer(warnAlert.showAndWait().orElse(null));

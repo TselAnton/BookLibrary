@@ -21,12 +21,12 @@ import com.tsel.home.project.booklibrary.update.ApplicationPaths;
 import com.tsel.home.project.booklibrary.update.GitHubReleaseClient;
 import com.tsel.home.project.booklibrary.update.UpdateStartup;
 import com.tsel.home.project.booklibrary.update.shared.InstallationLock;
+import com.tsel.home.project.booklibrary.update.shared.StartupDialogs;
 import com.tsel.home.project.booklibrary.utils.Timer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import javax.swing.JOptionPane;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -60,7 +60,7 @@ public class App {
                 launch(args);
             } catch (Exception e) {
                 log.error("Can't start application", e);
-                JOptionPane.showMessageDialog(null, e.getMessage(), "BookLibrary — ошибка запуска", JOptionPane.ERROR_MESSAGE);
+                StartupDialogs.message("BookLibrary — ошибка запуска", e.getMessage());
             }
         }
 

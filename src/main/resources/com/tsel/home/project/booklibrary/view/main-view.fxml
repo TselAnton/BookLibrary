@@ -39,7 +39,17 @@
                     <LineIcon name="plus"/>
                 </graphic>
             </Button>
-            <Region HBox.hgrow="ALWAYS"/>
+            <StackPane minWidth="160" HBox.hgrow="ALWAYS" styleClass="library-search">
+                <TextField fx:id="searchQueryField" promptText="Поиск по библиотеке" accessibleText="Поиск по названию, автору, издателю, жанру и циклу"/>
+                <Button fx:id="clearSearchButton" styleClass="icon-button,search-clear" accessibleText="Очистить поиск" onAction="#clearSearch" StackPane.alignment="CENTER_RIGHT">
+                    <tooltip>
+                        <Tooltip text="Очистить поиск"/>
+                    </tooltip>
+                    <graphic>
+                        <LineIcon name="close"/>
+                    </graphic>
+                </Button>
+            </StackPane>
             <Button fx:id="filtersButton" text="Фильтры" onAction="#toggleFilters">
                 <graphic>
                     <LineIcon name="filter"/>

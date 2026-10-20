@@ -19,7 +19,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 
 /**
@@ -170,7 +169,6 @@ public class ChoiceFilterEditor implements FilterEditor {
             choice.setId("filter-" + field.id() + "-option-" + index);
             if (!option.label().equals(choice.getText())) {
                 choice.setText(option.label());
-                choice.setTooltip(new Tooltip(option.label()));
             }
             choice.setSelected(selected.contains(option.value()));
             ((Label) choice.getGraphic()).setText("(" + option.count() + ")");

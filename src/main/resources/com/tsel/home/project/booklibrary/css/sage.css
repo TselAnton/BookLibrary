@@ -120,3 +120,72 @@
 .compact .table-view { -fx-fixed-cell-size: 32; -fx-font-size: 12px; }
 .compact .table-view .column-header .label { -fx-font-size: 11px; -fx-padding: 0 2; }
 .compact .table-cell { -fx-padding: 0 3; }
+
+.library-search .text-field, .library-search .text-field:focused {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-padding: 4 40 4 12;
+}
+
+.library-search .text-field:focused {
+    -fx-padding: 3 39 3 11;
+}
+
+.library-search .search-clear, .library-search .search-clear:focused {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-max-height: 32;
+    -fx-background-color: transparent;
+    -fx-background-insets: 4;
+    -fx-background-radius: 4;
+    -fx-border-color: transparent;
+    -fx-border-insets: 4;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-padding: 5;
+}
+
+.library-search .search-clear:hover, .library-search .search-clear:focus-visible {
+    -fx-background-color: rgba(47, 107, 79, 0.06);
+    -fx-border-color: rgba(47, 107, 79, 0.18);
+}
+
+.library-search .search-clear:pressed {
+    -fx-background-color: rgba(47, 107, 79, 0.10);
+    -fx-border-color: rgba(47, 107, 79, 0.24);
+}
+
+.message-dialog {
+    -fx-background-color: #F3F6F2;
+    -fx-padding: 0;
+}
+
+.message-dialog > .content, .message-dialog > .header-panel {
+    -fx-padding: 0;
+    -fx-background-color: #E8F0E9;
+}
+
+.message-dialog .message-heading {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.message-dialog .message-content {
+    -fx-padding: 24;
+}
+
+.message-dialog .message-scroll, .message-dialog .message-scroll > .viewport {
+    -fx-background-color: #F3F6F2;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+.message-dialog > .button-bar {
+    -fx-padding: 16;
+    -fx-border-color: #DFE6E0 transparent transparent transparent;
+    -fx-background-color: #F3F6F2;
+}
+
+.audio-table-container {
+    -fx-padding: 16;
+}

@@ -13,10 +13,7 @@ import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
@@ -177,19 +174,13 @@ public final class UpdateWindow {
     }
 
     private void install() {
-        ButtonType accept = new ButtonType("Обновить и перезапустить", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION,
+        if (!SageDialogs.confirm(
+            stage,
+            "Установить версию " + release.version() + "?",
             "Программа штатно закроется. Помощник сохранит текущий JAR, repository и настройки в backup/updates рядом с программой."
-                + "\nПри необходимости Windows запросит права администратора.\nПосле установки новая версия запустится автоматически.", accept, cancel);
-        dialog.initOwner(stage);
-        dialog.setTitle("Установить версию " + release.version() + "?");
-        dialog.setHeaderText(dialog.getTitle());
-        SageTheme.apply(dialog.getDialogPane().getScene());
-        ((Button) dialog.getDialogPane().lookupButton(accept)).setDefaultButton(false);
-        ((Button) dialog.getDialogPane().lookupButton(cancel)).setDefaultButton(true);
-        Platform.runLater(() -> dialog.getDialogPane().lookupButton(cancel).requestFocus());
-        if (dialog.showAndWait().orElse(cancel) != accept || !closeOtherWindows()) {
+                + "\nПри необходимости Windows запросит права администратора.\nПосле установки новая версия запустится автоматически.",
+            "Обновить и перезапустить"
+        ) || !closeOtherWindows()) {
             return;
         }
         installing = true;

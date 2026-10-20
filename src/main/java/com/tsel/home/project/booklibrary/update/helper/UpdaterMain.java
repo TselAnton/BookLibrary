@@ -1,6 +1,7 @@
 package com.tsel.home.project.booklibrary.update.helper;
 
 import com.tsel.home.project.booklibrary.update.shared.InstallationLock;
+import com.tsel.home.project.booklibrary.update.shared.StartupDialogs;
 import com.tsel.home.project.booklibrary.update.shared.UpdatePlan;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import javax.swing.JOptionPane;
 
 /** Самостоятельный помощник: только стандартная библиотека JDK, без JavaFX и зависимостей приложения. */
 public final class UpdaterMain {
@@ -31,9 +31,8 @@ public final class UpdaterMain {
                     e.printStackTrace();
                 }
                 if (!headless) {
-                    JOptionPane.showMessageDialog(null, "Автоматический запуск не выполнен.\n" + e.getMessage()
-                        + "\nПосле успешной установки программу можно запустить вручную.\nЖурнал: " + planFile.resolveSibling("restart-error.log"),
-                        "BookLibrary — перезапуск", JOptionPane.ERROR_MESSAGE);
+                    StartupDialogs.message("BookLibrary — перезапуск", "Автоматический запуск не выполнен.\n" + e.getMessage()
+                        + "\nПосле успешной установки программу можно запустить вручную.\nЖурнал: " + planFile.resolveSibling("restart-error.log"));
                 }
                 System.exit(1);
             }
@@ -64,9 +63,8 @@ public final class UpdaterMain {
                 }
             }
             if (!headless && !restartRequested) {
-                JOptionPane.showMessageDialog(null, "Установлена версия " + plan.version()
-                    + ". При следующем запуске откроется обновлённое приложение.\nРезервная копия: " + plan.backup(),
-                    "BookLibrary — обновление завершено", JOptionPane.INFORMATION_MESSAGE);
+                StartupDialogs.message("BookLibrary — обновление завершено", "Установлена версия " + plan.version()
+                    + ". При следующем запуске откроется обновлённое приложение.\nРезервная копия: " + plan.backup());
             }
         } catch (Exception e) {
             try (PrintWriter log = new PrintWriter(Files.newBufferedWriter(planFile.resolveSibling("update-error.log"), StandardCharsets.UTF_8))) {
@@ -82,8 +80,8 @@ public final class UpdaterMain {
                 e.printStackTrace();
             }
             if (!headless) {
-                JOptionPane.showMessageDialog(null, "Обновление не завершено.\n" + e.getMessage()
-                    + "\nЖурнал: " + planFile.resolveSibling("update-error.log"), "BookLibrary — ошибка обновления", JOptionPane.ERROR_MESSAGE);
+                StartupDialogs.message("BookLibrary — ошибка обновления", "Обновление не завершено.\n" + e.getMessage()
+                    + "\nЖурнал: " + planFile.resolveSibling("update-error.log"));
             }
             System.exit(1);
         }

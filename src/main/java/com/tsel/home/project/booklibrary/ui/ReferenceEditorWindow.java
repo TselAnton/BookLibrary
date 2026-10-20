@@ -17,10 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -29,7 +26,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -142,7 +138,6 @@ public final class ReferenceEditorWindow {
             protected void updateItem(String value, boolean empty) {
                 super.updateItem(value, empty);
                 setText(empty ? null : value);
-                setTooltip(empty || value == null ? null : new Tooltip(value));
             }
         });
         title.setMinWidth(120);
@@ -191,7 +186,6 @@ public final class ReferenceEditorWindow {
                     Hyperlink link = new Hyperlink(book.getName());
                     link.getStyleClass().add("reference-book-link");
                     link.setAccessibleText("Открыть книгу «" + book.getName() + "»");
-                    link.setTooltip(new Tooltip(book.getName()));
                     link.setMinWidth(0);
                     link.setMaxWidth(Double.MAX_VALUE);
                     link.setOnAction(event -> openBook(book.getId()));
@@ -405,17 +399,7 @@ public final class ReferenceEditorWindow {
     }
 
     private boolean confirm(String title, String message, String action) {
-        ButtonType accept = new ButtonType(action, ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION, message, accept, cancel);
-        dialog.initOwner(stage);
-        dialog.setTitle(title);
-        dialog.setHeaderText(title);
-        SageTheme.apply(dialog.getDialogPane().getScene());
-        ((Button) dialog.getDialogPane().lookupButton(accept)).setDefaultButton(false);
-        ((Button) dialog.getDialogPane().lookupButton(cancel)).setDefaultButton(true);
-        Platform.runLater(() -> dialog.getDialogPane().lookupButton(cancel).requestFocus());
-        return dialog.showAndWait().orElse(cancel) == accept;
+        return SageDialogs.confirm(stage, title, message, action);
     }
 
     private String normalize(String value) {

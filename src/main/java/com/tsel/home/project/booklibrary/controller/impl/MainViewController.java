@@ -15,6 +15,7 @@ import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
+import com.tsel.home.project.booklibrary.filter.BookSearch;
 import com.tsel.home.project.booklibrary.filter.FilterCatalog;
 import com.tsel.home.project.booklibrary.filter.model.FilterState;
 import com.tsel.home.project.booklibrary.helper.DataExporter;
@@ -59,6 +60,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
@@ -116,6 +118,12 @@ public class MainViewController extends AbstractViewController {
     @FXML
     @Getter
     private AnchorPane mainAnchorPane;
+
+    @FXML
+    private TextField searchQueryField;
+
+    @FXML
+    private Button clearSearchButton;
 
     @FXML
     private TableView<BookDTO> bookTableView;
@@ -248,10 +256,6 @@ public class MainViewController extends AbstractViewController {
             controller.configure(stage, scene, loader);
             stage.show();
             scene.getRoot().applyCss();
-            for (javafx.scene.Node node : scene.getRoot().lookupAll(".column-header .label")) {
-                if (node instanceof Label label && !label.getText().isBlank())
-                    Tooltip.install(label, new Tooltip(label.getText()));
-            }
         } catch (Exception e) {
             log.error("Exception while starting main window", e);
             throw new IllegalStateException("Не удалось открыть библиотеку", e);
@@ -272,6 +276,8 @@ public class MainViewController extends AbstractViewController {
         bookTableView.getSelectionModel().selectedItemProperty().addListener((o, a, b) -> updateStatus());
         activeFilters = new FilterChips(this::resetFilters);
         activeFilterContainer.getChildren().add(activeFilters);
+        clearSearchButton.visibleProperty().bind(searchQueryField.textProperty().isNotEmpty());
+        searchQueryField.textProperty().addListener((observable, previous, value) -> applyFilters());
         filterDrawer = new FilterDrawer(
             filterCatalog, filterState, FilterEditorRegistry.defaults(),
             () -> catalogBooks,
@@ -299,7 +305,11 @@ public class MainViewController extends AbstractViewController {
             if (filterDrawer.isOpen()) {
                 return;
             }
-            if (e.isControlDown() && e.getCode() == KeyCode.F) { toggleFilters(); e.consume(); }
+            if (e.isControlDown() && e.getCode() == KeyCode.F) {
+                searchQueryField.requestFocus();
+                searchQueryField.selectAll();
+                e.consume();
+            }
             if (e.isControlDown() && e.getCode() == KeyCode.N) { addBook(); e.consume(); }
         });
         addTooltip("priceButton", "Посчитать стоимость найденных книг", loader);
@@ -346,7 +356,14 @@ public class MainViewController extends AbstractViewController {
     @FXML
     public void resetFilters() {
         filterState.clear();
+        searchQueryField.clear();
         applyFilters();
+    }
+
+    @FXML
+    private void clearSearch() {
+        searchQueryField.clear();
+        searchQueryField.requestFocus();
     }
 
     private void updateFilterButton() {
@@ -377,7 +394,7 @@ public class MainViewController extends AbstractViewController {
         UUID selected = bookTableView.getSelectionModel().getSelectedItem() == null ? null
             : bookTableView.getSelectionModel().getSelectedItem().getId();
         List<BookDTO> all = catalogBooks;
-        List<BookDTO> results = filterCatalog.filter(all, filterState.applied());
+        List<BookDTO> results = BookSearch.search(filterCatalog.filter(all, filterState.applied()), searchQueryField.getText());
         results = results.stream().sorted(comparing(BookDTO::getName, String.CASE_INSENSITIVE_ORDER)).toList();
         bookTableView.setItems(observableArrayList(results));
         bookTableView.getItems().stream()
@@ -470,7 +487,7 @@ public class MainViewController extends AbstractViewController {
     @FXML
     private void manageAudioBookSites() {
         loadModalView(
-            "Audiobook sites",
+            "Сайты аудиокниг",
             "view/audio-book-sites-view.fxml",
             500,
             50
@@ -704,7 +721,7 @@ public class MainViewController extends AbstractViewController {
                 } else {
                     String text = value == null ? "—" : value.toString();
                     if ("cycleNumberColumn".equals(column.getId())) text = text.replace("/", " из ");
-                    setText(text); setTooltip(new Tooltip(text));
+                    setText(text);
                 }
             }
         });

@@ -4,18 +4,17 @@ import com.tsel.home.project.booklibrary.ui.SageTheme;
 import java.util.function.Function;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.Tooltip;
 import javafx.util.StringConverter;
 
 /**
- * Настраивает единое представление операций в ComboBox, включая подписи и подсказки.
+ * Настраивает единое представление операций в ComboBox, включая подписи.
  */
 public final class FilterEditorControls {
 
     private FilterEditorControls() {}
 
     /**
-     * Настраивает подписи, ограниченную ширину и подсказки списка операций.
+     * Настраивает подписи и ограниченную ширину списка операций.
      * @param <T> тип операции
      * @param combo настраиваемый список
      * @param label функция локализованной подписи
@@ -39,7 +38,6 @@ public final class FilterEditorControls {
                 super.updateItem(value, empty);
                 String text = empty || value == null ? null : label.apply(value);
                 setText(text);
-                setTooltip(text == null ? null : new Tooltip(text));
                 setMinWidth(0);
                 setPrefWidth(Math.max(0, list.getWidth() - 18));
                 setMaxWidth(USE_PREF_SIZE);
