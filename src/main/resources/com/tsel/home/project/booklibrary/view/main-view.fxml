@@ -19,10 +19,10 @@
                 </Menu>
                 <Menu text="Правка">
                     <items>
-                        <MenuItem text="Редактировать циклы" onAction="#editCycles"/>
-                        <MenuItem text="Редактировать авторов" onAction="#editAuthors"/>
-                        <MenuItem text="Редактировать жанры" onAction="#editGenres"/>
-                        <MenuItem text="Редактировать публицистов" onAction="#editPublishers"/>
+                        <MenuItem text="Правка циклов" onAction="#editCycles"/>
+                        <MenuItem text="Правка авторов" onAction="#editAuthors"/>
+                        <MenuItem text="Правка жанров" onAction="#editGenres"/>
+                        <MenuItem text="Правка публицистов" onAction="#editPublishers"/>
                     </items>
                 </Menu>
                 <Menu text="Справка">

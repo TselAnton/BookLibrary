@@ -11,6 +11,7 @@ import com.tsel.home.project.booklibrary.filter.condition.NumericOperation;
 import com.tsel.home.project.booklibrary.filter.processor.impl.NumericFilterProcessor;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +22,20 @@ class BookPriceFormatterTest {
         assertEquals("Бесценно", BookPriceFormatter.format(null));
         assertEquals("Подарок", BookPriceFormatter.format(0.0));
         assertEquals("1\u00a0250,5 ₽", BookPriceFormatter.format(1250.5));
+    }
+
+    @Test
+    void testTotalPriceUsesWholeRublesAndRussianSeparatorsForAnyDefaultLocale() {
+        Locale previous = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.US);
+            assertEquals("1\u00a0234\u00a0567 ₽", BookPriceFormatter.formatTotal(1234567));
+            assertEquals("1\u00a0250 ₽", BookPriceFormatter.formatTotal(1250));
+            assertEquals("0 ₽", BookPriceFormatter.formatTotal(0));
+            assertEquals("1\u00a0251 ₽", BookPriceFormatter.formatTotal(1250.89));
+        } finally {
+            Locale.setDefault(previous);
+        }
     }
 
     @Test

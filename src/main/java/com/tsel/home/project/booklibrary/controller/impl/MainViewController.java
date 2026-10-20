@@ -22,7 +22,9 @@ import com.tsel.home.project.booklibrary.helper.DataExporter;
 import com.tsel.home.project.booklibrary.service.ReferenceService;
 import com.tsel.home.project.booklibrary.service.ReferenceType;
 import com.tsel.home.project.booklibrary.ui.AboutWindow;
+import com.tsel.home.project.booklibrary.ui.BookPriceFormatter;
 import com.tsel.home.project.booklibrary.ui.LineIcon;
+import com.tsel.home.project.booklibrary.ui.RandomBookAnimation;
 import com.tsel.home.project.booklibrary.ui.ReferenceEditorWindow;
 import com.tsel.home.project.booklibrary.ui.SageTheme;
 import com.tsel.home.project.booklibrary.ui.UpdateWindow;
@@ -37,7 +39,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +115,7 @@ public class MainViewController extends AbstractViewController {
     private final PauseTransition coverFilterRefresh = new PauseTransition(Duration.millis(100));
     private final FilterCatalog filterCatalog = new FilterCatalog(BookDTO.class);
     private final FilterState filterState = new FilterState();
+    private final RandomBookAnimation randomBookAnimation = new RandomBookAnimation();
 
     @FXML
     @Getter
@@ -273,7 +275,6 @@ public class MainViewController extends AbstractViewController {
         bookTableView.addEventFilter(ScrollEvent.SCROLL, event -> {
             if (event.isControlDown()) { updateTableScale(event, bookTableView); event.consume(); }
         });
-        bookTableView.getSelectionModel().selectedItemProperty().addListener((o, a, b) -> updateStatus());
         activeFilters = new FilterChips(this::resetFilters);
         activeFilterContainer.getChildren().add(activeFilters);
         clearSearchButton.visibleProperty().bind(searchQueryField.textProperty().isNotEmpty());
@@ -291,17 +292,27 @@ public class MainViewController extends AbstractViewController {
         AnchorPane.setLeftAnchor(filterDrawer, 0.0);
         AnchorPane.setRightAnchor(filterDrawer, 0.0);
         mainAnchorPane.getChildren().add(filterDrawer);
+        AnchorPane.setTopAnchor(randomBookAnimation, 0.0);
+        AnchorPane.setBottomAnchor(randomBookAnimation, 0.0);
+        AnchorPane.setLeftAnchor(randomBookAnimation, 0.0);
+        AnchorPane.setRightAnchor(randomBookAnimation, 0.0);
+        mainAnchorPane.getChildren().add(randomBookAnimation);
         coverFilterRefresh.setOnFinished(event -> {
             filterDrawer.invalidateOptions();
             applyFilters();
         });
         stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
             coverFilterRefresh.stop();
+            randomBookAnimation.stop();
             filterDrawer.dispose();
         });
         stage.widthProperty().addListener((o, a, b) -> updateCompact(b.doubleValue()));
         updateCompact(1252);
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (randomBookAnimation.isVisible()) {
+                e.consume();
+                return;
+            }
             if (filterDrawer.isOpen()) {
                 return;
             }
@@ -427,8 +438,7 @@ public class MainViewController extends AbstractViewController {
     }
 
     private void updateStatus() {
-        resultStatus.setText("Найдено: " + bookTableView.getItems().size() + " из " + bookRepository.getAll().size()
-            + "   |   Выбрано: " + (bookTableView.getSelectionModel().getSelectedItem() == null ? 0 : 1));
+        resultStatus.setText("Найдено: " + bookTableView.getItems().size() + " из " + bookRepository.getAll().size());
     }
 
     @FXML public void exitApplication() { SageTheme.requestClose((Stage) mainAnchorPane.getScene().getWindow()); }
@@ -476,10 +486,10 @@ public class MainViewController extends AbstractViewController {
         int itemsSize = bookTableView.getItems().size();
 
         riseAlert(AlertType.INFORMATION, "Стоимость книг", "Стоимость книг",
-            format("Стоимость %s %s: %s руб",
+            format("Стоимость %s %s: %s",
                 itemsSize,
                 itemsSize == 1 ? "книги" : "книг",
-                new DecimalFormat("###,###").format(fullPrice)
+                BookPriceFormatter.formatTotal(fullPrice)
             )
         );
     }
@@ -497,6 +507,9 @@ public class MainViewController extends AbstractViewController {
 
     @FXML
     public void chooseRandomBook() {
+        if (randomBookAnimation.isVisible()) {
+            return;
+        }
         List<BookDTO> notReadBooks = bookTableView.getItems()
             .stream()
             .filter(bookDTO -> !bookDTO.getRead().isSelected())
@@ -511,8 +524,10 @@ public class MainViewController extends AbstractViewController {
             return;
         }
         BookDTO randomBook = notReadBooks.get(RANDOM.nextInt(notReadBooks.size()));
-        loadBookViewWindow(randomBook.getId());
-        refreshCatalog();
+        randomBookAnimation.play(() -> {
+            loadBookViewWindow(randomBook.getId());
+            refreshCatalog();
+        });
     }
 
     @FXML

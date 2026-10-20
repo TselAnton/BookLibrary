@@ -26,8 +26,21 @@ public final class BookPriceFormatter {
         if (price == 0.0) {
             return "Подарок";
         }
+        return formatAmount(price, 2);
+    }
+
+    /**
+     * Формирует итоговую стоимость в целых рублях, включая нулевую сумму.
+     * @param price суммарная стоимость найденных книг
+     * @return число с разделителями ru-RU без дробной части и со знаком рубля
+     */
+    public static String formatTotal(double price) {
+        return formatAmount(price, 0);
+    }
+
+    private static String formatAmount(double price, int maximumFractionDigits) {
         NumberFormat format = NumberFormat.getNumberInstance(Locale.forLanguageTag("ru-RU"));
-        format.setMaximumFractionDigits(2);
+        format.setMaximumFractionDigits(maximumFractionDigits);
         return format.format(price) + " ₽";
     }
 }

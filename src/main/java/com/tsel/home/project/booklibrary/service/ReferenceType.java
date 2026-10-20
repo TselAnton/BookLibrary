@@ -11,10 +11,10 @@ import lombok.Getter;
 
 @Getter
 public enum ReferenceType {
-    CYCLES("Редактировать циклы", Cycle.class),
-    AUTHORS("Редактировать авторов", Author.class),
-    GENRES("Редактировать жанры", Genre.class),
-    PUBLISHERS("Редактировать публицистов", Publisher.class);
+    CYCLES("Правка циклов", Cycle.class),
+    AUTHORS("Правка авторов", Author.class),
+    GENRES("Правка жанров", Genre.class),
+    PUBLISHERS("Правка публицистов", Publisher.class);
 
     private final String title;
     private final Class<? extends BaseEntity<UUID>> entityClass;
