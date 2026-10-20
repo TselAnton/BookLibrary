@@ -11,6 +11,7 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.GenreRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
+import com.tsel.home.project.booklibrary.dao.schema.StorageSchemaInitializer;
 import com.tsel.home.project.booklibrary.helper.DateProvider;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.PropertyProvider;
@@ -67,6 +68,8 @@ public class App {
         private static void initApplicationContext() {
             SimpleApplicationContext.initBean(PropertyProvider.class, () -> new PropertyProvider(buildPathFromCurrentDir()));
 
+            initializeStorage(DEFAULT_REPOSITORY_PATH, BACKUP_PATH);
+
             SimpleApplicationContext.initBean(AudioBookSiteRepository.class, AudioBookSiteRepository::new);
             SimpleApplicationContext.initBean(AuthorRepository.class, AuthorRepository::new);
             SimpleApplicationContext.initBean(CycleRepository.class, CycleRepository::new);
@@ -77,16 +80,18 @@ public class App {
 
             SimpleApplicationContext.initBean(ImageProvider.class, ImageProvider::new);
             SimpleApplicationContext.initBean(TableScroll.class, TableScroll::new);
+
+            Timer timer = Timer.start("Remove expired storages");
+            new StorageBackupArchiver().removeExpiredArchives(BACKUP_PATH);
+            timer.stop();
+        }
+
+        static void initializeStorage(Path repositoryPath, Path backupPath) {
             SimpleApplicationContext.initBean(DateProvider.class, DateProvider::new);
-
             Timer timer = Timer.start("Archive storages");
-            StorageBackupArchiver storageBackupArchiver = new StorageBackupArchiver();
-            storageBackupArchiver.archiveStorages(DEFAULT_REPOSITORY_PATH, BACKUP_PATH);
+            new StorageBackupArchiver().archiveStorages(repositoryPath, backupPath);
             timer.stop();
-
-            timer = Timer.start("Remove expired storages");
-            storageBackupArchiver.removeExpiredArchives(BACKUP_PATH);
-            timer.stop();
+            new StorageSchemaInitializer().initialize(repositoryPath);
         }
 
         @Override

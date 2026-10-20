@@ -25,6 +25,7 @@ import com.tsel.home.project.booklibrary.dto.ComboBoxDTO;
 import com.tsel.home.project.booklibrary.dto.CycleDTO;
 import com.tsel.home.project.booklibrary.dto.GenreDTO;
 import com.tsel.home.project.booklibrary.dto.PublisherDTO;
+import com.tsel.home.project.booklibrary.service.BookSaveService;
 import com.tsel.home.project.booklibrary.utils.MyGson;
 import com.tsel.home.project.booklibrary.utils.table.AutoCompleteComboBoxListener;
 import com.tsel.home.project.booklibrary.utils.table.CustomFileChooser;
@@ -409,6 +410,7 @@ public abstract class AbstractBookController extends AbstractViewController {
 
         if (isBookFieldsInvalid(bookTitle, bookPagesCount, bookPrice, bookPublishYear)
             || isAuthorAndPublisherFieldsInvalid(author, publisher)
+            || author == null || publisher == null
             || isCycleFieldsInvalid(cycle, cycleBookNumber, cycleTotalBookCount, cycleEndedFlag)) {
             return;
         }
@@ -416,37 +418,10 @@ public abstract class AbstractBookController extends AbstractViewController {
         Book newBook = null;
 
         try {
-            authorRepository.beginTransaction();
-            publisherRepository.beginTransaction();
-            cycleRepository.beginTransaction();
-            bookRepository.beginTransaction();
-
-            // Сохранение автора
             Author newAuthor = resolveAuthorByComboBox(author);
-            authorRepository.save(newAuthor);
-
-            // Сохранение публициста
             Publisher newPublisher = resolvePublisherByComboBox(publisher);
-            publisherRepository.save(newPublisher);
-
-            // Сохранение жанра
             Genre newGenre = resolveGenreByComboBox(genre);
-            if (newGenre != null) {
-                genreRepository.save(newGenre);
-            }
-
             Cycle newCycle = resolveCycleByComboBox(cycle, cycleEndedFlag, stringToInteger(cycleTotalBookCount));
-            log.info("Resolved cycle for book '{}': '{}'",
-                bookTitle,
-                ofNullable(newCycle).map(Cycle::getName).orElse("NULL")
-            );
-            if (newCycle != null) {
-                cycleRepository.save(newCycle);
-            }
-
-            Book oldBook = ofNullable(bookId)
-                .map(bookRepository::getById)
-                .orElse(null);
 
             newBook = Book.builder()
                 .id(bookId)
@@ -464,17 +439,16 @@ public abstract class AbstractBookController extends AbstractViewController {
                 .price(resolvePriceForSave(bookPrice))
                 .hardCover(hardCoverFlag)
                 .audioBookSiteIds(audioBookSiteIds)
-                .createdAt(resolveBookCreatedAt(oldBook))
-                .updatedAt(System.currentTimeMillis())
-                .readUpdatedAt(resolveBookReadUpdatedAt(oldBook, readBookFlag))
                 .build();
 
-            bookRepository.save(newBook);
-
-            bookRepository.commitTransaction();
-            cycleRepository.commitTransaction();
-            authorRepository.commitTransaction();
-            publisherRepository.commitTransaction();
+            BookSaveService service = new BookSaveService(
+                bookRepository,
+                authorRepository,
+                publisherRepository,
+                genreRepository,
+                cycleRepository
+            );
+            newBook = service.save(newBook, newAuthor, newPublisher, newGenre, newCycle);
 
             doAfterSave(newBook);
 
@@ -484,20 +458,10 @@ public abstract class AbstractBookController extends AbstractViewController {
         } catch (ConstraintException e) {
             log.warn("Constraint exception while trying to save new book '{}'", GSON.toJson(newBook), e);
 
-            authorRepository.abortTransaction();
-            publisherRepository.abortTransaction();
-            cycleRepository.abortTransaction();
-            bookRepository.abortTransaction();
-
             riseAlert(WARNING, "Ошибка", "Ошибка при создании новой книги", e.getMessage());
 
         } catch (Exception e) {
             log.error("Exception while trying to save new book '{}'", GSON.toJson(newBook), e);
-
-            authorRepository.abortTransaction();
-            publisherRepository.abortTransaction();
-            cycleRepository.abortTransaction();
-            bookRepository.abortTransaction();
 
             riseAlert(WARNING, "Ошибка", "Ошибка при создании новой книги", "Произошла непредвиденная ошибка: " + e.getMessage());
         }
@@ -679,21 +643,4 @@ public abstract class AbstractBookController extends AbstractViewController {
             .orElse(new Cycle(null, cycleComboBox.getName(), isCycleEnded, booksInCycle));
     }
 
-    private Long resolveBookCreatedAt(@Nullable Book book) {
-        if (book == null) {
-            return System.currentTimeMillis();
-        }
-        return book.getCreatedAt();
-    }
-
-    private Long resolveBookReadUpdatedAt(@Nullable Book book, boolean readBookFlag) {
-        if (!readBookFlag) {
-            return null;
-        }
-        if (book != null && book.getReadUpdatedAt() != null) {
-            return book.getReadUpdatedAt();
-        }
-
-        return System.currentTimeMillis();
-    }
 }

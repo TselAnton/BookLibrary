@@ -1,7 +1,10 @@
 package com.tsel.home.project.booklibrary.dao.data;
 
-import com.tsel.home.project.booklibrary.dao.annotation.EntityDisplayName;
 import com.tsel.home.project.booklibrary.dao.annotation.Property;
+import com.tsel.home.project.booklibrary.dao.schema.CurrentTimeDefault;
+import com.tsel.home.project.booklibrary.dao.schema.NullPolicy;
+import com.tsel.home.project.booklibrary.dao.schema.StorageEntity;
+import com.tsel.home.project.booklibrary.dao.schema.StorageField;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +22,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = {"coverImgAbsolutePath"})
-@EntityDisplayName("Книга")
+@StorageEntity(value = "book", displayName = "Книга", version = 1)
 public class Book implements BaseEntity<UUID> {
 
     @Serial
@@ -65,15 +68,19 @@ public class Book implements BaseEntity<UUID> {
     private Double price;
 
     @Property(value = "год издания", nullable = false)
+    @StorageField(defaultJson = "0", onNull = NullPolicy.USE_DEFAULT)
     private Integer publicationYear;
 
     @Property(value = "аудиокниги")
+    @StorageField(defaultJson = "[]", onNull = NullPolicy.USE_DEFAULT)
     private List<UUID> audioBookSiteIds = new ArrayList<>();
 
-    @Property(value = "время создания")
+    @Property(value = "время создания", nullable = false)
+    @StorageField(provider = CurrentTimeDefault.class, onNull = NullPolicy.USE_DEFAULT)
     private Long createdAt;
 
-    @Property(value = "время обновления")
+    @Property(value = "время обновления", nullable = false)
+    @StorageField(provider = CurrentTimeDefault.class, onNull = NullPolicy.USE_DEFAULT)
     private Long updatedAt;
 
     @Property(value = "время обновления флага 'прочитано'")

@@ -1136,3 +1136,28 @@ protected void paintThumb(Graphics graphics, JComponent component, Rectangle bou
     graphics.fillRoundRect(bounds.x + 2, bounds.y, bounds.width - 4, bounds.height, 8, 8);
 }
 ```
+
+
+## 27. Метаданные схемы и транзакции хранилища
+
+Литерал класса, реализующего интерфейс provider, используется в аннотации с ограниченным
+параметром типа. Пример из `dao/schema/StorageField.java`:
+
+```java
+Class<? extends DefaultValueProvider> provider() default NoDefaultValue.class;
+```
+
+Вычисляемое значение и политика обработки null задаются одной аннотацией поля.
+Реальный пример из `dao/data/Book.java`:
+
+```java
+@Property(value = "время создания", nullable = false)
+@StorageField(provider = CurrentTimeDefault.class, onNull = NullPolicy.USE_DEFAULT)
+private Long createdAt;
+```
+
+Описание полей схемы использует приватный record с многострочным списком компонентов
+по правилам раздела 24 (`EntitySchema.FieldDefinition`). Enum политик без дополнительных
+членов оформляется одной константой на строку, без завершающей точки с запятой
+(`NullPolicy`). Тестовый источник времени создаётся через
+`Clock.fixed(Instant.ofEpochMilli(millis), ZoneOffset.UTC)`.

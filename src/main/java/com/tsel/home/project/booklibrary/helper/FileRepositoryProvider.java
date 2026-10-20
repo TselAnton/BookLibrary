@@ -11,8 +11,7 @@ import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
 import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.utils.FileUtils;
 import com.tsel.home.project.booklibrary.utils.MyGson;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -51,8 +50,12 @@ public final class FileRepositoryProvider<K extends Serializable, E extends Base
             return new ArrayList<>();
         }
 
-        try {
-            return GSON.fromJson(Files.readString(fileRepositoryPath, UTF_8), listType);
+        try (BufferedReader reader = Files.newBufferedReader(fileRepositoryPath, UTF_8)) {
+            List<E> entities = GSON.fromJson(reader, listType);
+            if (entities == null) {
+                throw new IllegalStateException("Ожидается JSON-массив: " + fileRepositoryPath);
+            }
+            return entities;
 
         } catch (IOException e) {
             log.error("Exception while trying to read storage file '{}' by bytes", fileRepositoryPath, e);
@@ -65,18 +68,13 @@ public final class FileRepositoryProvider<K extends Serializable, E extends Base
      * @param entities Список сущностей
      */
     public void overwriteStorageFile(Collection<E> entities) {
-        if (isNotExists(fileRepositoryPath)) {
-            log.info("File '{}' not exist, trying to create new one", fileRepositoryPath);
-            FileUtils.createFile(fileRepositoryPath);
-        }
+        StorageWriteBatch batch = new StorageWriteBatch();
+        prepareWrite(batch, entities);
+        batch.commit();
+    }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileRepositoryPath.toFile(), UTF_8, false))) {
-            writer.write(GSON.toJson(entities));
-
-        } catch (IOException e) {
-            log.error("Exception while trying to write storage file '{}' line by line", fileRepositoryPath, e);
-            throw new IllegalStateException(format("Проблема при записи данных в файл хранилища '%s'", fileRepositoryPath), e);
-        }
+    public void prepareWrite(StorageWriteBatch batch, Collection<E> entities) {
+        batch.add(fileRepositoryPath, GSON.toJson(entities).getBytes(UTF_8));
     }
 
     /**

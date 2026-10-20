@@ -4,18 +4,22 @@ import static com.tsel.home.project.booklibrary.utils.FileUtils.buildPathFromCur
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
-import com.tsel.home.project.booklibrary.dao.annotation.EntityDisplayName;
+import com.google.gson.Gson;
 import com.tsel.home.project.booklibrary.dao.annotation.Property;
 import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
 import com.tsel.home.project.booklibrary.dao.exception.ConstraintException;
 import com.tsel.home.project.booklibrary.dao.exception.NotNullConstraintException;
 import com.tsel.home.project.booklibrary.dao.identifier.IdentifierGenerator;
+import com.tsel.home.project.booklibrary.dao.schema.EntitySchema;
+import com.tsel.home.project.booklibrary.dao.schema.StorageEntity;
 import com.tsel.home.project.booklibrary.helper.FileRepositoryProvider;
+import com.tsel.home.project.booklibrary.helper.StorageWriteBatch;
+import com.tsel.home.project.booklibrary.utils.MyGson;
 import com.tsel.home.project.booklibrary.utils.StringUtils;
-import com.tsel.home.project.booklibrary.utils.Timer;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.time.Clock;
 import java.util.*;
 import java.util.Map.Entry;
 import javax.annotation.Nullable;
@@ -26,6 +30,10 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
 
     public static final Path DEFAULT_REPOSITORY_PATH = buildPathFromCurrentDir("repository");
 
+    protected static final Gson GSON = MyGson.buildGson();
+
+    private final Class<E> entityClass;
+    private final EntitySchema schema;
     private final String entityDisplayName;
     private final Map<Field, Property> notNullFields;
     private final IdentifierGenerator<K> keyGenerator;
@@ -36,12 +44,14 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
     private Map<K, E> repositoryMapSnapshot;
 
     protected AbstractFileRepository(Class<E> entityClass, IdentifierGenerator<K> keyGenerator, @Nullable Path rootPath) {
+        this.entityClass = entityClass;
+        this.schema = entityClass.isAnnotationPresent(StorageEntity.class) ? new EntitySchema(entityClass) : null;
         this.keyGenerator = keyGenerator;
         this.entityDisplayName = resolveEntityName(entityClass);
         this.fileRepositoryProvider = new FileRepositoryProvider<>(this.getClass(), entityClass, rootPath);
 
-        this.repositoryMap = initEntities();
         this.notNullFields = resolveNotNullFields(entityClass);
+        this.repositoryMap = initEntities();
 
         this.repositoryMapSnapshot = null;
         this.isTransactionOpen = false;
@@ -49,7 +59,7 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
 
     @Override
     public E getById(K id) {
-        return repositoryMap.get(id);
+        return copy(repositoryMap.get(id));
     }
 
     @Override
@@ -59,29 +69,36 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
 
     @Override
     public List<E> getAll() {
-        return new ArrayList<>(repositoryMap.values());
+        return repositoryMap.values().stream().map(this::copy).toList();
     }
 
     @Override
     public K save(E entity) {
-        Timer timer = Timer.start("Save entity " + entityDisplayName);
-
-        if (entity.getId() == null) {
-            entity.setId(keyGenerator.generate());
+        boolean ownTransaction = !isTransactionOpen;
+        if (ownTransaction) {
+            beginTransaction();
         }
-
-        checkConstrains(entity);
-        repositoryMap.put(entity.getId(), entity);
-
-        if (isTransactionOpen) {
-            log.info("Successfully saved entity '{}' in transaction", entity);
-        } else {
-            fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
-            log.info("Successfully saved entity '{}'", entity);
+        try {
+            if (entity.getId() == null) {
+                entity.setId(keyGenerator.generate());
+            }
+            E candidate = copy(entity);
+            if (schema != null) {
+                candidate = GSON.fromJson(schema.normalize(GSON.toJsonTree(candidate).getAsJsonObject(), storageClock()), entityClass);
+            }
+            prepareSave(candidate, copy(repositoryMap.get(entity.getId())));
+            checkConstrains(candidate);
+            repositoryMap.put(candidate.getId(), candidate);
+            if (ownTransaction) {
+                commitTransaction();
+            }
+            return candidate.getId();
+        } catch (RuntimeException e) {
+            if (ownTransaction) {
+                abortTransaction();
+            }
+            throw e;
         }
-
-        timer.stop();
-        return entity.getId();
     }
 
     @Override
@@ -91,53 +108,89 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
 
     @Override
     public void deleteById(K id) {
-        E removedEntity = repositoryMap.remove(id);
-        if (removedEntity != null) {
-            if (isTransactionOpen) {
-                log.info("Deleted entity '{}' in transaction", removedEntity);
-            } else {
-                fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
-                log.info("Successfully deleted entity '{}'", removedEntity);
+        boolean ownTransaction = !isTransactionOpen;
+        if (ownTransaction) {
+            beginTransaction();
+        }
+        try {
+            repositoryMap.remove(id);
+            if (ownTransaction) {
+                commitTransaction();
             }
+        } catch (RuntimeException e) {
+            if (ownTransaction) {
+                abortTransaction();
+            }
+            throw e;
         }
     }
 
     @Override
     public void beginTransaction() {
-        if (!this.isTransactionOpen) {
-            this.isTransactionOpen = true;
-            this.repositoryMapSnapshot = new HashMap<>(this.repositoryMap);
-            log.info("Starting transaction");
+        if (isTransactionOpen) {
+            throw new IllegalStateException("Транзакция уже открыта: " + entityDisplayName);
         }
+        repositoryMapSnapshot = copyMap(repositoryMap);
+        isTransactionOpen = true;
     }
 
     @Override
     public void commitTransaction() {
-        Timer timer = Timer.start("Commit transaction for " + entityDisplayName);
-        if (this.isTransactionOpen) {
-            fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
-
-            this.isTransactionOpen = false;
-            this.repositoryMapSnapshot = null;
-            log.info("Transaction commited");
+        if (isTransactionOpen) {
+            try {
+                StorageWriteBatch batch = new StorageWriteBatch();
+                prepareCommit(batch);
+                batch.commit();
+                finishCommit();
+            } catch (RuntimeException e) {
+                abortTransaction();
+                throw e;
+            }
         }
-        timer.stop();
     }
 
     @Override
     public void abortTransaction() {
-        if (this.isTransactionOpen) {
-            this.repositoryMap = new HashMap<>(this.repositoryMapSnapshot);
-            fileRepositoryProvider.overwriteStorageFile(repositoryMap.values());
-
-            this.isTransactionOpen = false;
-            this.repositoryMapSnapshot = null;
-            log.info("Transaction aborted");
+        if (isTransactionOpen) {
+            repositoryMap = repositoryMapSnapshot;
+            finishCommit();
         }
     }
 
+    void prepareCommit(StorageWriteBatch batch) {
+        if (!isTransactionOpen) {
+            throw new IllegalStateException("Транзакция не открыта: " + entityDisplayName);
+        }
+        if (!GSON.toJsonTree(repositoryMap).equals(GSON.toJsonTree(repositoryMapSnapshot))) {
+            fileRepositoryProvider.prepareWrite(batch, repositoryMap.values());
+        }
+    }
+
+    void finishCommit() {
+        isTransactionOpen = false;
+        repositoryMapSnapshot = null;
+    }
+
+    protected Clock storageClock() {
+        return Clock.systemUTC();
+    }
+
+    protected void prepareSave(E entity, E previous) {
+        // FOR OVERWRITE
+    }
+
     protected Map<K, E> getRepositoryMap() {
-        return this.repositoryMap;
+        return copyMap(repositoryMap);
+    }
+
+    private E copy(E entity) {
+        return entity == null ? null : GSON.fromJson(GSON.toJsonTree(entity), entityClass);
+    }
+
+    private Map<K, E> copyMap(Map<K, E> source) {
+        Map<K, E> result = new LinkedHashMap<>();
+        source.forEach((key, entity) -> result.put(key, copy(entity)));
+        return result;
     }
 
     protected ConstraintException buildConstraintException(String message) {
@@ -186,11 +239,11 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
     }
 
     private String resolveEntityName(Class<E> entityClass) {
-        return ofNullable(entityClass.getAnnotation(EntityDisplayName.class))
-            .map(EntityDisplayName::value)
+        return ofNullable(entityClass.getAnnotation(StorageEntity.class))
+            .map(StorageEntity::displayName)
             .filter(StringUtils::isNotBlank)
             .orElseThrow(() -> new IllegalStateException(
-                format("Не определена аннотация @EntityDisplayName для сущности %s", entityClass.getName()))
+                format("Не задан displayName в @StorageEntity для сущности %s", entityClass.getName()))
             );
     }
 
@@ -212,6 +265,9 @@ public abstract class AbstractFileRepository<K extends Serializable, E extends B
         Map<K, E> entitiesMap = new LinkedHashMap<>();
         List<E> entitiesList = ofNullable(fileRepositoryProvider.readStorageFile()).orElse(Collections.emptyList());
         for (E entity : entitiesList) {
+            if (entity == null || entity.getId() == null || entitiesMap.containsKey(entity.getId())) {
+                throw new IllegalStateException("Пустой или повторный идентификатор: " + entityDisplayName);
+            }
             preCreateEntity(entity);
             entitiesMap.put(entity.getId(), entity);
         }
