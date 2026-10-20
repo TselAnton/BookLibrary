@@ -1,9 +1,9 @@
 package com.tsel.home.project.booklibrary.helper;
 
-import static org.reflections.scanners.Scanners.SubTypes;
 import static org.reflections.scanners.Scanners.TypesAnnotated;
 
 import com.tsel.home.project.booklibrary.dao.annotation.FileStorageName;
+import com.tsel.home.project.booklibrary.dao.schema.StorageSchemas;
 import com.tsel.home.project.booklibrary.utils.FileUtils;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.LinkedHashSet;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -38,12 +38,14 @@ public final class StorageBackupArchiver {
     public void archiveStorages(Path repositoryPath, Path archivePath) {
         log.info("Trying to archive current storage files");
 
-        // Поиск всех репозиториев для получения названия файлов
+        // Реестр гарантирует включение файлов миграции даже при ограниченном сканировании модулей.
+        Set<String> storageNames = new LinkedHashSet<>();
+        StorageSchemas.definitions().forEach(definition -> storageNames.add(definition.fileName()));
         Reflections reflections = new Reflections("com.tsel.home.project.booklibrary");
-        Set<Class<?>> repositoryClasses = reflections.get(SubTypes.of(TypesAnnotated.with(FileStorageName.class)).asClass());
-
-        String repositoryClassesStringArray = repositoryClasses.stream().map(Class::getName).collect(Collectors.joining(", "));
-        log.info("Found repository classes: [{}]", repositoryClassesStringArray);
+        reflections.get(TypesAnnotated.with(FileStorageName.class).asClass()).stream()
+            .map(FileRepositoryProvider::resolveStorageFileName)
+            .filter(java.util.Objects::nonNull)
+            .forEach(storageNames::add);
 
         try {
             // Создание директории под бекапы
@@ -63,20 +65,11 @@ public final class StorageBackupArchiver {
         log.info("Trying to create archive with name: {}", archivePath.getFileName());
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(archivePath.toFile()))) {
 
-            // Попытка собрать в архив все найденные файлы
-            for (Class<?> repositoryClass : repositoryClasses) {
-                log.info("Trying to read storage file for repository class {}", repositoryClass.getName());
-                String fileStorageName = FileRepositoryProvider.resolveStorageFileName(repositoryClass);
-                Path resolvedStoragePath = FileRepositoryProvider.resolveStoragePath(repositoryClass, repositoryPath);
-
-                if (fileStorageName == null || resolvedStoragePath == null || !Files.exists(resolvedStoragePath)) {
-                    log.warn("Not found storage file name for repository class {} by name '{}'. Skip it", repositoryClass.getName(), fileStorageName);
-                    continue;
+            for (String fileStorageName : storageNames) {
+                Path resolvedStoragePath = repositoryPath.resolve(fileStorageName);
+                if (Files.exists(resolvedStoragePath)) {
+                    writeFileToZipStream(resolvedStoragePath, fileStorageName, zipOutputStream);
                 }
-
-                // Запись файла в архив
-                log.info("Founded storage file '{}' for repository class {}", fileStorageName, repositoryClass.getName());
-                writeFileToZipStream(resolvedStoragePath, repositoryClass, fileStorageName, zipOutputStream);
             }
 
         } catch (Exception e) {
@@ -101,13 +94,12 @@ public final class StorageBackupArchiver {
 
     private void writeFileToZipStream(
         Path resolvedStoragePath,
-        Class<?> repositoryClass,
         String fileStorageName,
         ZipOutputStream zipOutputStream
     ) throws IOException {
 
         try (FileInputStream fileInputStream = new FileInputStream(resolvedStoragePath.toFile())) {
-            log.info("Trying to write storage file {} for repository class {} into archive", fileStorageName, repositoryClass.getName());
+            log.info("Trying to write storage file {} into archive", fileStorageName);
             ZipEntry zipEntry = new ZipEntry(fileStorageName);
             zipOutputStream.putNextEntry(zipEntry);
 

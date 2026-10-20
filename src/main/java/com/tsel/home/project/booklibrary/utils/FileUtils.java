@@ -2,9 +2,9 @@ package com.tsel.home.project.booklibrary.utils;
 
 import static java.lang.String.format;
 
+import com.tsel.home.project.booklibrary.update.ApplicationPaths;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,10 +22,7 @@ public final class FileUtils {
      */
     public static Path buildPathFromCurrentDir(String... pathParts) {
         return Paths.get(
-            FileSystems.getDefault()
-                .getPath("")
-                .toAbsolutePath()
-                .toString(),
+            ApplicationPaths.dataDirectory().toString(),
             pathParts
         );
     }

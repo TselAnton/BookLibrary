@@ -11,12 +11,18 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.CycleRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.GenreRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository;
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
+import com.tsel.home.project.booklibrary.dao.schema.StorageSchemaInitializer;
 import com.tsel.home.project.booklibrary.helper.DateProvider;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.helper.PropertyProvider;
 import com.tsel.home.project.booklibrary.helper.SimpleApplicationContext;
 import com.tsel.home.project.booklibrary.helper.StorageBackupArchiver;
-import com.tsel.home.project.booklibrary.search.SearchService;
+import com.tsel.home.project.booklibrary.ui.StartupUpdateCheck;
+import com.tsel.home.project.booklibrary.update.ApplicationPaths;
+import com.tsel.home.project.booklibrary.update.GitHubReleaseClient;
+import com.tsel.home.project.booklibrary.update.UpdateStartup;
+import com.tsel.home.project.booklibrary.update.shared.InstallationLock;
+import com.tsel.home.project.booklibrary.update.shared.StartupDialogs;
 import com.tsel.home.project.booklibrary.utils.Timer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
 import java.nio.file.Path;
@@ -36,12 +42,33 @@ public class App {
         private static final Path BACKUP_PATH = buildPathFromCurrentDir("backup");
 
         public static void main(String[] args) {
-            initApplicationContext();
-            launch(args);
+            try {
+                if (!UpdateStartup.allowLaunch()) {
+                    return;
+                }
+                InstallationLock lock = InstallationLock.acquire(ApplicationPaths.dataDirectory());
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        lock.close();
+                    } catch (Exception e) {
+                        log.error("Can't release application lock", e);
+                    }
+                }, "booklibrary-instance-lock"));
+                if (!UpdateStartup.allowLaunch(true)) {
+                    return;
+                }
+                initApplicationContext();
+                launch(args);
+            } catch (Exception e) {
+                log.error("Can't start application", e);
+                StartupDialogs.message("BookLibrary — ошибка запуска", e.getMessage());
+            }
         }
 
         private static void initApplicationContext() {
             SimpleApplicationContext.initBean(PropertyProvider.class, () -> new PropertyProvider(buildPathFromCurrentDir()));
+
+            initializeStorage(DEFAULT_REPOSITORY_PATH, BACKUP_PATH);
 
             SimpleApplicationContext.initBean(AudioBookSiteRepository.class, AudioBookSiteRepository::new);
             SimpleApplicationContext.initBean(AuthorRepository.class, AuthorRepository::new);
@@ -52,18 +79,19 @@ public class App {
             SimpleApplicationContext.initBean(BookRepository.class, BookRepository::new);
 
             SimpleApplicationContext.initBean(ImageProvider.class, ImageProvider::new);
-            SimpleApplicationContext.initBean(SearchService.class, SearchService::new);
             SimpleApplicationContext.initBean(TableScroll.class, TableScroll::new);
+
+            Timer timer = Timer.start("Remove expired storages");
+            new StorageBackupArchiver().removeExpiredArchives(BACKUP_PATH);
+            timer.stop();
+        }
+
+        static void initializeStorage(Path repositoryPath, Path backupPath) {
             SimpleApplicationContext.initBean(DateProvider.class, DateProvider::new);
-
             Timer timer = Timer.start("Archive storages");
-            StorageBackupArchiver storageBackupArchiver = new StorageBackupArchiver();
-            storageBackupArchiver.archiveStorages(DEFAULT_REPOSITORY_PATH, BACKUP_PATH);
+            new StorageBackupArchiver().archiveStorages(repositoryPath, backupPath);
             timer.stop();
-
-            timer = Timer.start("Remove expired storages");
-            storageBackupArchiver.removeExpiredArchives(BACKUP_PATH);
-            timer.stop();
+            new StorageSchemaInitializer().initialize(repositoryPath);
         }
 
         @Override
@@ -71,10 +99,16 @@ public class App {
             try {
                 MainViewController mainViewController = new MainViewController();
                 mainViewController.startScene(primaryStage);
+                StartupUpdateCheck.start(primaryStage, new GitHubReleaseClient());
 
             } catch (Exception e) {
                 log.error("Can't start main window", e);
             }
+        }
+
+        @Override
+        public void stop() {
+            SimpleApplicationContext.getBean(ImageProvider.class).close();
         }
     }
 }

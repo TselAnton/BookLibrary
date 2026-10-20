@@ -6,102 +6,214 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import com.tsel.home.project.booklibrary.dao.data.Book;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class ImageProvider {
+public final class ImageProvider implements AutoCloseable {
 
-    private final Map<UUID, Image> cashedImages = new ConcurrentHashMap<>();
-    private final Map<UUID, Image> cashedSmallImages = new ConcurrentHashMap<>();
+    private final Map<UUID, ImageHolder> cachedImages = new ConcurrentHashMap<>();
+    private final Map<UUID, ImageHolder> cachedSmallImages = new ConcurrentHashMap<>();
+    private final ExecutorService coverExecutor;
     private final Image cachedIcon;
     private final Image defaultImg;
+    private final ImageHolder defaultCover;
+    private Set<UUID> visibleCoverIds = Set.of();
 
     public ImageProvider() {
+        this(new CoverLoadExecutor(Math.min(4, Runtime.getRuntime().availableProcessors())));
+    }
+
+    ImageProvider(ExecutorService coverExecutor) {
+        this.coverExecutor = coverExecutor;
         try {
-            this.cachedIcon = loadImage("img/icon.png");
-            this.defaultImg = loadImage("img/default.png");
+            this.cachedIcon = loadImage("img/icon.png", 0, 0);
+            this.defaultImg = loadImage("img/default-book-cover.png", 244, 370);
+            this.defaultCover = new ImageHolder(null);
         } catch (Exception ex) {
+            coverExecutor.shutdownNow();
             log.error("Exception while init abstract constructor", ex);
             throw ex;
         }
     }
 
     public Image getWindowIcon() {
-        return cachedIcon;
+        return javafx.application.Platform.isFxApplicationThread()
+            ? com.tsel.home.project.booklibrary.ui.SageTheme.windowIcon() : cachedIcon;
     }
 
-    public Image resolveCover(Book book) {
-        if (isNotBlank(book.getCoverImgAbsolutePath())) {
-            Image cashedImage = cashedImages.get(book.getId());
-            if (cashedImage != null) {
-                return cashedImage;
-            }
+    public boolean isPlaceholder(Image image) {
+        return image == defaultImg;
+    }
 
-            Path imgPath = Paths.get(book.getCoverImgAbsolutePath());
-            if (Files.exists(imgPath)) {
-                try (InputStream inputStream = Files.newInputStream(imgPath)) {
-                    Image bookImage = new Image(inputStream);
-                    if (!bookImage.isError()) {
-                        cashedImages.put(book.getId(), bookImage);
-                        return bookImage;
-                    }
-                    return defaultImg;
-
-                } catch (IOException e) {
-                    log.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
-                }
-            }
+    /**
+     * Синхронно загружает обложку карточки в отдельный кеш памяти.
+     * Вызывается в потоке JavaFX и не ожидает очереди миниатюр.
+     * Неудачное чтение повторяется при следующем открытии карточки.
+     */
+    public ImageHolder resolveCover(Book book) {
+        String sourcePath = book.getCoverImgAbsolutePath();
+        if (!isNotBlank(sourcePath)) {
+            cancel(cachedImages.remove(book.getId()));
+            return defaultCover;
         }
-
-        return defaultImg;
+        return cachedImages.compute(book.getId(), (id, previous) -> {
+            if (previous != null && Objects.equals(previous.sourcePath, sourcePath) && !previous.isDefault()) {
+                return previous;
+            }
+            cancel(previous);
+            ImageHolder holder = new ImageHolder(sourcePath);
+            holder.image.set(loadCover(sourcePath, 488, 740));
+            holder.loading.set(false);
+            return holder;
+        });
     }
 
     public ImageHolder resolveSmallCover(Book book) {
-        if (isNotBlank(book.getCoverImgAbsolutePath())) {
-            Image cashedImage = cashedSmallImages.get(book.getId());
-            if (cashedImage != null) {
-                return new ImageHolder(cashedImage, false);
-            }
+        return resolveSmallCoverAsync(book);
+    }
 
-            Path imgPath = Paths.get(book.getCoverImgAbsolutePath());
-            if (Files.exists(imgPath)) {
-                try {
-                    Image bookImage = new Image(imgPath.toUri().toURL().toExternalForm(), 12, 0, true, true, true);
-                    if (!bookImage.isError()) {
-                        cashedSmallImages.put(book.getId(), bookImage);
-                        return new ImageHolder(bookImage, false);
-                    }
-                } catch (MalformedURLException e) {
-                    log.error(format("Exception while load img %s", book.getCoverImgAbsolutePath()), e);
+    /**
+     * Обновляет приоритет ожидающих миниатюр по снимку видимых строк.
+     * Вызывается в потоке JavaFX после раскладки таблицы; файлы здесь не читаются.
+     */
+    public void prioritizeSmallCovers(Set<UUID> visibleIds) {
+        visibleCoverIds = Set.copyOf(visibleIds);
+        if (coverExecutor instanceof CoverLoadExecutor executor) {
+            Set<Future<?>> tasks = new HashSet<>();
+            for (UUID id : visibleCoverIds) {
+                ImageHolder holder = cachedSmallImages.get(id);
+                if (holder != null && holder.loadingTask != null) {
+                    tasks.add(holder.loadingTask);
                 }
             }
+            executor.prioritize(tasks);
         }
-
-        return new ImageHolder(defaultImg, true);
     }
 
     public void deleteImagesFromCache(Book book) {
-        cashedImages.remove(book.getId());
-        cashedSmallImages.remove(book.getId());
+        cancel(cachedImages.remove(book.getId()));
+        cancel(cachedSmallImages.remove(book.getId()));
     }
 
-    private Image loadImage(String path) {
+    @Override
+    public void close() {
+        cachedImages.values().forEach(this::cancel);
+        cachedSmallImages.values().forEach(this::cancel);
+        coverExecutor.shutdownNow();
+        cachedImages.clear();
+        cachedSmallImages.clear();
+    }
+
+    private ImageHolder resolveSmallCoverAsync(Book book) {
+        String sourcePath = book.getCoverImgAbsolutePath();
+        if (!isNotBlank(sourcePath)) {
+            cancel(cachedSmallImages.remove(book.getId()));
+            return defaultCover;
+        }
+
+        return cachedSmallImages.compute(book.getId(), (id, previous) -> {
+            if (previous != null && Objects.equals(previous.sourcePath, sourcePath)) {
+                return previous;
+            }
+
+            cancel(previous);
+            ImageHolder holder = new ImageHolder(sourcePath);
+            Runnable load = () -> {
+                Image image = loadCover(sourcePath, 24, 32);
+                if (!Thread.currentThread().isInterrupted() && !holder.cancelled) {
+                    Platform.runLater(() -> {
+                        if (!holder.cancelled) {
+                            holder.image.set(image);
+                            holder.loading.set(false);
+                        }
+                    });
+                }
+            };
+            holder.loadingTask = coverExecutor instanceof CoverLoadExecutor executor
+                ? executor.submitCover(load, visibleCoverIds.contains(id))
+                : coverExecutor.submit(load);
+            return holder;
+        });
+    }
+
+    private Image loadCover(String sourcePath, double width, double height) {
+        try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(sourcePath)))) {
+            Image image = new Image(inputStream, width, height, true, true);
+            return image.isError() ? defaultImg : image;
+        } catch (IOException | IllegalArgumentException e) {
+            log.debug("Can't load book cover '{}'", sourcePath, e);
+            return defaultImg;
+        }
+    }
+
+    private void cancel(ImageHolder holder) {
+        if (holder != null) {
+            holder.cancelled = true;
+            if (holder.loadingTask != null) {
+                holder.loadingTask.cancel(true);
+            }
+        }
+    }
+
+    private Image loadImage(String path, double width, double height) {
         try (InputStream imageInputStream = this.getClass().getResourceAsStream(RESOURCE_PATH + path)) {
-            return new Image(requireNonNull(imageInputStream));
+            return new Image(requireNonNull(imageInputStream), width, height, true, true);
         } catch (IOException e) {
             throw new IllegalStateException(format("Exception while loading image by path '%s'", path), e);
         }
     }
 
-    public record ImageHolder(Image image, boolean isDefault) {}
+    public final class ImageHolder {
+
+        private final String sourcePath;
+        private final ReadOnlyObjectWrapper<Image> image = new ReadOnlyObjectWrapper<>(defaultImg);
+        private final ReadOnlyBooleanWrapper loading;
+
+        private volatile boolean cancelled;
+        private Future<?> loadingTask;
+
+        private ImageHolder(String sourcePath) {
+            this.sourcePath = sourcePath;
+            this.loading = new ReadOnlyBooleanWrapper(sourcePath != null);
+        }
+
+        public Image image() {
+            return image.get();
+        }
+
+        public ReadOnlyObjectProperty<Image> imageProperty() {
+            return image.getReadOnlyProperty();
+        }
+
+        public boolean isDefault() {
+            return isPlaceholder(image());
+        }
+
+        public boolean isLoading() {
+            return loading.get();
+        }
+
+        public ReadOnlyBooleanProperty loadingProperty() {
+            return loading.getReadOnlyProperty();
+        }
+    }
 }

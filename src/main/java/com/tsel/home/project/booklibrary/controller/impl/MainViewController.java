@@ -4,7 +4,6 @@ import static com.tsel.home.project.booklibrary.helper.SimpleApplicationContext.
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
 import static com.tsel.home.project.booklibrary.utils.table.TableComparators.CHECK_BOX_COMPARATOR;
 import static com.tsel.home.project.booklibrary.utils.table.TableComparators.NON_COMPARATOR;
-import static com.tsel.home.project.booklibrary.utils.table.TableComparators.STRING_NUMBER_COMPARATOR;
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
@@ -15,30 +14,53 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.stage.Modality.NONE;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
-import com.tsel.home.project.booklibrary.dao.data.BaseEntity;
-import com.tsel.home.project.booklibrary.dao.data.Book;
-import com.tsel.home.project.booklibrary.dao.repository.FileRepository;
 import com.tsel.home.project.booklibrary.dto.BookDTO;
-import com.tsel.home.project.booklibrary.search.SearchService;
+import com.tsel.home.project.booklibrary.filter.BookSearch;
+import com.tsel.home.project.booklibrary.filter.FilterCatalog;
+import com.tsel.home.project.booklibrary.filter.model.FilterState;
+import com.tsel.home.project.booklibrary.helper.DataExporter;
+import com.tsel.home.project.booklibrary.service.ReferenceService;
+import com.tsel.home.project.booklibrary.service.ReferenceType;
+import com.tsel.home.project.booklibrary.ui.AboutWindow;
+import com.tsel.home.project.booklibrary.ui.BookPriceFormatter;
+import com.tsel.home.project.booklibrary.ui.LineIcon;
+import com.tsel.home.project.booklibrary.ui.RandomBookAnimation;
+import com.tsel.home.project.booklibrary.ui.ReferenceEditorWindow;
+import com.tsel.home.project.booklibrary.ui.BookEditorWindow;
+import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.UpdateWindow;
+import com.tsel.home.project.booklibrary.ui.VisibleCoverPriority;
+import com.tsel.home.project.booklibrary.ui.WindowPlacement;
+import com.tsel.home.project.booklibrary.update.GitHubReleaseClient;
+import com.tsel.home.project.booklibrary.ui.filter.FilterChips;
+import com.tsel.home.project.booklibrary.ui.filter.FilterDrawer;
+import com.tsel.home.project.booklibrary.ui.filter.editor.FilterEditorRegistry;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import com.tsel.home.project.booklibrary.utils.table.TableScroll;
-import java.text.DecimalFormat;
+import java.awt.Desktop;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
-import java.util.function.ToDoubleFunction;
+import javafx.animation.PauseTransition;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -50,8 +72,12 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -76,21 +102,22 @@ public class MainViewController extends AbstractViewController {
         TABLE_COLUMNS_SETTINGS.put("readColumn", "read");
         TABLE_COLUMNS_SETTINGS.put("pagesColumn", "pages");
         TABLE_COLUMNS_SETTINGS.put("imageColumn", "cover");
-        TABLE_COLUMNS_SETTINGS.put("audioBookSiteGeneratedColumn", "hasAnyAudioBookSite");
+
 
         TABLE_COLUMNS_SORTING = new HashMap<>();
         TABLE_COLUMNS_SORTING.put("readColumn", CHECK_BOX_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("cycleEndColumn", CHECK_BOX_COMPARATOR);
-        TABLE_COLUMNS_SORTING.put("shelfColumn", STRING_NUMBER_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("nameColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("authorColumn", String.CASE_INSENSITIVE_ORDER);
         TABLE_COLUMNS_SORTING.put("cycleColumn", NON_COMPARATOR);
         TABLE_COLUMNS_SORTING.put("pagesColumn", NON_COMPARATOR);
-        TABLE_COLUMNS_SORTING.put("audioBookSiteGeneratedColumn", CHECK_BOX_COMPARATOR);
     }
 
     private final TableScroll tableScroll = getBean(TableScroll.class);
-    private final SearchService searchService = getBean(SearchService.class);
+    private final PauseTransition coverFilterRefresh = new PauseTransition(Duration.millis(100));
+    private final FilterCatalog filterCatalog = new FilterCatalog(BookDTO.class);
+    private final FilterState filterState = new FilterState();
+    private final RandomBookAnimation randomBookAnimation = new RandomBookAnimation();
 
     @FXML
     @Getter
@@ -100,59 +127,344 @@ public class MainViewController extends AbstractViewController {
     private TextField searchQueryField;
 
     @FXML
+    private Button clearSearchButton;
+
+    @FXML
     private TableView<BookDTO> bookTableView;
 
     @FXML
     private TableColumn<BookDTO, String> cycleColumn;
-    private boolean cycleColumnSortedByASC = true;
 
     @FXML
     private TableColumn<BookDTO, Integer> pagesColumn;
-    private boolean pagesColumnSortedByASC = true;
 
     private Stage lastOpenedBookViewStage;
+    @FXML
+    private Button addBookButton;
+
+    @FXML
+    private Button filtersButton;
+
+    @FXML
+    private VBox activeFilterContainer;
+
+    @FXML
+    private Label resultStatus;
+
+    private FilterChips activeFilters;
+    private FilterDrawer filterDrawer;
+    private List<BookDTO> catalogBooks = List.of();
+    private boolean compact;
+    private boolean exporting;
+
+    @FXML
+    private MenuItem exportDataItem;
+
+    @FXML
+    public void exportData() {
+        if (exporting) {
+            return;
+        }
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Папка для экспорта данных");
+        File destination = chooser.showDialog(mainAnchorPane.getScene().getWindow());
+        if (destination == null) {
+            return;
+        }
+        exporting = true;
+        exportDataItem.setDisable(true);
+        resultStatus.setText("Создание архива данных…");
+        Task<Path> task = new Task<>() {
+            @Override
+            protected Path call() throws Exception {
+                return new DataExporter().export(
+                    com.tsel.home.project.booklibrary.dao.repository.AbstractFileRepository.DEFAULT_REPOSITORY_PATH,
+                    destination.toPath()
+                );
+            }
+        };
+        task.setOnSucceeded(event -> {
+            exporting = false;
+            exportDataItem.setDisable(false);
+            updateStatus();
+            riseAlert(AlertType.INFORMATION, "Экспорт данных", "Архив сохранён", task.getValue().toString());
+        });
+        task.setOnFailed(event -> {
+            exporting = false;
+            exportDataItem.setDisable(false);
+            updateStatus();
+            log.error("Data export failed", task.getException());
+            riseAlert(AlertType.ERROR, "Экспорт данных", "Не удалось создать архив", task.getException().getMessage());
+        });
+        Thread worker = new Thread(task, "booklibrary-export");
+        worker.start();
+    }
+
+    @FXML
+    public void openApplicationDirectory() {
+        try {
+            Path location = Path.of(com.tsel.home.project.booklibrary.App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            Path directory = Files.isRegularFile(location) ? location.getParent() : Path.of("").toAbsolutePath();
+            Desktop.getDesktop().open(directory.toFile());
+        } catch (Exception e) {
+            log.error("Can't open application directory", e);
+            riseAlert(AlertType.ERROR, "Открыть директорию", "Не удалось открыть папку программы", e.getMessage());
+        }
+    }
+
+    @FXML
+    public void showAbout() {
+        AboutWindow.show(mainAnchorPane.getScene().getWindow());
+    }
+
+    @FXML
+    public void checkUpdates() {
+        new UpdateWindow(mainAnchorPane.getScene().getWindow(), new GitHubReleaseClient()).show();
+    }
+
+    @FXML
+    public void editCycles() {
+        openReferenceEditor(ReferenceType.CYCLES);
+    }
+
+    @FXML
+    public void editAuthors() {
+        openReferenceEditor(ReferenceType.AUTHORS);
+    }
+
+    @FXML
+    public void editGenres() {
+        openReferenceEditor(ReferenceType.GENRES);
+    }
+
+    @FXML
+    public void editPublishers() {
+        openReferenceEditor(ReferenceType.PUBLISHERS);
+    }
+
+    @FXML
+    public void editBookProperties() {
+        new BookEditorWindow(mainAnchorPane.getScene().getWindow(), this, this::refreshCatalog).show();
+    }
+
+    private void openReferenceEditor(ReferenceType type) {
+        ReferenceService service = new ReferenceService(bookRepository, authorRepository, cycleRepository, genreRepository, publisherRepository);
+        new ReferenceEditorWindow(mainAnchorPane.getScene().getWindow(), type, service, this::refreshCatalog).show();
+    }
+
 
     /**
      * Запуск окна контроллера
      * @param stage текущий {@link Stage}
      */
-    @SuppressWarnings("unchecked")
     public void startScene(Stage stage) {
         try {
-            cleanUpRepositoryData();    // Предварительно чистятся репозитории от лишних данных
-
-            FXMLLoader windowLoader = new FXMLLoader(this.getClass().getResource(RESOURCE_PATH + "view/main-view.fxml"));
-            Scene scene = new Scene(windowLoader.load());
-
-            stage.setTitle("Book library");
-            stage.getIcons().add(imageProvider.getWindowIcon());
-            stage.setScene(scene);
-            stage.setMinWidth(812);
-            stage.setMinHeight(700);
-
-            TableView<BookDTO> initBookTableView = (TableView<BookDTO>) windowLoader.getNamespace().get("bookTableView");
-            initTableColumns(windowLoader, initBookTableView);
-            updateTableColumns(initBookTableView);
-            initBookTableView.getItems().sort(comparing(BookDTO::getName));
-
-            initBookTableView.addEventFilter(ScrollEvent.ANY, scrollEvent -> updateTableScale(scrollEvent, initBookTableView));
-
-            addTooltip("searchHelpButton", "Подсказки для поисковых команд", windowLoader);
-            addTooltip("priceButton", "Посчитать стоимость выбранных книг", windowLoader);
-            addTooltip("audioBookSiteButton", "Управление сайтами аудиокниг", windowLoader);
-            addTooltip("randomBookButton", "Показать случайную книгу из выбранных", windowLoader);
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(RESOURCE_PATH + "view/main-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            MainViewController controller = loader.getController();
+            controller.configure(stage, scene, loader);
             stage.show();
-
+            scene.getRoot().applyCss();
         } catch (Exception e) {
-            log.error("Exception while start scene", e);
+            log.error("Exception while starting main window", e);
+            throw new IllegalStateException("Не удалось открыть библиотеку", e);
         }
     }
 
+    private void configure(Stage stage, Scene scene, FXMLLoader loader) {
+        SageTheme.install(stage, scene, "Моя библиотека", true);
+        stage.getIcons().add(imageProvider.getWindowIcon());
+        stage.setScene(scene);
+        stage.setMinWidth(812);
+        stage.setMinHeight(700);
+        initTableColumns(loader, bookTableView);
+        VisibleCoverPriority coverPriority = new VisibleCoverPriority(bookTableView, imageProvider::prioritizeSmallCovers);
+        bookTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        bookTableView.addEventFilter(ScrollEvent.SCROLL, event -> {
+            if (event.isControlDown()) { updateTableScale(event, bookTableView); event.consume(); }
+        });
+        activeFilters = new FilterChips(this::resetFilters);
+        activeFilterContainer.getChildren().add(activeFilters);
+        clearSearchButton.visibleProperty().bind(searchQueryField.textProperty().isNotEmpty());
+        searchQueryField.textProperty().addListener((observable, previous, value) -> applyFilters());
+        filterDrawer = new FilterDrawer(
+            filterCatalog, filterState, FilterEditorRegistry.defaults(),
+            () -> catalogBooks,
+            this::applyFilters, () -> {
+                updateFilterButton();
+                filtersButton.requestFocus();
+            }
+        );
+        AnchorPane.setTopAnchor(filterDrawer, 84.0);
+        AnchorPane.setBottomAnchor(filterDrawer, 28.0);
+        AnchorPane.setLeftAnchor(filterDrawer, 0.0);
+        AnchorPane.setRightAnchor(filterDrawer, 0.0);
+        mainAnchorPane.getChildren().add(filterDrawer);
+        AnchorPane.setTopAnchor(randomBookAnimation, 0.0);
+        AnchorPane.setBottomAnchor(randomBookAnimation, 0.0);
+        AnchorPane.setLeftAnchor(randomBookAnimation, 0.0);
+        AnchorPane.setRightAnchor(randomBookAnimation, 0.0);
+        mainAnchorPane.getChildren().add(randomBookAnimation);
+        coverFilterRefresh.setOnFinished(event -> {
+            filterDrawer.invalidateOptions();
+            applyFilters();
+        });
+        stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+            coverPriority.close();
+            coverFilterRefresh.stop();
+            randomBookAnimation.stop();
+            filterDrawer.dispose();
+        });
+        stage.widthProperty().addListener((o, a, b) -> updateCompact(b.doubleValue()));
+        updateCompact(1252);
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (randomBookAnimation.isVisible()) {
+                e.consume();
+                return;
+            }
+            if (filterDrawer.isOpen()) {
+                return;
+            }
+            if (e.isControlDown() && e.getCode() == KeyCode.F) {
+                searchQueryField.requestFocus();
+                searchQueryField.selectAll();
+                e.consume();
+            }
+            if (e.isControlDown() && e.getCode() == KeyCode.N) { addBook(); e.consume(); }
+        });
+        addTooltip("priceButton", "Посчитать стоимость найденных книг", loader);
+        addTooltip("randomBookButton", "Случайная непрочитанная книга из найденных", loader);
+        addBookButton.setTooltip(new Tooltip("Добавить книгу (Ctrl+N)"));
+        refreshCatalog();
+    }
+
+    private void updateCompact(double width) {
+        compact = width < 1050;
+        if (compact) { if (!mainAnchorPane.getStyleClass().contains("compact")) mainAnchorPane.getStyleClass().add("compact"); }
+        else mainAnchorPane.getStyleClass().remove("compact");
+        addBookButton.setText(compact ? "" : "Добавить книгу");
+        updateFilterButton();
+        double[] widths = compact ? new double[]{24,28,154,112,58,112,64,76,80,72}
+            : new double[]{36,40,268,190,90,180,80,88,88,80};
+        double available = Math.max(740, width - 48);
+        double total = java.util.Arrays.stream(widths).sum();
+        for (int i = 0; i < widths.length; i++) {
+            TableColumn<BookDTO, ?> column = bookTableView.getColumns().get(i);
+            column.setReorderable(false);
+            double size = Math.floor(widths[i] * available / total);
+            column.setMinWidth(size); column.setMaxWidth(size); column.setPrefWidth(size);
+        }
+        bookTableView.refresh();
+    }
+
+    /**
+     * Переключает панель; закрытие отбрасывает только черновик, а не применённые условия.
+     */
+    @FXML
+    public void toggleFilters() {
+        if (filterDrawer.isOpen()) {
+            filterDrawer.cancel();
+        } else {
+            filterDrawer.open();
+        }
+        updateFilterButton();
+    }
+
+    /**
+     * Снимает все условия, обновляет таблицу и прогревает варианты для полного каталога.
+     */
+    @FXML
+    public void resetFilters() {
+        filterState.clear();
+        searchQueryField.clear();
+        applyFilters();
+    }
+
+    @FXML
+    private void clearSearch() {
+        searchQueryField.clear();
+        searchQueryField.requestFocus();
+    }
+
+    private void updateFilterButton() {
+        int count = filterState.applied().size();
+        HBox content = new HBox(8);
+        content.setAlignment(Pos.CENTER);
+        content.getChildren().add(new LineIcon("filter"));
+        if (!compact) {
+            content.getChildren().add(new Label("Фильтры"));
+        }
+        if (count > 0) {
+            Label badge = new Label(Integer.toString(count));
+            badge.getStyleClass().add("filter-count");
+            content.getChildren().add(badge);
+        }
+        if (!compact) {
+            LineIcon chevron = new LineIcon("down");
+            chevron.setRotate(filterDrawer.isOpen() ? 180 : 0);
+            content.getChildren().add(chevron);
+        }
+        filtersButton.setText(null);
+        filtersButton.setGraphic(content);
+        filtersButton.setAccessibleText("Фильтры, активно: " + count + (filterDrawer.isOpen() ? ", закрыть" : ", открыть"));
+        filtersButton.setTooltip(new Tooltip(filtersButton.getAccessibleText()));
+    }
+
+    private void applyFilters() {
+        UUID selected = bookTableView.getSelectionModel().getSelectedItem() == null ? null
+            : bookTableView.getSelectionModel().getSelectedItem().getId();
+        List<BookDTO> all = catalogBooks;
+        List<BookDTO> results = BookSearch.search(filterCatalog.filter(all, filterState.applied()), searchQueryField.getText());
+        results = results.stream().sorted(comparing(BookDTO::getName, String.CASE_INSENSITIVE_ORDER)).toList();
+        bookTableView.setItems(observableArrayList(results));
+        bookTableView.getItems().stream()
+            .filter(book -> book.getId().equals(selected))
+            .findFirst()
+            .ifPresent(book -> bookTableView.getSelectionModel().select(book));
+        if (!bookTableView.getSortOrder().isEmpty()) {
+            bookTableView.sort();
+        }
+        activeFilters.update(filterCatalog, filterState.applied(), field -> {
+            filterState.remove(field);
+            applyFilters();
+        });
+        filterDrawer.refreshOptions();
+        updateFilterButton();
+        updateStatus();
+        VBox empty = new VBox(8);
+        empty.setAlignment(Pos.CENTER);
+        empty.getChildren().add(new Label(all.isEmpty() ? "Ещё ничего не прочитано" : "Ничего не найдено"));
+        Button action = new Button(all.isEmpty() ? "Добавить книгу" : "Сбросить");
+        action.setOnAction(event -> {
+            if (all.isEmpty()) {
+                addBook();
+            } else {
+                resetFilters();
+            }
+        });
+        empty.getChildren().add(action);
+        bookTableView.setPlaceholder(empty);
+    }
+
+    private void updateStatus() {
+        resultStatus.setText("Найдено: " + bookTableView.getItems().size() + " из " + bookRepository.getAll().size());
+    }
+
+    @FXML public void exitApplication() { SageTheme.requestClose((Stage) mainAnchorPane.getScene().getWindow()); }
+    @FXML public void openSelectedBook() {
+        BookDTO selected = bookTableView.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            if (lastOpenedBookViewStage != null) lastOpenedBookViewStage.close();
+            loadBookViewWindow(selected.getId());
+        }
+    }
+
+    @Override public void updateControllerState(UUID entityId) { refreshCatalog(); }
+
     @FXML
     public void addBook() {
-        loadModalView("Add new book", "view/add-view.fxml", 400, 15);
-        updateTableColumns(bookTableView);
+        loadModalView("Добавить книгу", "view/add-view.fxml", 0, 0);
+        refreshCatalog();
     }
 
     @FXML
@@ -166,19 +478,9 @@ public class MainViewController extends AbstractViewController {
                 }
 
                 loadBookViewWindow(clickedEntity.getId());
-                updateTableColumns(bookTableView);
+                refreshCatalog();
             }
         }
-    }
-
-    @FXML
-    public void showSearchHelp() {
-        riseAlert(
-            AlertType.INFORMATION,
-            "Подсказки команд для поиска",
-            "Подсказки команд для поиска",
-            searchService.getGeneratedTooltip()
-        );
     }
 
     @FXML
@@ -193,10 +495,10 @@ public class MainViewController extends AbstractViewController {
         int itemsSize = bookTableView.getItems().size();
 
         riseAlert(AlertType.INFORMATION, "Стоимость книг", "Стоимость книг",
-            format("Стоимость %s %s: %s руб",
+            format("Стоимость %s %s: %s",
                 itemsSize,
                 itemsSize == 1 ? "книги" : "книг",
-                new DecimalFormat("###,###").format(fullPrice)
+                BookPriceFormatter.formatTotal(fullPrice)
             )
         );
     }
@@ -204,16 +506,19 @@ public class MainViewController extends AbstractViewController {
     @FXML
     private void manageAudioBookSites() {
         loadModalView(
-            "Audiobook sites",
+            "Сайты аудиокниг",
             "view/audio-book-sites-view.fxml",
             500,
             50
         );
-        updateTableColumns(bookTableView);
+        refreshCatalog();
     }
 
     @FXML
     public void chooseRandomBook() {
+        if (randomBookAnimation.isVisible()) {
+            return;
+        }
         List<BookDTO> notReadBooks = bookTableView.getItems()
             .stream()
             .filter(bookDTO -> !bookDTO.getRead().isSelected())
@@ -223,9 +528,15 @@ public class MainViewController extends AbstractViewController {
             lastOpenedBookViewStage.close();
         }
 
+        if (notReadBooks.isEmpty()) {
+            riseAlert(AlertType.INFORMATION, "Случайная книга", "Нет непрочитанных книг", "Измените фильтры.");
+            return;
+        }
         BookDTO randomBook = notReadBooks.get(RANDOM.nextInt(notReadBooks.size()));
-        loadBookViewWindow(randomBook.getId());
-        updateTableColumns(bookTableView);
+        randomBookAnimation.play(() -> {
+            loadBookViewWindow(randomBook.getId());
+            refreshCatalog();
+        });
     }
 
     @FXML
@@ -238,35 +549,31 @@ public class MainViewController extends AbstractViewController {
                     CONFIRMATION,
                     "Внимание!",
                     "Вы уверены?",
-                    "Книга будет безвозвратно удалена из библиотеки"
+                    "Удалить книгу «" + clickedEntity.getName() + "»?"
                 );
 
                 if (answer.isOkAnswer()) {
-                    bookRepository.deleteById(clickedEntity.getId());
-                    updateTableColumns(bookTableView);
+                    bookRepository.delete(bookRepository.getById(clickedEntity.getId()));
+                    refreshCatalog();
                 }
             }
 
+        } else if (keyEvent.getCode() == KeyCode.ENTER) {
+            openSelectedBook(); keyEvent.consume();
         } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
             ButtonAnswer answer = riseAlert(CONFIRMATION, "Внимание!", "Закрыть приложение?", "");
             if (answer.isOkAnswer()) {
-                System.exit(0);
+                exitApplication();
             }
         }
     }
 
-    //todo: price <= 100 обновляет список после просмотра карточки, нужно починить
+    /**
+     * Перечитывает каталог без сброса применённых условий и раскрытия тегов.
+     */
     @FXML
-    private void search() {
-        String searchQuery = searchQueryField.getText();
-        bookTableView.setItems(observableArrayList(searchService.search(searchQuery, getDtoBooks())));
-    }
-
-    @FXML
-    private void searchLabelKeyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getCode() == KeyCode.ENTER) {
-            search();
-        }
+    public void refreshBooks() {
+        refreshCatalog();
     }
 
     // TODO: refactoring
@@ -280,7 +587,7 @@ public class MainViewController extends AbstractViewController {
 
         // Sort by cycle name + book number in cycle
         if (cycleColumn.equals(bookTableView.getSortOrder().get(0))) {
-            if (cycleColumnSortedByASC) {
+            if (cycleColumn.getSortType() == TableColumn.SortType.ASCENDING) {
                 bookTableView.getItems()
                   .sort(comparing(
                       BookDTO::getCycleName,
@@ -293,15 +600,11 @@ public class MainViewController extends AbstractViewController {
                     .thenComparing(BookDTO::getCycleNumber, this::comparatorByBookNumberInCycle)
                   );
             }
-            cycleColumnSortedByASC = !cycleColumnSortedByASC;
-
-        } else {
-            cycleColumnSortedByASC = true;
         }
 
         // Sort by pages + !read
         if (pagesColumn.equals(bookTableView.getSortOrder().get(0))) {
-            if (pagesColumnSortedByASC) {
+            if (pagesColumn.getSortType() == TableColumn.SortType.ASCENDING) {
                 bookTableView.getItems()
                   .sort(comparing(BookDTO::getRead, (c1, c2) -> Boolean.compare(c1.isSelected(), c2.isSelected()))
                     .thenComparing(BookDTO::getPages)
@@ -314,10 +617,6 @@ public class MainViewController extends AbstractViewController {
                     .reversed()
                   );
             }
-            pagesColumnSortedByASC = !pagesColumnSortedByASC;
-
-        } else {
-            pagesColumnSortedByASC = true;
         }
     }
 
@@ -345,17 +644,12 @@ public class MainViewController extends AbstractViewController {
             .toList();
     }
 
-    private double resolveCoordinate(ToDoubleFunction<Stage> getStageCoordinate, double defaultCoordinate) {
-        return lastOpenedBookViewStage != null
-            ? getStageCoordinate.applyAsDouble(lastOpenedBookViewStage)
-            : defaultCoordinate;
-    }
-
     @SuppressWarnings("unchecked")
     private void initTableColumns(FXMLLoader loader, TableView<BookDTO> bookTableView) {
         TABLE_COLUMNS_SETTINGS.forEach((columnName, fieldName) -> {
             TableColumn<BookDTO, ?> column = (TableColumn<BookDTO, ?>) loader.getNamespace().get(columnName);
             column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
+            installCellFactory(column);
 
             if (TABLE_COLUMNS_SORTING.containsKey(columnName)) {
                 column.setComparator(TABLE_COLUMNS_SORTING.get(columnName));
@@ -365,6 +659,7 @@ public class MainViewController extends AbstractViewController {
         // Проставление порядковых номеров для записей
         TableColumn<BookDTO, Number> numberColumn = (TableColumn<BookDTO, Number>) loader.getNamespace().get("numberColumn");
         numberColumn.setCellValueFactory(column -> new ReadOnlyObjectWrapper<>(bookTableView.getItems().indexOf(column.getValue()) + 1));
+        numberColumn.setStyle("-fx-alignment: CENTER;");
     }
 
     private void updateTableScale(ScrollEvent scrollEvent, TableView<BookDTO> bookTableView) {
@@ -395,13 +690,13 @@ public class MainViewController extends AbstractViewController {
             Stage stage = new Stage() {
                 @Override
                 public void hide() {
-                    updateTableColumns(bookTableView);
+                    refreshCatalog();
                     super.hide();
                 }
             };
 
             stage.setResizable(false);
-            stage.setTitle("Book info");
+            SageTheme.install(stage, scene, "Карточка книги", false);
             stage.getIcons().add(imageProvider.getWindowIcon());
             stage.setScene(scene);
             stage.initModality(NONE);
@@ -409,14 +704,12 @@ public class MainViewController extends AbstractViewController {
             Stage primaryStage = (Stage) mainAnchorPane.getScene().getWindow();
             stage.initOwner(primaryStage);
 
-            stage.setX(resolveCoordinate(Stage::getX, 550));
-            stage.setY(resolveCoordinate(Stage::getY, 150));
-
             if (bookId != null) {
                 AbstractViewController controller = loader.getController();
                 controller.initController(loader, this, bookId);
             }
 
+            WindowPlacement.positionRelativeToMainWindow(stage);
             stage.show();
             lastOpenedBookViewStage = stage;
 
@@ -425,46 +718,54 @@ public class MainViewController extends AbstractViewController {
         }
     }
 
-    private void updateTableColumns(TableView<BookDTO> bookTableView) {
-        bookTableView.setItems(observableArrayList(
-            getDtoBooks().stream()
-                .sorted(Comparator.comparing(BookDTO::getName))
-                .toList()
-        ));
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void installCellFactory(TableColumn<BookDTO, ?> column) {
+        ((TableColumn) column).setCellFactory(c -> new TableCell<BookDTO, Object>() {
+            {
+                if (java.util.Set.of("imageColumn", "cycleNumberColumn", "cycleEndColumn", "readColumn", "pagesColumn").contains(column.getId()))
+                    getStyleClass().add("numeric-cell");
+            }
+            @Override protected void updateItem(Object value, boolean empty) {
+                super.updateItem(value, empty);
+                setText(null); setGraphic(null); setTooltip(null);
+                if (empty) return;
+                setAlignment(Pos.CENTER_LEFT);
+                if (java.util.Set.of("cycleNumberColumn", "cycleEndColumn", "readColumn", "pagesColumn").contains(column.getId()))
+                    setAlignment(Pos.CENTER);
+                if (value instanceof javafx.scene.image.ImageView image) {
+                    if (!compact) {
+                        image.setFitWidth(24);
+                        image.setFitHeight(32);
+                        image.setPreserveRatio(true);
+                        setGraphic(image);
+                    }
+                } else if (value instanceof CheckBox check) {
+                    setAlignment(Pos.CENTER); setGraphic(check); check.setFocusTraversable(false); check.setMouseTransparent(true);
+                    setAccessibleText(check.isSelected() ? "Да" : "Нет");
+                } else {
+                    String text = value == null ? "—" : value.toString();
+                    if ("cycleNumberColumn".equals(column.getId())) text = text.replace("/", " из ");
+                    setText(text);
+                }
+            }
+        });
     }
 
     /**
-     * Чистка из репозиториев всех записей, не связанных с book
+     * Обновляет DTO, повторно применяет фильтры и запускает фоновый прогрев их вариантов.
+     * Один путь используется после добавления, изменения, удаления и ручного обновления.
      */
-    private void cleanUpRepositoryData() {
-        try {
-            Set<UUID> usedCycleIds = new HashSet<>();
-            Set<UUID> usedGenreIds = new HashSet<>();
-            Set<UUID> usedAuthorIds = new HashSet<>();
-            Set<UUID> usedPublisherIds = new HashSet<>();
-
-            for (Book book : bookRepository.getAll()) {
-                if (book.getCycleId() != null) usedCycleIds.add(book.getCycleId());
-                if (book.getGenreId() != null) usedGenreIds.add(book.getGenreId());
-                if (book.getAuthorId() != null) usedAuthorIds.add(book.getAuthorId());
-                if (book.getPublisherId() != null) usedPublisherIds.add(book.getPublisherId());
-            }
-
-            cleanUpRepository(cycleRepository, usedCycleIds);
-            cleanUpRepository(genreRepository, usedGenreIds);
-            cleanUpRepository(authorRepository, usedAuthorIds);
-            cleanUpRepository(publisherRepository, usedPublisherIds);
-
-        } catch (Exception e) {
-            log.error("Exception while cleaning repository data", e);
+    private void refreshCatalog() {
+        if (filterDrawer != null) {
+            catalogBooks = getDtoBooks();
+            List<BookDTO> currentBooks = catalogBooks;
+            currentBooks.forEach(book -> book.getCover().imageProperty().addListener((observable, previous, image) -> {
+                if (catalogBooks == currentBooks && imageProvider.isPlaceholder(previous) != imageProvider.isPlaceholder(image)) {
+                    coverFilterRefresh.playFromStart();
+                }
+            }));
+            applyFilters();
         }
     }
 
-    private <T extends BaseEntity<UUID>, R extends FileRepository<UUID, T>> void cleanUpRepository(R repository, Set<UUID> userIdSet) {
-        repository.getAll()
-            .stream()
-            .map(BaseEntity::getId)
-            .filter(id -> !userIdSet.contains(id))
-            .forEach(repository::deleteById);
-    }
 }

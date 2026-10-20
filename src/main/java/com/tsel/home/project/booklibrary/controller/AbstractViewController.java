@@ -11,6 +11,13 @@ import com.tsel.home.project.booklibrary.dao.repository.impl.PublisherRepository
 import com.tsel.home.project.booklibrary.dao.repository.impl.UserSettingsRepository;
 import com.tsel.home.project.booklibrary.helper.ImageProvider;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
+import com.tsel.home.project.booklibrary.ui.SageDialogs;
+import com.tsel.home.project.booklibrary.ui.SageTheme;
+import com.tsel.home.project.booklibrary.ui.WindowPlacement;
+import com.tsel.home.project.booklibrary.controller.impl.book.AbstractBookController;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
 import java.net.URI;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +26,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,10 +59,15 @@ public abstract class AbstractViewController {
      * @return Результат вызова
      */
     protected ButtonAnswer riseAlert(Alert.AlertType alertType, String title, String warnMsg, String explanationMsg) {
-        Alert warnAlert = new Alert(alertType);
-        warnAlert.setTitle(title);
-        warnAlert.setHeaderText(warnMsg);
-        warnAlert.setContentText(explanationMsg);
+        ButtonType accept = new ButtonType(alertType == Alert.AlertType.CONFIRMATION ? "Продолжить" : "Понятно", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        javafx.stage.Window owner = getMainAnchorPane() == null || getMainAnchorPane().getScene() == null
+            ? null
+            : getMainAnchorPane().getScene().getWindow();
+        Alert warnAlert = SageDialogs.create(
+            owner, alertType, title, warnMsg, explanationMsg,
+            alertType == Alert.AlertType.CONFIRMATION ? new ButtonType[] {accept, cancel} : new ButtonType[] {accept}
+        );
 
         log.info("Raised alert {} with message '{}'", alertType, explanationMsg);
         return new ButtonAnswer(warnAlert.showAndWait().orElse(null));
@@ -92,7 +105,7 @@ public abstract class AbstractViewController {
 
             Stage stage = new Stage();
             stage.setResizable(false);
-            stage.setTitle(modalViewTitle);
+            SageTheme.install(stage, scene, modalViewTitle, false);
             stage.getIcons().add(imageProvider.getWindowIcon());
             stage.setScene(scene);
             stage.initModality(Modality.WINDOW_MODAL);
@@ -105,12 +118,32 @@ public abstract class AbstractViewController {
 
             AbstractViewController controller = loader.getController();
             controller.initController(loader, this, initParameters);
+            if (controller instanceof AbstractBookController bookController) {
+                bookController.configureWindow(stage);
+                WindowPlacement.positionRelativeToMainWindow(stage);
+            } else {
+                stage.setX(primaryStage.getX() + Math.max(0, (primaryStage.getWidth() - scene.getRoot().prefWidth(-1)) / 2));
+                Rectangle2D bounds = Screen.getScreensForRectangle(
+                    primaryStage.getX(),
+                    primaryStage.getY(),
+                    primaryStage.getWidth(),
+                    primaryStage.getHeight()
+                )
+                    .stream()
+                    .findFirst()
+                    .orElse(Screen.getPrimary())
+                    .getVisualBounds();
+
+                stage.setX(Math.max(bounds.getMinX(), Math.min(stage.getX(), bounds.getMaxX() - scene.getRoot().prefWidth(-1))));
+                stage.setY(Math.max(bounds.getMinY(), Math.min(stage.getY(), bounds.getMaxY() - scene.getRoot().prefHeight(-1))));
+            }
 
             log.info("Opening modal window {}", modalViewResourceFile);
             stage.showAndWait();
 
         } catch (Exception e) {
             log.error("Exception while load model view", e);
+            riseAlert(Alert.AlertType.ERROR, "Ошибка", "Не удалось открыть окно", "Повторите попытку. Подробности доступны в журнале приложения.");
         }
     }
 

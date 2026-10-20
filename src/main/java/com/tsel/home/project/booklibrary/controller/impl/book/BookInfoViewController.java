@@ -1,241 +1,120 @@
 package com.tsel.home.project.booklibrary.controller.impl.book;
 
-import static com.tsel.home.project.booklibrary.utils.CollectionUtils.isNotEmpty;
-import static com.tsel.home.project.booklibrary.utils.StringUtils.isNotBlank;
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
-
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
-import com.tsel.home.project.booklibrary.dao.data.Author;
-import com.tsel.home.project.booklibrary.dao.data.Book;
-import com.tsel.home.project.booklibrary.dao.data.Cycle;
-import com.tsel.home.project.booklibrary.dao.data.Genre;
-import com.tsel.home.project.booklibrary.dao.data.Publisher;
-import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
-import java.text.DecimalFormat;
+import com.tsel.home.project.booklibrary.dao.data.*;
+import com.tsel.home.project.booklibrary.ui.BookPriceFormatter;
 import java.util.UUID;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
 import lombok.Getter;
 
+/**
+ * Отображает сохранённые данные книги и уведомляет родительский контроллер об изменениях.
+ * Стоимость форматируется по общему правилу, совпадающему с семантикой фильтров.
+ */
 @Getter
 public class BookInfoViewController extends AbstractViewController {
-
-    private static final double NORMAL_FONT_SIZE = 18f;
-    private static final double SMALL_FONT_SIZE = 14f;
-
-    // Основные элементы
-
-    @FXML
-    private AnchorPane mainAnchorPane;
-
-    @FXML
-    private Button deleteBookButton;
-
-    @FXML
-    private Button editBookButton;
-
-    @FXML
-    private Button viewAudioBookSitesButton;
-
-    // Элементы отображения
-
-    @FXML
-    private Label nameLabel;
-
-    @FXML
-    private Label priceLabel;
-
-    @FXML
-    private Label authorLabel;
-
-    @FXML
-    private Label genreLabel;
-
-    @FXML
-    private Label publisherLabel;
-
-    @FXML
-    private Label pageCountLabel;
-
-    @FXML
-    private Label publicationYearLabel;
-
-    @FXML
-    private CheckBox readCheckBox;
-
-    @FXML
-    private CheckBox isHardCoverCheckBox;
-
-    @FXML
-    private CheckBox autographCheckBox;
-
-    @FXML
-    private Label cycleLabel;
-
-    @FXML
-    private CheckBox cycleEndedCheckBox;
-
-    @FXML
-    private ImageView coverImage;
-
-    // Заголовки левой части отображения, которые необходимо скрывать
-
-    @FXML
-    private Label cycleTitle;
-
-    @FXML
-    private Label cycleEndedTitle;
-
-
+    @FXML private AnchorPane mainAnchorPane;
+    @FXML private Button deleteBookButton;
+    @FXML private Button editBookButton;
+    @FXML private Label nameLabel;
+    @FXML private Label authorLabel;
+    @FXML private Label publisherLabel;
+    @FXML private Label pageCountLabel;
+    @FXML private Label publicationYearLabel;
+    @FXML private Label genreLabel;
+    @FXML private Label hardCoverLabel;
+    @FXML private Label readLabel;
+    @FXML private Label autographLabel;
+    @FXML private Label priceLabel;
+    @FXML private Label cycleLabel;
+    @FXML private Label cycleEndedLabel;
+    @FXML private ImageView coverImage;
     private Book bookForView;
+    private AbstractViewController parentController;
 
-    @Override
-    public void initController(FXMLLoader loader, AbstractViewController parentController, Object... initParameters) {
-        UUID bookId = (UUID) initParameters[0];
-        if (bookId == null) {
-            throw new IllegalStateException("Entity ID for view controller is not passed!");
-        }
-        this.bookForView = bookRepository.getById(bookId);
-        if (this.bookForView == null) {
-            throw new IllegalStateException(format("Not found book by ID '%s' for book info controller", bookId));
-        }
+    /**
+     * Связывает карточку с родительским окном и загружает книгу по идентификатору.
+     */
+    @Override public void initController(FXMLLoader loader, AbstractViewController parent, Object... parameters) {
+        parentController = parent;
+        updateControllerState((UUID) parameters[0]);
+    }
 
+    /**
+     * Перечитывает книгу после редактирования и обновляет фильтры родительской библиотеки.
+     */
+    @Override public void updateControllerState(UUID id) {
+        bookForView = bookRepository.getById(id);
+        if (bookForView == null) { closeWindow(); return; }
         updateBookViewInfo();
+        if (parentController != null) parentController.updateControllerState(id);
     }
 
-    @Override
-    public void updateControllerState(UUID bookId) {
-        this.bookForView = bookRepository.getById(bookId);
-        if (this.bookForView == null) {
-            throw new IllegalStateException(format("Not found book by ID '%s' for book info controller", bookId));
-        }
-
-        updateBookViewInfo();
+    /**
+     * Закрывает карточку по Escape без изменения данных.
+     */
+    @FXML public void stageKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) { closeWindow(); event.consume(); }
     }
 
-    @FXML
-    public void stageKeyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            Stage stage = (Stage) editBookButton.getScene().getWindow();
-            stage.close();
+    /**
+     * Закрывает карточку; родительское окно сохраняет свои применённые фильтры.
+     */
+    @FXML public void closeWindow() { closeStage(mainAnchorPane); }
 
-        } else if (keyEvent.getCode() == KeyCode.ENTER) {
-            editBook();
-        }
+    /**
+     * Открывает редактор книги и перечитывает сохранённые данные после его закрытия.
+     */
+    @FXML public void editBook() {
+        loadModalView("Изменить книгу", "view/edit-view.fxml", 165, -32, bookForView.getId());
+        updateControllerState(bookForView.getId());
     }
 
-    @FXML
-    public void editBook() {
-        loadModalView(
-            "Edit book", "view/edit-view.fxml",
-            165,
-            -25,
-            bookForView.getId()
-        );
-        updateBookViewInfo();
-    }
-
-    @FXML
-    public void audioBookSitesView() {
-        loadModalView(
-            "Audio Book Sites", "view/audio-book-sites-connections-view.fxml",
-            165,
-            0,
-            bookForView.getAudioBookSiteIds()
-        );
-        updateBookViewInfo();
-    }
-
-    @FXML
-    public void deleteBook() {
-        ButtonAnswer answer = riseAlert(
-            CONFIRMATION,
-            "Внимание!",
-            "Вы уверены?",
-            "Книга будет безвозвратно удалена из библиотеки"
-        );
-
-        if (answer.isOkAnswer()) {
+    /**
+     * Запрашивает подтверждение, удаляет книгу и уведомляет родителя для обновления таблицы и кеша.
+     */
+    @FXML public void deleteBook() {
+        if (!riseAlert(Alert.AlertType.CONFIRMATION, "Удаление книги", "Удалить «" + bookForView.getName() + "»?",
+            "Книга будет безвозвратно удалена из библиотеки.").isOkAnswer()) return;
+        try {
             bookRepository.delete(bookForView);
-
-            Stage stage = (Stage) deleteBookButton.getScene().getWindow();
-            stage.close();
+            if (parentController != null) parentController.updateControllerState(bookForView.getId());
+            closeWindow();
+        } catch (RuntimeException e) {
+            riseAlert(Alert.AlertType.ERROR, "Ошибка", "Не удалось удалить книгу", "Повторите попытку. Подробности доступны в журнале.");
         }
     }
 
     private void updateBookViewInfo() {
-        setTextWithSizeControl(nameLabel, bookForView.getName());
-        setTextWithSizeControl(authorLabel,
-            ofNullable(authorRepository.getById(bookForView.getAuthorId()))
-                .map(Author::getName)
-                .orElse(null)
-        );
-        setTextWithSizeControl(publisherLabel,
-            ofNullable(publisherRepository.getById(bookForView.getPublisherId()))
-                .map(Publisher::getName)
-                .orElse(null)
-        );
-        setTextWithSizeControl(genreLabel,
-            ofNullable(genreRepository.getById(bookForView.getGenreId()))
-                .map(Genre::getName)
-                .orElse(null)
-        );
-
-        pageCountLabel.setText(String.valueOf(bookForView.getPages()));
-        publicationYearLabel.setText(String.valueOf(bookForView.getPublicationYear()));
-        priceLabel.setText(resolvePrice(bookForView.getPrice()));
-
-        readCheckBox.setSelected(bookForView.getRead());
-        autographCheckBox.setSelected(Boolean.TRUE.equals(bookForView.getAutograph()));
-        isHardCoverCheckBox.setSelected(Boolean.TRUE.equals(bookForView.getHardCover()));
-
-        if (bookForView.getCycleId() != null && cycleRepository.existById(bookForView.getCycleId())) {
-            Cycle cycle = cycleRepository.getById(bookForView.getCycleId());
-
-            setTextWithSizeControl(cycleLabel, cycle.getName());
-            cycleLabel.setText(format("%s (%d / %d)", cycle.getName(), bookForView.getNumberInSeries(), cycle.getBooksInCycle()));
-            cycleEndedCheckBox.setSelected(cycle.getEnded());
-
-            cycleTitle.setVisible(true);
-            cycleLabel.setVisible(true);
-            cycleEndedTitle.setVisible(true);
-            cycleEndedCheckBox.setVisible(true);
-
-        } else {
-            cycleTitle.setVisible(false);
-            cycleLabel.setVisible(false);
-            cycleEndedTitle.setVisible(false);
-            cycleEndedCheckBox.setVisible(false);
-        }
-
-        coverImage.setImage(imageProvider.resolveCover(bookForView));
-        viewAudioBookSitesButton.setVisible(isNotEmpty(bookForView.getAudioBookSiteIds()));
+        setValue(nameLabel, bookForView.getName());
+        Author author = authorRepository.getById(bookForView.getAuthorId());
+        Publisher publisher = publisherRepository.getById(bookForView.getPublisherId());
+        Genre genre = genreRepository.getById(bookForView.getGenreId());
+        setValue(authorLabel, author == null ? null : author.getName());
+        setValue(publisherLabel, publisher == null ? null : publisher.getName());
+        setValue(genreLabel, genre == null ? null : genre.getName());
+        setValue(pageCountLabel, bookForView.getPages());
+        setValue(publicationYearLabel, bookForView.getPublicationYear());
+        setValue(hardCoverLabel, yesNo(bookForView.getHardCover()));
+        setValue(readLabel, yesNo(bookForView.getRead()));
+        setValue(autographLabel, yesNo(bookForView.getAutograph()));
+        setValue(priceLabel, BookPriceFormatter.format(bookForView.getPrice()));
+        Cycle cycle = cycleRepository.getById(bookForView.getCycleId());
+        setValue(cycleLabel, cycle == null ? null : cycle.getName() + " · " + bookForView.getNumberInSeries() + " из " + cycle.getBooksInCycle());
+        setValue(cycleEndedLabel, cycle == null ? null : yesNo(cycle.getEnded()));
+        coverImage.imageProperty().bind(imageProvider.resolveCover(bookForView).imageProperty());
     }
 
-    private String resolvePrice(Double price) {
-        if (price == null) return "Бесценно";
-        if (price == 0.0) return "Подарок";
-        return new DecimalFormat("###,###").format(price) + " руб.";
-    }
+    private String yesNo(Boolean value) { return Boolean.TRUE.equals(value) ? "Да" : "Нет"; }
 
-    private void setTextWithSizeControl(Label label, String text) {
-        Font labelFont = label.getFont();
-        if (isNotBlank(text) && text.length() > 34) {
-            label.setFont(new Font(labelFont.getName(), SMALL_FONT_SIZE));
-        } else {
-            label.setFont(new Font(labelFont.getName(), NORMAL_FONT_SIZE));
-        }
+    private void setValue(Label label, Object value) {
+        String text = value == null ? "—" : value.toString();
         label.setText(text);
     }
 }

@@ -1,12 +1,12 @@
 package com.tsel.home.project.booklibrary.controller.impl.audiobook;
 
-import static com.tsel.home.project.booklibrary.utils.CollectionUtils.isNotEmpty;
 import static com.tsel.home.project.booklibrary.utils.StringUtils.isBlank;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 import com.tsel.home.project.booklibrary.controller.AbstractViewController;
 import com.tsel.home.project.booklibrary.dao.data.AudioBookSite;
 import com.tsel.home.project.booklibrary.dto.AudioBookSiteDTO;
+import com.tsel.home.project.booklibrary.service.AudioBookSiteService;
 import com.tsel.home.project.booklibrary.utils.table.AudioBookSiteNameEditableColumn;
 import com.tsel.home.project.booklibrary.utils.table.ButtonAnswer;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -72,15 +72,12 @@ public class AudioBookSiteController extends AbstractAudioBookSiteController {
             );
 
             if (answer.isOkAnswer()) {
-                bookRepository.getAll()
-                    .stream()
-                    .filter(book -> isNotEmpty(book.getAudioBookSiteIds()))
-                    .forEach(book -> {
-                        book.getAudioBookSiteIds().remove(clickedEntity.getId());
-                        bookRepository.save(book);
-                    });
-
-                audioBookSiteRepository.deleteById(clickedEntity.getId());
+                try {
+                    new AudioBookSiteService(bookRepository, audioBookSiteRepository).delete(clickedEntity.getId());
+                } catch (RuntimeException e) {
+                    riseAlert(javafx.scene.control.Alert.AlertType.ERROR, "Ошибка", "Не удалось удалить аудиосайт", e.getMessage());
+                    return;
+                }
                 updateBookSiteTableItems(audioBookSiteTable);
             }
         }

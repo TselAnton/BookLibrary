@@ -1,7 +1,7 @@
 package com.tsel.home.project.booklibrary.dao.data;
 
-import com.tsel.home.project.booklibrary.dao.annotation.EntityDisplayName;
 import com.tsel.home.project.booklibrary.dao.annotation.Property;
+import com.tsel.home.project.booklibrary.dao.schema.StorageEntity;
 import java.io.Serial;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityDisplayName("Автор")
+@StorageEntity(value = "author", displayName = "Автор", version = 1)
 public class Author implements BaseEntity<UUID> {
 
     @Serial

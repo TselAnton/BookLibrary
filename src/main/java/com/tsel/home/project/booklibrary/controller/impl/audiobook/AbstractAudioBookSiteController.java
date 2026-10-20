@@ -8,6 +8,8 @@ import com.tsel.home.project.booklibrary.converter.AudioBookSiteConverter;
 import com.tsel.home.project.booklibrary.dao.repository.impl.AudioBookSiteRepository;
 import com.tsel.home.project.booklibrary.dto.AudioBookSiteDTO;
 import java.util.Comparator;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.AnchorPane;
@@ -17,9 +19,12 @@ public abstract class AbstractAudioBookSiteController extends AbstractViewContro
     protected final AudioBookSiteConverter audioBookSiteConverter = new AudioBookSiteConverter();
     protected final AudioBookSiteRepository audioBookSiteRepository = getBean(AudioBookSiteRepository.class);
 
+    @FXML
+    private AnchorPane mainAnchorPane;
+
     @Override
     protected AnchorPane getMainAnchorPane() {
-        return null;
+        return mainAnchorPane;
     }
 
     /**
@@ -43,6 +48,8 @@ public abstract class AbstractAudioBookSiteController extends AbstractViewContro
     @SafeVarargs
     protected final void initTableView(TableView<AudioBookSiteDTO> audioBookSiteTableView, TableColumn<AudioBookSiteDTO, ?>... tableColumns) {
         audioBookSiteTableView.setEditable(true);
+        audioBookSiteTableView.setPlaceholder(new Label("Сайты аудиокниг пока не добавлены"));
+        audioBookSiteTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
         audioBookSiteTableView.getColumns().addAll(tableColumns);
         updateBookSiteTableItems(audioBookSiteTableView);
     }

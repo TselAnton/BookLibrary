@@ -1,7 +1,9 @@
 package com.tsel.home.project.booklibrary.dao.data;
 
-import com.tsel.home.project.booklibrary.dao.annotation.EntityDisplayName;
 import com.tsel.home.project.booklibrary.dao.annotation.Property;
+import com.tsel.home.project.booklibrary.dao.schema.NullPolicy;
+import com.tsel.home.project.booklibrary.dao.schema.StorageEntity;
+import com.tsel.home.project.booklibrary.dao.schema.StorageField;
 import java.io.Serial;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -15,7 +17,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityDisplayName("Цикл")
+@StorageEntity(value = "cycle", displayName = "Цикл", version = 1)
 public class Cycle implements BaseEntity<UUID> {
 
     @Serial
@@ -28,8 +30,10 @@ public class Cycle implements BaseEntity<UUID> {
     private String name;
 
     @Property(value = "законченный цикл", nullable = false)
+    @StorageField(defaultJson = "false", onNull = NullPolicy.USE_DEFAULT)
     private Boolean ended = false;
 
     @Property(value = "книг в цикле", nullable = false)
+    @StorageField(defaultJson = "1", onNull = NullPolicy.USE_DEFAULT)
     private Integer booksInCycle = 1;
 }
